@@ -1,0 +1,115 @@
+/* Generic Section */
+fieldset {
+	border: 1px solid #ccc;
+	margin: 1em .3em 2.5em .3em;
+}
+fieldset legend {
+	border: 1px solid #ccc;
+	color: #999;
+	padding: .2em 1.5em .2em 20px;
+	font-size: small;
+	background-repeat: no-repeat;
+	background-position: left;
+
+}
+
+body {
+	font-family: Arial, sans-serif;
+	font-weight: lighter;
+	font-size: 12px;
+}
+div#rawmetadata textarea{
+	height: 400px;
+}
+div#certs textarea{
+	height: 140px;
+}
+textarea {
+	font-family: "Monaco", monospace;
+	font-size: 90%;
+	width: 100%;
+	height: 70px;
+	border: 1px solid #ccc;
+}
+
+p {
+	color: #777;
+	font-size: small;
+}
+button {
+	margin: 4px; padding: 4px;
+}
+
+
+/* Metadata tab */
+
+
+
+/* Information tab */
+div#tabs div#info div.infonamediv select { width: auto; }
+div#tabs div#info div.infonamediv input { width: 400px; }
+div#tabs div#info div.infonamediv button { width: auto; }
+
+div#tabs div#info div.infodescrdiv {
+	margin-bottom: 1em;
+}
+
+div#info fieldset legend {
+	background-image: url('../icons/information.png');
+}
+div#info fieldset.description legend {
+	background-image: url('../icons/note_edit.png');
+}
+
+
+/* SAML SP tab */
+
+div#saml2sp fieldset legend {
+	background-image: url('../icons/bullet_wrench.png');
+}
+div#tabs div#saml2sp div.endpointfield.endpointfield-location {
+	clear: both;
+}
+div#tabs div#saml2sp div.endpointfield input {
+	width: 400px ! important;
+}
+div#tabs div#saml2sp div.endpointfield label {
+	width: 200px ! important;
+	display: block;
+	color: #999;
+	font-size: small;
+}
+div#tabs div#saml2sp div.endpointfield {
+	float: left;
+	margin: 2px 10px 5px 10px;
+/*	width: 45%;*/
+}
+
+
+
+/* Contacts tab */
+div#tabs div#contact div.contactfield input {
+	width: 200px ! important;
+}
+div#tabs div#contact div.contactfield label {
+	width: 200px ! important;
+	display: block;
+	color: #999;
+	font-size: small;
+}
+div#tabs div#contact div.contactfield {
+	float: left;
+	margin: 2px 10px 10px 10px;
+/*	width: 45%;*/
+}
+div#contact fieldset legend {
+	background-image: url('../icons/vcard.png');
+}
+
+
+/* Certificates tab */
+
+div#certs fieldset legend {
+	background-image: url('../icons/lock.png');
+
+}
