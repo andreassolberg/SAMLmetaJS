@@ -73,14 +73,6 @@ if(typeof(DOMParser) === 'undefined') {
 
 			SAMLmetaJS.UI.setEntityID(entitydescriptor.entityid);
 
-			// Add existing contacts (from XML)
-			SAMLmetaJS.UI.clearContacts();
-			if (entitydescriptor.contacts) {
-				for (i = 0; i < entitydescriptor.contacts.length; i++ ) {
-					SAMLmetaJS.UI.addContact(entitydescriptor.contacts[i]);
-				}
-			}
-
 			// Add name and description
 			SAMLmetaJS.UI.clearInfoname();
 			if (entitydescriptor.name) {
@@ -169,17 +161,7 @@ if(typeof(DOMParser) === 'undefined') {
 				if (!$(element).find('div > textarea').val()) return;
 				entitydescriptor.descr[$(element).find('div > select').val()] = $(element).find('div > textarea').val();
 			});
-			$('div#contact fieldset').each(function(index, element) {
 
-				if (!$(element).find('input').eq(1).attr('value')) return;
-
-				var newContact = {};
-				newContact.contactType	= $(element).find('select').val();
-				newContact.givenName	= $(element).find('input').eq(0).attr('value');
-				newContact.surName		= $(element).find('input').eq(1).attr('value');
-				newContact.emailAddress	= $(element).find('input').eq(2).attr('value');
-				entitydescriptor.contacts.push(newContact);
-			});
 			$('div#saml2sp fieldset').each(function(index, element) {
 
 				if (!$(element).find('input').eq(0).attr('value')) return;
@@ -242,7 +224,6 @@ if(typeof(DOMParser) === 'undefined') {
 
 		$("a[href='#rawmetadata']").click(toXML);
 		$("a[href='#info']").click(fromXML);
-		$("a[href='#contact']").click(fromXML);
 		$("a[href='#attributes']").click(fromXML);
 		$("a[href='#location']").click(fromXML);
 		$("a[href='#saml2sp']").click(fromXML);
@@ -275,10 +256,6 @@ if(typeof(DOMParser) === 'undefined') {
 		$("div#info button.adddescr").click(function(e) {
 			e.preventDefault();
 			SAMLmetaJS.UI.addInfodescr('en', '');
-		});
-		$("div#contact button.addcontact").click(function(e) {
-			e.preventDefault();
-			SAMLmetaJS.UI.addContact({});
 		});
 		$("div#saml2sp button.addendpoint").click(function(e) {
 			e.preventDefault();
