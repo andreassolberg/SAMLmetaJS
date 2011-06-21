@@ -16,6 +16,7 @@
 		},
 
 		fromXML: function (entitydescriptor) {
+            var i;
 			if (!entitydescriptor.entityAttributes) {
 				return;
 			}
@@ -31,14 +32,16 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#contact fieldset').each(function (index, element) {
-
-				if (!$(element).find('input').eq(1).attr('value')) return;
-
 				var newContact = {};
-				newContact.contactType	= $(element).find('select').val();
-				newContact.givenName	= $(element).find('input').eq(0).attr('value');
-				newContact.surName		= $(element).find('input').eq(1).attr('value');
-				newContact.emailAddress	= $(element).find('input').eq(2).attr('value');
+
+				if (!$(element).find('input').eq(1).attr('value')) {
+                    return;
+                }
+
+				newContact.contactType = $(element).find('select').val();
+				newContact.givenName = $(element).find('input').eq(0).attr('value');
+				newContact.surName = $(element).find('input').eq(1).attr('value');
+				newContact.emailAddress = $(element).find('input').eq(2).attr('value');
 				entitydescriptor.contacts.push(newContact);
 			});
 		}
