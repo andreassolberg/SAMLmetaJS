@@ -16,7 +16,7 @@
 		},
 
 		fromXML: function (entitydescriptor) {
-            var i;
+			var i;
 			if (!entitydescriptor.entityAttributes) {
 				return;
 			}
@@ -35,8 +35,8 @@
 				var newContact = {};
 
 				if (!$(element).find('input').eq(1).attr('value')) {
-                    return;
-                }
+					return;
+				}
 
 				newContact.contactType = $(element).find('select').val();
 				newContact.givenName = $(element).find('input').eq(0).attr('value');
