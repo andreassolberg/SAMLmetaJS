@@ -87,14 +87,18 @@ SAMLmetaJS.sync = function(node, options) {
 		SAMLmetaJS.UI.clearInfoname();
 		if (entitydescriptor.name) {
 			for (l in entitydescriptor.name) {
-				SAMLmetaJS.UI.addInfoname(l, entitydescriptor.name[l]);
+				if (entitydescriptor.name.hasOwnProperty(l)) {
+					SAMLmetaJS.UI.addInfoname(l, entitydescriptor.name[l]);
+				}
 			}
 		}
 
 		SAMLmetaJS.UI.clearInfodescr();
 		if (entitydescriptor.descr) {
 			for (l in entitydescriptor.descr) {
-				SAMLmetaJS.UI.addInfodescr(l, entitydescriptor.descr[l]);
+				if (entitydescriptor.descr.hasOwnProperty(l)) {
+					SAMLmetaJS.UI.addInfodescr(l, entitydescriptor.descr[l]);
+				}
 			}
 		}
 
@@ -111,7 +115,9 @@ SAMLmetaJS.sync = function(node, options) {
 		SAMLmetaJS.UI.clearCerts();
 		if (entitydescriptor.certs) {
 			for (l in entitydescriptor.certs) {
-				SAMLmetaJS.UI.addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
+				if (entitydescriptor.certs.hasOwnProperty(l)) {
+					SAMLmetaJS.UI.addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
+				}
 			}
 		}
 
