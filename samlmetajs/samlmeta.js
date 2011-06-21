@@ -1,22 +1,22 @@
-if (typeof console == "undefined" || typeof console.log == "undefined") var console = { log: function() {} };
+if (typeof console === "undefined" || typeof console.log === "undefined") var console = { log: function() {} };
 
 // Hack to initiatlize a DOMParser in browser that do not support this natively.
 // Hack found here:
 //  https://sites.google.com/a/van-steenbeek.net/archive/explorer_domparser_parsefromstring
 //
-if(typeof(DOMParser) == 'undefined') {
+if(typeof(DOMParser) === 'undefined') {
 	DOMParser = function() {};
 	DOMParser.prototype.parseFromString = function(str, contentType) {
 		var xmldata = null;
 
-		if(typeof(ActiveXObject) != 'undefined') {
+		if(typeof(ActiveXObject) !== 'undefined') {
 			xmldata = new ActiveXObject('MSXML.DomDocument');
 
 			xmldata.async = false;
 			xmldata.loadXML(str);
 			return xmldata;
 
-		} else if(typeof(XMLHttpRequest) != 'undefined') {
+		} else if(typeof(XMLHttpRequest) !== 'undefined') {
 			xmldata = new XMLHttpRequest();
 			if(!contentType) {
 				contentType = 'application/xml';
