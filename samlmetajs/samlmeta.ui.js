@@ -27,7 +27,7 @@ SAMLmetaJS.Constants = {
 		'fr': 'Français',
 		'it': 'Italian',
 		'nl': 'Nederlands',
-		'lb': 'Luxembourgish', 
+		'lb': 'Luxembourgish',
 		'cs': 'Czech',
 		'sl': 'Slovenščina',
 		'lt': 'Lietuvių kalba',
@@ -133,7 +133,7 @@ SAMLmetaJS.Constants = {
 
 
 
-// This object allows you to update UI elements on the page, using various 
+// This object allows you to update UI elements on the page, using various
 // simple functions to add and clear UI elements.
 SAMLmetaJS.UI = {
 
@@ -181,20 +181,20 @@ SAMLmetaJS.UI = {
 
 		// SAMLmetaJS.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 		SAMLmetaJS.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-	
+
 		SAMLmetaJS.mapmarker = new google.maps.Marker({
 			position: latLng,
 			title: 'Point A',
 			map: SAMLmetaJS.map,
 			draggable: true
 		});
-	
+
 		tabnode.tabs({
 			"show": function(event, ui) {
 				if (ui.panel.id == "location") {
 					console.log('google resize');
 					google.maps.event.trigger(SAMLmetaJS.map, 'resize');
-			        // SAMLmetaJS.map.checkResize(); 
+			        // SAMLmetaJS.map.checkResize();
 			    }
 			}
 		});
@@ -218,35 +218,35 @@ SAMLmetaJS.UI = {
 			updateMarkerStatus('Drag ended');
 			updateMarkerPosition(SAMLmetaJS.mapmarker.getPosition());
 			geocodePosition(SAMLmetaJS.mapmarker.getPosition());
-			
+
 			$("input#includeLocation").attr('checked', true);
 		});
 
 
-		
-		
-		
+
+
+
 	},
 
 	"embrace": function(node) {
-	
+
 
 		$(node).wrap('<div id="rawmetadata"></div>');
 		$(node).parent().wrap('<div id="tabs" />');
-	
-		
+
+
 		var metatab = $(node).parent();
 		var tabnode = $(node).parent().parent();
 
 		var pluginTabs = {'list': [], 'content': []};
 		SAMLmetaJS.pluginEngine.execute('addTab', [pluginTabs]);
 
-		
+
 		metatab.append('<div>' +
 							'<button class="prettify">Pretty format</button>' +
 							'<button class="wipe">Wipe</button>' +
 						'</div>');
-		
+
 		tabnode.prepend('<ul>' +
 							'<li><a href="#rawmetadata">Metadata</a></li>' +
 							'<li><a href="#info">Information</a></li>' +
@@ -294,7 +294,7 @@ SAMLmetaJS.UI = {
 							'  <p><input type="checkbox" id="includeLocation" name="includeLocation" /> ' +
 							'   <label for="includeLocation">Associate this entity with the location below.' +
 							' Drag the marker to set the correct location.</label></p>' +
-							'  <p><input type="input" id="geolocation" style="width: 30em" disabled="disabled" name="location" value="" />' + 
+							'  <p><input type="input" id="geolocation" style="width: 30em" disabled="disabled" name="location" value="" />' +
 							'   <span id="locationDescr"></span>' +
 							'  </p>' +
 							' </div>' +
@@ -325,11 +325,11 @@ SAMLmetaJS.UI = {
 
 						'</div>'  + pluginTabs.content.join(''));
 
-		
+
 		this.maps(tabnode);
-	
+
 	},
-	
+
 
 
 
@@ -351,7 +351,7 @@ SAMLmetaJS.UI = {
 	"addInfoname": function(lang, name) {
 		var infoHTML;
 		var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
-		
+
 		infoHTML = '<div class="infonamediv">' +
 				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
 
@@ -362,20 +362,20 @@ SAMLmetaJS.UI = {
 				checked = ' selected="selected" ';
 				languageFound = true;
 			}
-			infoHTML += '<option value="' + language + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.languages[language] + 
+			infoHTML += '<option value="' + language + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.languages[language] +
 				'</option>';
 		}
 		if (!languageFound) {
 			infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
 		}
-		
-		
+
+
 		infoHTML += '</select>' +
 			'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 			'<button style="" class="removename">Remove</button>' +
-			'</div>' 
-		
+			'</div>'
+
 
 		$(infoHTML).appendTo("div#info div#infoname").find('button.removename').click(function(e) {
 			e.preventDefault();
@@ -385,10 +385,10 @@ SAMLmetaJS.UI = {
 	"addInfodescr": function(lang, descr) {
 		var infoHTML;
 		var randID = 'infodescr' + Math.floor(Math.random() * 10000 + 1000);
-		
+
 		infoHTML = '<div class="infodescrdiv"><div>' +
 				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-		
+
 		var languageFound = false;
 		for (var language in SAMLmetaJS.Constants.languages) {
 			var checked = '';
@@ -396,22 +396,22 @@ SAMLmetaJS.UI = {
 				checked = ' selected="selected" ';
 				languageFound = true;
 			}
-			infoHTML += '<option value="' + language + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.languages[language] + 
+			infoHTML += '<option value="' + language + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.languages[language] +
 				'</option>';
 		}
 		if (!languageFound) {
 			infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
 		}
-		
-		
-		infoHTML += '</select>' + 
+
+
+		infoHTML += '</select>' +
 			'<button style="" class="removedescr">Remove</button>' +
 			'</div><div>' +
 			'<textarea name="' + randID + '-name-name" id="' + randID + '-name">' + (descr || '') + '</textarea>' +
 
-			'</div></div>' 
-		
+			'</div></div>'
+
 		$(infoHTML).appendTo("div#info div#infodescr").find('button.removedescr').click(function(e) {
 			e.preventDefault();
 			$(e.target).closest('div.infodescrdiv').remove();
@@ -420,23 +420,23 @@ SAMLmetaJS.UI = {
 
 
 	"addCert": function(use, cert) {
-		
+
 		var infoHTML;
 		var randID = 'cert' + Math.floor(Math.random() * 10000 + 1000);
-		
+
 		infoHTML = '<fieldset><legend>Certificate</legend>' +
 				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">';
-		
+
 
 		for (var key in SAMLmetaJS.Constants.certusage) {
 			var checked = '';
 			if (key == use) checked = ' selected="selected" ';
-			infoHTML += '<option value="' + key + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.certusage[key] + 
+			infoHTML += '<option value="' + key + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.certusage[key] +
 				'</option>';
 		}
-		
-		
+
+
 		infoHTML += '</select>' +
 			'<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>' +
 			'<button style="display: block" class="removecert">Remove</button>' +
@@ -455,9 +455,9 @@ SAMLmetaJS.UI = {
 		$("div#contact > div.content").empty();
 	},
 	"addContact": function(contact) {
-		
+
 		var randID = Math.floor(Math.random() * 10000 + 1000);
-		
+
 		var contactHTML = '<fieldset><legend>Contact</legend>' +
 
 			'<div>' +
@@ -468,34 +468,34 @@ SAMLmetaJS.UI = {
 		for (var contactType in SAMLmetaJS.Constants.contactTypes) {
 			var checked = '';
 			if (contact.contactType == contactType) checked = ' selected="selected" ';
-			contactHTML += '<option value="' + contactType + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.contactTypes[contactType] + 
+			contactHTML += '<option value="' + contactType + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.contactTypes[contactType] +
 				'</option>';
 		}
-		
-		
+
+
 		contactHTML += '</select>' +
 			'</div>' +
-			
+
 			'<div class="contactfield">' +
 				'<label for="contact-' + randID + '-givenname">Given name: </label>' +
 				'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-givenname" value="' + (contact.givenName || '') + '" />' +
 			'</div>' +
-			
+
 			'<div class="contactfield">' +
 				'<label for="contact-' + randID + '-surname">Surname: </label>' +
 				'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-surname" value="' + (contact.surName || '') + '" />' +
 			'</div>' +
-			
+
 			'<div class="contactfield">' +
 				'<label for="contact-' + randID + '-email">E-mail: </label>' +
 				'<input type="text" name="contact-' + randID + '-email-name" id="contact-' + randID + '-email" value="' + (contact.emailAddress || '')+ '" />' +
 			'</div>' +
-			
+
 			'<button style="display: block; clear: both" class="remove">Remove</button>' +
-			
+
 		'</fieldset>';
-		
+
 
 		$(contactHTML).appendTo("div#contact > div.content").find('button.remove').click(function(e) {
 			e.preventDefault();
@@ -508,9 +508,9 @@ SAMLmetaJS.UI = {
 	},
 	"addEndpoint": function(endpoint, endpointname) {
 
-		var checked, endpointHTML;		
+		var checked, endpointHTML;
 		var randID ='endpoint-' + Math.floor(Math.random() * 10000 + 1000);
-		
+
 		// ---- Type of endpoint selector
 		endpointHTML = '<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>' +
 			'<div class="endpointfield">' +
@@ -522,19 +522,19 @@ SAMLmetaJS.UI = {
 			if (endpointType == endpointname) {
 				checked = ' selected="selected" ';
 			}
-			endpointHTML += '<option value="' + endpointType + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.endpointTypes.sp[endpointType] + 
+			endpointHTML += '<option value="' + endpointType + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.endpointTypes.sp[endpointType] +
 				'</option>';
 		}
 		endpointHTML += '</select></div>';
-		
+
 		if (endpoint.index) {
 			endpointHTML += '<input type="hidden" class="datafield-index" id="' + randID + '-binding" name="' + randID + '-index-name" value="' +
 				endpoint.index + '" />';
 		}
-		
 
-		// ---- Binding		
+
+		// ---- Binding
 		endpointHTML += '<div class="endpointfield"><label for="' + randID + '-binding">Binding: </label>' +
 				'<select class="datafield-binding" name="' + randID + '-binding-name" id="' + randID + '-binding">';
 
@@ -545,32 +545,32 @@ SAMLmetaJS.UI = {
 				checked = ' selected="selected" ';
 				foundBinding = true;
 			}
-			endpointHTML += '<option value="' + binding + '" ' + checked + '>' + 
-				SAMLmetaJS.Constants.bindings[binding] + 
+			endpointHTML += '<option value="' + binding + '" ' + checked + '>' +
+				SAMLmetaJS.Constants.bindings[binding] +
 				'</option>';
 		}
 		if (endpoint.Binding && !foundBinding) {
-			endpointHTML += '<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>';			
+			endpointHTML += '<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>';
 		}
 		endpointHTML += '</select>' +
 			'</div>';
-		
-		
+
+
 		// Text field for location
 		endpointHTML +=	'<div class="endpointfield endpointfield-location">' +
 				'<label for="' + randID + '-location">  Location</label>' +
 				'<input class="datafield-location" type="text" name="' + randID + '-location-name" id="contact-' + randID + '-location" value="' + (endpoint.Location || '') + '" /></div>';
-		
+
 		// Text field for response location
-		endpointHTML +=	'<div class="endpointfield">' + 
+		endpointHTML +=	'<div class="endpointfield">' +
 				'<label for="' + randID + '-locationresponse">  Response location</label>' +
 				'<input class="datafield-responselocation" type="text" name="' + randID + '-locationresponse-name" id="contact-' + randID + '-locationresponse" value="' + (endpoint.ResponseLocation || '') + '" />' +
 			'</div>';
-		
-			
+
+
 		endpointHTML += '<button style="display: block; clear: both" class="remove">Remove</button>' +
 			'</fieldset>';
-		
+
 		$(endpointHTML).appendTo("div#saml2sp > div.content").find('button.remove').click(function(e) {
 			e.preventDefault();
 			$(e.target).closest('fieldset').remove();
@@ -578,20 +578,20 @@ SAMLmetaJS.UI = {
 
 	},
 	"setAttributes": function(attributes) {
-	
+
 		if (!attributes) attributes = {};
-	
+
 		var attributeHTML, checked;
 		attributeHTML = '';
 		for(var attrname in SAMLmetaJS.Constants.attributes) {
 			checked = (attributes[attrname] ? 'checked="checked"' : '');
-			attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' + 
+			attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
 				'<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
 
 		}
 		attributeHTML += '<br style="height: 0px; clear: both" />';
 		$("div#attributes > div.content").empty();
-		$("div#attributes > div.content").append(attributeHTML);		
+		$("div#attributes > div.content").append(attributeHTML);
 	},
 };
 
