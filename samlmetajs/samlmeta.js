@@ -9,7 +9,7 @@ if(typeof(DOMParser) === 'undefined') {
 	DOMParser.prototype.parseFromString = function(str, contentType) {
 		var xmldata = null;
 
-		if(typeof(ActiveXObject) !== 'undefined') {
+		if (typeof(ActiveXObject) !== 'undefined') {
 			xmldata = new ActiveXObject('MSXML.DomDocument');
 
 			xmldata.async = false;
@@ -40,7 +40,7 @@ SAMLmetaJS.pluginEngine = {
 	'execute': function(hook, parameters) {
 		var plugin;
 		if (!SAMLmetaJS.plugins) return;
-		for(plugin in SAMLmetaJS.plugins) {
+		for (plugin in SAMLmetaJS.plugins) {
 			if (SAMLmetaJS.plugins[plugin][hook]) {
 				console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
 				SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
@@ -78,7 +78,7 @@ SAMLmetaJS.sync = function(node, options) {
 		// Add existing contacts (from XML)
 		SAMLmetaJS.UI.clearContacts();
 		if (entitydescriptor.contacts) {
-			for(i = 0; i < entitydescriptor.contacts.length; i++ ) {
+			for (i = 0; i < entitydescriptor.contacts.length; i++ ) {
 				SAMLmetaJS.UI.addContact(entitydescriptor.contacts[i]);
 			}
 		}
@@ -123,7 +123,7 @@ SAMLmetaJS.sync = function(node, options) {
 
 			for (endpoint in entitydescriptor.saml2sp) {
 
-				if(entitydescriptor.saml2sp[endpoint].length > 0) {
+				if (entitydescriptor.saml2sp[endpoint].length > 0) {
 					for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
 						SAMLmetaJS.UI.addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
 					}
