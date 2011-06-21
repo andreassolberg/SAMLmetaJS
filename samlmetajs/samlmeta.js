@@ -5,18 +5,19 @@ if (typeof console == "undefined" || typeof console.log == "undefined") var cons
 //  https://sites.google.com/a/van-steenbeek.net/archive/explorer_domparser_parsefromstring
 //
 if(typeof(DOMParser) == 'undefined') {
-	DOMParser = function() {}
+	DOMParser = function() {};
 	DOMParser.prototype.parseFromString = function(str, contentType) {
+		var xmldata = null;
 
 		if(typeof(ActiveXObject) != 'undefined') {
-			var xmldata = new ActiveXObject('MSXML.DomDocument');
+			xmldata = new ActiveXObject('MSXML.DomDocument');
 
 			xmldata.async = false;
 			xmldata.loadXML(str);
 			return xmldata;
 
 		} else if(typeof(XMLHttpRequest) != 'undefined') {
-			var xmldata = new XMLHttpRequest;
+			xmldata = new XMLHttpRequest();
 			if(!contentType) {
 				contentType = 'application/xml';
 			}
@@ -29,7 +30,7 @@ if(typeof(DOMParser) == 'undefined') {
 			xmldata.send(null);
 			return xmldata.responseXML;
 		}
-	}
+	};
 }
 
 var SAMLmetaJS = {};
@@ -37,8 +38,9 @@ SAMLmetaJS.plugins = {};
 
 SAMLmetaJS.pluginEngine = {
 	'execute': function(hook, parameters) {
+		var plugin;
 		if (!SAMLmetaJS.plugins) return;
-		for(var plugin in SAMLmetaJS.plugins) {
+		for(plugin in SAMLmetaJS.plugins) {
 			if (SAMLmetaJS.plugins[plugin][hook]) {
 				console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
 				SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
@@ -58,6 +60,7 @@ SAMLmetaJS.sync = function(node, options) {
 	// This section extracts the information from the Metadata XML document,
 	// and updates the UI elements to reflect that.
 	var fromXML = function () {
+		var i, l, endpoint;
 
 		if (currentTab !== 'xml') return;
 		currentTab = 'other';
@@ -75,7 +78,7 @@ SAMLmetaJS.sync = function(node, options) {
 		// Add existing contacts (from XML)
 		SAMLmetaJS.UI.clearContacts();
 		if (entitydescriptor.contacts) {
-			for(var i= 0; i < entitydescriptor.contacts.length; i++ ) {
+			for(i = 0; i < entitydescriptor.contacts.length; i++ ) {
 				SAMLmetaJS.UI.addContact(entitydescriptor.contacts[i]);
 			}
 		}
@@ -83,14 +86,14 @@ SAMLmetaJS.sync = function(node, options) {
 		// Add name and description
 		SAMLmetaJS.UI.clearInfoname();
 		if (entitydescriptor.name) {
-			for (var l in entitydescriptor.name) {
+			for (l in entitydescriptor.name) {
 				SAMLmetaJS.UI.addInfoname(l, entitydescriptor.name[l]);
 			}
 		}
 
 		SAMLmetaJS.UI.clearInfodescr();
 		if (entitydescriptor.descr) {
-			for (var l in entitydescriptor.descr) {
+			for (l in entitydescriptor.descr) {
 				SAMLmetaJS.UI.addInfodescr(l, entitydescriptor.descr[l]);
 			}
 		}
@@ -107,7 +110,7 @@ SAMLmetaJS.sync = function(node, options) {
 
 		SAMLmetaJS.UI.clearCerts();
 		if (entitydescriptor.certs) {
-			for (var l in entitydescriptor.certs) {
+			for (l in entitydescriptor.certs) {
 				SAMLmetaJS.UI.addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
 			}
 		}
@@ -118,10 +121,10 @@ SAMLmetaJS.sync = function(node, options) {
 		SAMLmetaJS.UI.clearEndpoints();
 		if (entitydescriptor.saml2sp) {
 
-			for (var endpoint in entitydescriptor.saml2sp) {
+			for (endpoint in entitydescriptor.saml2sp) {
 
 				if(entitydescriptor.saml2sp[endpoint].length > 0) {
-					for (var i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
+					for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
 						SAMLmetaJS.UI.addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
 					}
 				}
@@ -313,4 +316,4 @@ SAMLmetaJS.sync = function(node, options) {
 			SAMLmetaJS.sync(this, options);
 		});
 	};
-})(jQuery);
+}(jQuery));
