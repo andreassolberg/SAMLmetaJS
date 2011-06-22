@@ -137,97 +137,6 @@ SAMLmetaJS.Constants = {
 // simple functions to add and clear UI elements.
 SAMLmetaJS.UI = {
 
-	"maps": function(tabnode) {
-		var geocoder = new google.maps.Geocoder();
-
-		function geocodePosition(pos) {
-			geocoder.geocode({
-				latLng: pos
-			}, function(responses) {
-				if (responses && responses.length > 0) {
-					updateMarkerAddress(responses[0].formatted_address);
-				} else {
-					updateMarkerAddress('Cannot determine address at this location.');
-				}
-			});
-		}
-
-		function updateMarkerStatus(str) {
-//			$("#locationDescr").html(str);
-//			document.getElementById('markerStatus').innerHTML = str;
-		}
-
-		function updateMarkerPosition(latLng) {
-			$("input#geolocation").val(latLng.lat() + ',' + latLng.lng());
-			// document.getElementById('info').innerHTML = [
-			// latLng.lat(),
-			// latLng.lng()
-			// ].join(', ');
-		}
-
-		function updateMarkerAddress(str) {
-			$("#locationDescr").html(str);
-//			document.getElementById('address').innerHTML = str;
-		}
-
-
-
-		var latLng = new google.maps.LatLng(53.852527,14.238281);
-		var myOptions = {
-			zoom: 4,
-			center: latLng,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-
-		// SAMLmetaJS.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-		SAMLmetaJS.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-		SAMLmetaJS.mapmarker = new google.maps.Marker({
-			position: latLng,
-			title: 'Point A',
-			map: SAMLmetaJS.map,
-			draggable: true
-		});
-
-		tabnode.tabs({
-			"show": function(event, ui) {
-				if (ui.panel.id == "location") {
-					console.log('google resize');
-					google.maps.event.trigger(SAMLmetaJS.map, 'resize');
-			        // SAMLmetaJS.map.checkResize();
-			    }
-			}
-		});
-
-
-		// Update current position info.
-		updateMarkerPosition(latLng);
-		geocodePosition(latLng);
-
-		// Add dragging event listeners.
-		google.maps.event.addListener(SAMLmetaJS.mapmarker, 'dragstart', function() {
-			updateMarkerAddress('Dragging...');
-		});
-
-		google.maps.event.addListener(SAMLmetaJS.mapmarker, 'drag', function() {
-			updateMarkerStatus('Dragging...');
-			updateMarkerPosition(SAMLmetaJS.mapmarker.getPosition());
-		});
-
-		google.maps.event.addListener(SAMLmetaJS.mapmarker, 'dragend', function() {
-			updateMarkerStatus('Drag ended');
-			updateMarkerPosition(SAMLmetaJS.mapmarker.getPosition());
-			geocodePosition(SAMLmetaJS.mapmarker.getPosition());
-
-			$("input#includeLocation").attr('checked', true);
-		});
-
-
-
-
-
-	},
-
 	"embrace": function(node) {
 
 
@@ -249,26 +158,11 @@ SAMLmetaJS.UI = {
 
 		tabnode.prepend('<ul>' +
 							'<li><a href="#rawmetadata">Metadata</a></li>' +
-							'<li><a href="#location">Location</a></li>' +
 							'<li><a href="#saml2sp">SAML Endpoints</a></li>' +
 							'<li><a href="#certs">Certificates</a></li>' +
 							pluginTabs.list.join('') +
 						'</ul>');
-		tabnode.append('<div id="location">' +
-							'<div class="content">' +
-							' <div id="map_info">' +
-							'  <p><input type="checkbox" id="includeLocation" name="includeLocation" /> ' +
-							'   <label for="includeLocation">Associate this entity with the location below.' +
-							' Drag the marker to set the correct location.</label></p>' +
-							'  <p><input type="input" id="geolocation" style="width: 30em" disabled="disabled" name="location" value="" />' +
-							'   <span id="locationDescr"></span>' +
-							'  </p>' +
-							' </div>' +
-							' <div id="map_canvas" style="width:100%; height:500px"></div>' +
-							'</div>' +
-						'</div>' +
-
-						'<div id="saml2sp">' +
+		tabnode.append('<div id="saml2sp">' +
 							'<div class="content"></div>' +
 							'<div><button class="addendpoint">Add new endpoint</button></div>' +
 						'</div>' +
@@ -280,9 +174,6 @@ SAMLmetaJS.UI = {
 
 						'</div>'  + pluginTabs.content.join(''));
 
-
-		this.maps(tabnode);
-
 	},
 
 
@@ -292,10 +183,6 @@ SAMLmetaJS.UI = {
 
 	"setEntityID": function(entityid) {
 		$("input#entityid").val(entityid);
-	},
-	"setLocation": function(location) {
-		$("input#geolocation").val(location);
-		$("input#includeLocation").attr('checked', true);
 	},
 
 	"addCert": function(use, cert) {
