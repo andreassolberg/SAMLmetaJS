@@ -73,25 +73,6 @@ if(typeof(DOMParser) === 'undefined') {
 
 			SAMLmetaJS.UI.setEntityID(entitydescriptor.entityid);
 
-			// Add name and description
-			SAMLmetaJS.UI.clearInfoname();
-			if (entitydescriptor.name) {
-				for (l in entitydescriptor.name) {
-					if (entitydescriptor.name.hasOwnProperty(l)) {
-						SAMLmetaJS.UI.addInfoname(l, entitydescriptor.name[l]);
-					}
-				}
-			}
-
-			SAMLmetaJS.UI.clearInfodescr();
-			if (entitydescriptor.descr) {
-				for (l in entitydescriptor.descr) {
-					if (entitydescriptor.descr.hasOwnProperty(l)) {
-						SAMLmetaJS.UI.addInfodescr(l, entitydescriptor.descr[l]);
-					}
-				}
-			}
-
 			if (entitydescriptor.location) {
 				SAMLmetaJS.UI.setLocation(entitydescriptor.location);
 				var spl = entitydescriptor.location.split(',');
@@ -152,15 +133,6 @@ if(typeof(DOMParser) === 'undefined') {
 			};
 
 			entitydescriptor.entityid = $('input#entityid').val();
-
-			$('div#infoname > div').each(function(index, element) {
-				if (!$(element).children('input').attr('value')) return;
-				entitydescriptor.name[$(element).children('select').val()] = $(element).children('input').attr('value');
-			});
-			$('div#infodescr > div').each(function(index, element) {
-				if (!$(element).find('div > textarea').val()) return;
-				entitydescriptor.descr[$(element).find('div > select').val()] = $(element).find('div > textarea').val();
-			});
 
 			$('div#saml2sp fieldset').each(function(index, element) {
 
@@ -223,7 +195,6 @@ if(typeof(DOMParser) === 'undefined') {
 		// Initialization of the automatic reflection between UI elements and XML
 
 		$("a[href='#rawmetadata']").click(toXML);
-		$("a[href='#info']").click(fromXML);
 		$("a[href='#attributes']").click(fromXML);
 		$("a[href='#location']").click(fromXML);
 		$("a[href='#saml2sp']").click(fromXML);
@@ -248,14 +219,6 @@ if(typeof(DOMParser) === 'undefined') {
 		$("div#rawmetadata button.wipe").click(function(e) {
 			e.preventDefault();
 			$(node).val('');
-		});
-		$("div#info button.addname").click(function(e) {
-			e.preventDefault();
-			SAMLmetaJS.UI.addInfoname('en', '');
-		});
-		$("div#info button.adddescr").click(function(e) {
-			e.preventDefault();
-			SAMLmetaJS.UI.addInfodescr('en', '');
 		});
 		$("div#saml2sp button.addendpoint").click(function(e) {
 			e.preventDefault();
