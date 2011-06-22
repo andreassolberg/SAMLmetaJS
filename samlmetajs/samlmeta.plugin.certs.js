@@ -35,7 +35,9 @@
 				var use = $(element).find('select.certuse').val();
 				var cert = $(element).find('textarea.certdata').val();
 
-				if (!use || !cert) return;
+				if (!use || !cert) {
+					return;
+				}
 
 				if (!entitydescriptor.certs) {
 					entitydescriptor.certs = [];
