@@ -249,7 +249,6 @@ SAMLmetaJS.UI = {
 
 		tabnode.prepend('<ul>' +
 							'<li><a href="#rawmetadata">Metadata</a></li>' +
-							'<li><a href="#info">Information</a></li>' +
  							'<li><a href="#contact">Contacts</a></li>' +
 							'<li><a href="#location">Location</a></li>' +
 							'<li><a href="#attributes">Attributes</a></li>' +
@@ -257,33 +256,7 @@ SAMLmetaJS.UI = {
 							'<li><a href="#certs">Certificates</a></li>' +
 							pluginTabs.list.join('') +
 						'</ul>');
-		tabnode.append('<div id="info">' +
-
-							'<fieldset class="entityid"><legend>Entity ID</legend>' +
-								'<div id="div-entityid">' +
-									'<input style="width: 600px" type="text" name="entityid" id="entityid" value="" />' +
-									'<p style="margin: 0px">The format MUST be an URI.</p>' +
-								'</div>' +
-							'</fieldset>' +
-
-							'<fieldset class="name"><legend>Name of Service</legend>' +
-								'<div id="infoname"></div>' +
-								'<div>' +
-									'<button class="addname">Add name in one more language</button>' +
-								'</div>' +
-							'</fieldset>' +
-
-
-							'<fieldset class="description"><legend>Description of Service</legend>' +
-								'<div id="infodescr"></div>' +
-								'<div>' +
-									'<button class="adddescr">Add description in one more language</button>' +
-								'</div>' +
-							'</fieldset>' +
-
-						'</div>' +
-
-						'<div id="contact">' +
+		tabnode.append('<div id="contact">' +
 							'<div class="content"></div>' +
 							'<div><button class="addcontact">Add new contact</button></div>' +
 						'</div>' +
@@ -335,12 +308,6 @@ SAMLmetaJS.UI = {
 
 
 
-	"clearInfoname": function() {
-		$("div#info div#infoname").empty();
-	},
-	"clearInfodescr": function() {
-		$("div#info div#infodescr").empty();
-	},
 	"setEntityID": function(entityid) {
 		$("input#entityid").val(entityid);
 	},
@@ -348,76 +315,6 @@ SAMLmetaJS.UI = {
 		$("input#geolocation").val(location);
 		$("input#includeLocation").attr('checked', true);
 	},
-	"addInfoname": function(lang, name) {
-		var infoHTML;
-		var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
-
-		infoHTML = '<div class="infonamediv">' +
-				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-
-		var languageFound = false;
-		for (var language in SAMLmetaJS.Constants.languages) {
-			var checked = '';
-			if (lang == language) {
-				checked = ' selected="selected" ';
-				languageFound = true;
-			}
-			infoHTML += '<option value="' + language + '" ' + checked + '>' +
-				SAMLmetaJS.Constants.languages[language] +
-				'</option>';
-		}
-		if (!languageFound) {
-			infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
-		}
-
-
-		infoHTML += '</select>' +
-			'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
-			'<button style="" class="removename">Remove</button>' +
-			'</div>'
-
-
-		$(infoHTML).appendTo("div#info div#infoname").find('button.removename').click(function(e) {
-			e.preventDefault();
-			$(e.target).closest('div.infonamediv').remove();
-		});
-	},
-	"addInfodescr": function(lang, descr) {
-		var infoHTML;
-		var randID = 'infodescr' + Math.floor(Math.random() * 10000 + 1000);
-
-		infoHTML = '<div class="infodescrdiv"><div>' +
-				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-
-		var languageFound = false;
-		for (var language in SAMLmetaJS.Constants.languages) {
-			var checked = '';
-			if (lang == language) {
-				checked = ' selected="selected" ';
-				languageFound = true;
-			}
-			infoHTML += '<option value="' + language + '" ' + checked + '>' +
-				SAMLmetaJS.Constants.languages[language] +
-				'</option>';
-		}
-		if (!languageFound) {
-			infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
-		}
-
-
-		infoHTML += '</select>' +
-			'<button style="" class="removedescr">Remove</button>' +
-			'</div><div>' +
-			'<textarea name="' + randID + '-name-name" id="' + randID + '-name">' + (descr || '') + '</textarea>' +
-
-			'</div></div>'
-
-		$(infoHTML).appendTo("div#info div#infodescr").find('button.removedescr').click(function(e) {
-			e.preventDefault();
-			$(e.target).closest('div.infodescrdiv').remove();
-		});
-	},
-
 
 	"addCert": function(use, cert) {
 
