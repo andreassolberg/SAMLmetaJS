@@ -47,17 +47,17 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#infoname > div').each(function (index, element) {
-                var value = $(element).children('input').attr('value');
+				var value = $(element).children('input').attr('value');
 				if (!value) {
-                    return;
-                }
+					return;
+				}
 				entitydescriptor.name[$(element).children('select').val()] = value;
 			});
 			$('div#infodescr > div').each(function (index, element) {
-                var value = $(element).find('div > textarea').val();
+				var value = $(element).find('div > textarea').val();
 				if (!value) {
-                    return;
-                }
+					return;
+				}
 				entitydescriptor.descr[$(element).find('div > select').val()] = value;
 			});
 		}
