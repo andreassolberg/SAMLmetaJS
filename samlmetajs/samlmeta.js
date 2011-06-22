@@ -73,15 +73,6 @@ if(typeof(DOMParser) === 'undefined') {
 
 			SAMLmetaJS.UI.setEntityID(entitydescriptor.entityid);
 
-			if (entitydescriptor.location) {
-				SAMLmetaJS.UI.setLocation(entitydescriptor.location);
-				var spl = entitydescriptor.location.split(',');
-				var latLng = new google.maps.LatLng(spl[0],spl[1]);
-
-				SAMLmetaJS.map.panTo(latLng);
-				SAMLmetaJS.mapmarker.setPosition(latLng);
-			}
-
 			SAMLmetaJS.UI.clearCerts();
 			if (entitydescriptor.certs) {
 				for (l in entitydescriptor.certs) {
@@ -145,10 +136,6 @@ if(typeof(DOMParser) === 'undefined') {
 				entitydescriptor.saml2sp[endpointType].push(newEndpoint);
 			});
 
-			if ($("input#includeLocation").attr('checked')) {
-				entitydescriptor.location = $("input#geolocation").val();
-			}
-
 			delete entitydescriptor.certs;
 			$('div#certs fieldset').each(function(index, element) {
 
@@ -186,7 +173,6 @@ if(typeof(DOMParser) === 'undefined') {
 		// Initialization of the automatic reflection between UI elements and XML
 
 		$("a[href='#rawmetadata']").click(toXML);
-		$("a[href='#location']").click(fromXML);
 		$("a[href='#saml2sp']").click(fromXML);
 		$("a[href='#certs']").click(fromXML);
 
