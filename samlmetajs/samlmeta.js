@@ -106,9 +106,6 @@ if(typeof(DOMParser) === 'undefined') {
 				}
 			}
 
-			// Set attributes
-			SAMLmetaJS.UI.setAttributes(entitydescriptor.attributes);
-
 
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
 		};
@@ -146,12 +143,6 @@ if(typeof(DOMParser) === 'undefined') {
 				newEndpoint.ResponseLocation	= $(element).find('input.datafield-responselocation').attr('value');
 				newEndpoint.index				= $(element).find('input.datafield-index').attr('value');
 				entitydescriptor.saml2sp[endpointType].push(newEndpoint);
-			});
-			$('div#attributes div').each(function(index, element) {
-
-				$(element).find('input:checked').each(function(index2, element2) {
-					entitydescriptor.attributes[$(element2).attr('name')] = 1;
-				});
 			});
 
 			if ($("input#includeLocation").attr('checked')) {
@@ -195,7 +186,6 @@ if(typeof(DOMParser) === 'undefined') {
 		// Initialization of the automatic reflection between UI elements and XML
 
 		$("a[href='#rawmetadata']").click(toXML);
-		$("a[href='#attributes']").click(fromXML);
 		$("a[href='#location']").click(fromXML);
 		$("a[href='#saml2sp']").click(fromXML);
 		$("a[href='#certs']").click(fromXML);
@@ -227,18 +217,6 @@ if(typeof(DOMParser) === 'undefined') {
 		$("div#certs button.addcert").click(function(e) {
 			e.preventDefault();
 			SAMLmetaJS.UI.addCert('both', '');
-		});
-		$("div#attributes button.selectall").click(function(e) {
-			e.preventDefault();
-			$("div#attributes div.content input:checkbox").each(function(index, box) {
-				$(box).attr('checked', 'checked');
-			});
-		});
-		$("div#attributes button.unselectall").click(function(e) {
-			e.preventDefault();
-			$("div#attributes div.content input:checkbox").each(function(index, box) {
-				$(box).removeAttr('checked');
-			});
 		});
 
 	};
