@@ -251,7 +251,6 @@ SAMLmetaJS.UI = {
 							'<li><a href="#rawmetadata">Metadata</a></li>' +
  							'<li><a href="#contact">Contacts</a></li>' +
 							'<li><a href="#location">Location</a></li>' +
-							'<li><a href="#attributes">Attributes</a></li>' +
 							'<li><a href="#saml2sp">SAML Endpoints</a></li>' +
 							'<li><a href="#certs">Certificates</a></li>' +
 							pluginTabs.list.join('') +
@@ -273,17 +272,6 @@ SAMLmetaJS.UI = {
 							' </div>' +
 							' <div id="map_canvas" style="width:100%; height:500px"></div>' +
 							'</div>' +
-						'</div>' +
-
-						'<div id="attributes">' +
-
-							'<div class="content"></div>' +
-
-							'<div>' +
-								'<button class="selectall">Select all</button>' +
-								'<button class="unselectall">Unselect all</button>' +
-							'</div>' +
-
 						'</div>' +
 
 						'<div id="saml2sp">' +
@@ -473,23 +461,7 @@ SAMLmetaJS.UI = {
 			$(e.target).closest('fieldset').remove();
 		});
 
-	},
-	"setAttributes": function(attributes) {
-
-		if (!attributes) attributes = {};
-
-		var attributeHTML, checked;
-		attributeHTML = '';
-		for(var attrname in SAMLmetaJS.Constants.attributes) {
-			checked = (attributes[attrname] ? 'checked="checked"' : '');
-			attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
-				'<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
-
-		}
-		attributeHTML += '<br style="height: 0px; clear: both" />';
-		$("div#attributes > div.content").empty();
-		$("div#attributes > div.content").append(attributeHTML);
-	},
+	}
 };
 
 

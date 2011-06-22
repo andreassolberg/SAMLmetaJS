@@ -20,16 +20,39 @@
 		},
 
 		addTab: function (pluginTabs) {
+			pluginTabs.list.push('<li><a href="#attributes">Attributes</a></li>');
+			pluginTabs.content.push(
+				'<div id="attributes">' +
 
+					'<div class="content"></div>' +
+
+					'<div>' +
+						'<button class="selectall">Select all</button>' +
+						'<button class="unselectall">Unselect all</button>' +
+					'</div>' +
+
+				'</div>'
+			);
 		},
 
 		fromXML: function (entitydescriptor) {
-			if (!entitydescriptor.entityAttributes) {
+			var attributeHTML, checked, attrname;
+			if (!entitydescriptor.attributes) {
 				return;
 			}
 
 			// Set attributes
-			SAMLmetaJS.UI.setAttributes(entitydescriptor.attributes);
+			attributeHTML = '';
+			for(attrname in SAMLmetaJS.Constants.attributes) {
+                if (SAMLmetaJS.Constants.attributes.hasOwnProperty(attrname)) {
+				    checked = (entitydescriptor.attributes[attrname] ? 'checked="checked"' : '');
+				    attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
+					    '<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
+                }
+			}
+			attributeHTML += '<br style="height: 0px; clear: both" />';
+			$("div#attributes > div.content").empty();
+			$("div#attributes > div.content").append(attributeHTML);
 		},
 
 		toXML: function (entitydescriptor) {
