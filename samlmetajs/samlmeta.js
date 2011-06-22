@@ -58,7 +58,7 @@ if(typeof(DOMParser) === 'undefined') {
 		// This section extracts the information from the Metadata XML document,
 		// and updates the UI elements to reflect that.
 		var fromXML = function () {
-			var i, l, endpoint;
+			var i, l;
 
 			if (currentTab !== 'xml') return;
 			currentTab = 'other';
@@ -81,22 +81,6 @@ if(typeof(DOMParser) === 'undefined') {
 					}
 				}
 			}
-
-			// Add existing endpoints (from XML)
-			SAMLmetaJS.UI.clearEndpoints();
-			if (entitydescriptor.saml2sp) {
-
-				for (endpoint in entitydescriptor.saml2sp) {
-
-					if (entitydescriptor.saml2sp[endpoint].length > 0) {
-						for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
-							SAMLmetaJS.UI.addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
-						}
-					}
-
-				}
-			}
-
 
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
 		};
@@ -121,20 +105,6 @@ if(typeof(DOMParser) === 'undefined') {
 			};
 
 			entitydescriptor.entityid = $('input#entityid').val();
-
-			$('div#saml2sp fieldset').each(function(index, element) {
-
-				if (!$(element).find('input').eq(0).attr('value')) return;
-
-				var newEndpoint = {};
-				var endpointType;
-				endpointType					= $(element).find('select.datafield-type').val();
-				newEndpoint.Binding				= $(element).find('select.datafield-binding').attr('value');
-				newEndpoint.Location			= $(element).find('input.datafield-location').attr('value');
-				newEndpoint.ResponseLocation	= $(element).find('input.datafield-responselocation').attr('value');
-				newEndpoint.index				= $(element).find('input.datafield-index').attr('value');
-				entitydescriptor.saml2sp[endpointType].push(newEndpoint);
-			});
 
 			delete entitydescriptor.certs;
 			$('div#certs fieldset').each(function(index, element) {
@@ -173,7 +143,6 @@ if(typeof(DOMParser) === 'undefined') {
 		// Initialization of the automatic reflection between UI elements and XML
 
 		$("a[href='#rawmetadata']").click(toXML);
-		$("a[href='#saml2sp']").click(fromXML);
 		$("a[href='#certs']").click(fromXML);
 
 		SAMLmetaJS.pluginEngine.execute('tabClick', [
@@ -195,10 +164,6 @@ if(typeof(DOMParser) === 'undefined') {
 		$("div#rawmetadata button.wipe").click(function(e) {
 			e.preventDefault();
 			$(node).val('');
-		});
-		$("div#saml2sp button.addendpoint").click(function(e) {
-			e.preventDefault();
-			SAMLmetaJS.UI.addEndpoint({});
 		});
 		$("div#certs button.addcert").click(function(e) {
 			e.preventDefault();
