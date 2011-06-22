@@ -58,13 +58,10 @@ if(typeof(DOMParser) === 'undefined') {
 		// This section extracts the information from the Metadata XML document,
 		// and updates the UI elements to reflect that.
 		var fromXML = function () {
-			var i, l;
-
 			if (currentTab !== 'xml') return;
 			currentTab = 'other';
 
 			console.log('fromXML()');
-
 
 			var parser = SAMLmetaJS.xmlparser($(node).val());
 			var entitydescriptor = parser.getEntityDescriptor();
