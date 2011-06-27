@@ -1,3 +1,6 @@
+(function($) {
+
+var SAMLmetaJS = $.fn.SAMLmetaJS;
 
 // MetaLib. Library to handle Metadata XML Parsing.
 SAMLmetaJS.xmlparser = function(xmlstring) {
@@ -943,5 +946,4 @@ SAMLmetaJS.XML = {
 
 };
 
-
-
+}(jQuery));
