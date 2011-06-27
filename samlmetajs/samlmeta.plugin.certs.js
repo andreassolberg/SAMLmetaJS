@@ -1,9 +1,43 @@
 (function($) {
 	var SAMLmetaJS = $.fn.SAMLmetaJS;
 
+	function clearCerts () {
+		$("div#certs > div.content").empty();
+	}
+
+	function addCert (use, cert) {
+		var infoHTML, key, checked;
+		var randID = 'cert' + Math.floor(Math.random() * 10000 + 1000);
+
+		infoHTML = '<fieldset><legend>Certificate</legend>' +
+				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">';
+
+		for (key in SAMLmetaJS.Constants.certusage) {
+            if (SAMLmetaJS.Constants.certusage.hasOwnProperty(key)) {
+			    checked = '';
+			    if (key === use) {
+                    checked = ' selected="selected" ';
+                }
+			    infoHTML += '<option value="' + key + '" ' + checked + '>' +
+				    SAMLmetaJS.Constants.certusage[key] +
+				    '</option>';
+            }
+		}
+
+		infoHTML += '</select>' +
+			'<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>' +
+			'<button style="display: block" class="removecert">Remove</button>' +
+			'</fieldset>';
+
+		$(infoHTML).appendTo("div#certs > div.content").find('button.removecert').click(function(e) {
+			e.preventDefault();
+			$(e.target).closest('fieldset').remove();
+		});
+	}
+
 	$("div#certs button.addcert").click(function(e) {
 		e.preventDefault();
-		SAMLmetaJS.UI.addCert('both', '');
+		addCert('both', '');
 	});
 
 	SAMLmetaJS.plugins.certs = {
@@ -12,17 +46,23 @@
 		},
 
 		addTab: function (pluginTabs) {
-
+            pluginTabs.list.push('<li><a href="#certs">Certificates</a></li>');
+            pluginTabs.content.push(
+                '<div id="certs">' +
+					'<div class="content"></div>' +
+					'<div><button class="addcert">Add new certificate</button></div>' +
+				'</div>'
+            );
 		},
 
 		fromXML: function (entitydescriptor) {
 			var l;
 
-			SAMLmetaJS.UI.clearCerts();
+			clearCerts();
 			if (entitydescriptor.certs) {
 				for (l in entitydescriptor.certs) {
 					if (entitydescriptor.certs.hasOwnProperty(l)) {
-						SAMLmetaJS.UI.addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
+						addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
 					}
 				}
 			}

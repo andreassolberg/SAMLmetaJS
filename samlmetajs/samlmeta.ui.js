@@ -139,7 +139,6 @@ SAMLmetaJS.UI = {
 
 	"embrace": function(node) {
 
-
 		$(node).wrap('<div id="rawmetadata"></div>');
 		$(node).parent().wrap('<div id="tabs" />');
 
@@ -157,140 +156,17 @@ SAMLmetaJS.UI = {
 						'</div>');
 
 		tabnode.prepend('<ul>' +
-							'<li><a href="#rawmetadata">Metadata</a></li>' +
-							'<li><a href="#saml2sp">SAML Endpoints</a></li>' +
-							'<li><a href="#certs">Certificates</a></li>' +
-							pluginTabs.list.join('') +
+						'<li><a href="#rawmetadata">Metadata</a></li>' +
+						pluginTabs.list.join('') +
 						'</ul>');
-		tabnode.append('<div id="saml2sp">' +
-							'<div class="content"></div>' +
-							'<div><button class="addendpoint">Add new endpoint</button></div>' +
-						'</div>' +
-
-						'<div id="certs">' +
-
-							'<div class="content"></div>' +
-							'<div><button class="addcert">Add new certificate</button></div>' +
-
-						'</div>'  + pluginTabs.content.join(''));
+		tabnode.append(pluginTabs.content.join(''));
 
 	},
-
-
-
-
-
 
 	"setEntityID": function(entityid) {
 		$("input#entityid").val(entityid);
-	},
-
-	"addCert": function(use, cert) {
-
-		var infoHTML;
-		var randID = 'cert' + Math.floor(Math.random() * 10000 + 1000);
-
-		infoHTML = '<fieldset><legend>Certificate</legend>' +
-				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">';
-
-
-		for (var key in SAMLmetaJS.Constants.certusage) {
-			var checked = '';
-			if (key == use) checked = ' selected="selected" ';
-			infoHTML += '<option value="' + key + '" ' + checked + '>' +
-				SAMLmetaJS.Constants.certusage[key] +
-				'</option>';
-		}
-
-
-		infoHTML += '</select>' +
-			'<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>' +
-			'<button style="display: block" class="removecert">Remove</button>' +
-			'</fieldset>';
-
-		$(infoHTML).appendTo("div#certs > div.content").find('button.removecert').click(function(e) {
-			e.preventDefault();
-			$(e.target).closest('fieldset').remove();
-		});
-	},
-	"clearCerts": function() {
-		$("div#certs > div.content").empty();
-	},
-
-	"clearEndpoints": function() {
-		$("div#saml2sp > div.content").empty();
-	},
-	"addEndpoint": function(endpoint, endpointname) {
-
-		var checked, endpointHTML;
-		var randID ='endpoint-' + Math.floor(Math.random() * 10000 + 1000);
-
-		// ---- Type of endpoint selector
-		endpointHTML = '<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>' +
-			'<div class="endpointfield">' +
-				'<label for="' + randID + '-type">Endpoint type: </label>' +
-				'<select class="datafield-type" name="' + randID + '-type-name" id="' + randID + '-type">';
-
-		for (var endpointType in SAMLmetaJS.Constants.endpointTypes.sp) {
-			checked = '';
-			if (endpointType == endpointname) {
-				checked = ' selected="selected" ';
-			}
-			endpointHTML += '<option value="' + endpointType + '" ' + checked + '>' +
-				SAMLmetaJS.Constants.endpointTypes.sp[endpointType] +
-				'</option>';
-		}
-		endpointHTML += '</select></div>';
-
-		if (endpoint.index) {
-			endpointHTML += '<input type="hidden" class="datafield-index" id="' + randID + '-binding" name="' + randID + '-index-name" value="' +
-				endpoint.index + '" />';
-		}
-
-
-		// ---- Binding
-		endpointHTML += '<div class="endpointfield"><label for="' + randID + '-binding">Binding: </label>' +
-				'<select class="datafield-binding" name="' + randID + '-binding-name" id="' + randID + '-binding">';
-
-		var foundBinding = false;
-		for (var binding in SAMLmetaJS.Constants.bindings) {
-			checked = '';
-			if (endpoint.Binding == binding) {
-				checked = ' selected="selected" ';
-				foundBinding = true;
-			}
-			endpointHTML += '<option value="' + binding + '" ' + checked + '>' +
-				SAMLmetaJS.Constants.bindings[binding] +
-				'</option>';
-		}
-		if (endpoint.Binding && !foundBinding) {
-			endpointHTML += '<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>';
-		}
-		endpointHTML += '</select>' +
-			'</div>';
-
-
-		// Text field for location
-		endpointHTML +=	'<div class="endpointfield endpointfield-location">' +
-				'<label for="' + randID + '-location">  Location</label>' +
-				'<input class="datafield-location" type="text" name="' + randID + '-location-name" id="contact-' + randID + '-location" value="' + (endpoint.Location || '') + '" /></div>';
-
-		// Text field for response location
-		endpointHTML +=	'<div class="endpointfield">' +
-				'<label for="' + randID + '-locationresponse">  Response location</label>' +
-				'<input class="datafield-responselocation" type="text" name="' + randID + '-locationresponse-name" id="contact-' + randID + '-locationresponse" value="' + (endpoint.ResponseLocation || '') + '" />' +
-			'</div>';
-
-
-		endpointHTML += '<button style="display: block; clear: both" class="remove">Remove</button>' +
-			'</fieldset>';
-
-		$(endpointHTML).appendTo("div#saml2sp > div.content").find('button.remove').click(function(e) {
-			e.preventDefault();
-			$(e.target).closest('fieldset').remove();
-		});
-
 	}
+
 };
 
 

@@ -1,9 +1,87 @@
 (function($) {
 	var SAMLmetaJS = $.fn.SAMLmetaJS;
 
+	function clearEndpoints () {
+		$("div#saml2sp > div.content").empty();
+	}
+
+	function addEndpoint (endpoint, endpointname) {
+		var checked, endpointHTML, endpointType, foundBinding, binding;
+		var randID ='endpoint-' + Math.floor(Math.random() * 10000 + 1000);
+
+		// ---- Type of endpoint selector
+		endpointHTML = '<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>' +
+			'<div class="endpointfield">' +
+				'<label for="' + randID + '-type">Endpoint type: </label>' +
+				'<select class="datafield-type" name="' + randID + '-type-name" id="' + randID + '-type">';
+
+		for (endpointType in SAMLmetaJS.Constants.endpointTypes.sp) {
+			if (SAMLmetaJS.Constants.endpointTypes.sp.hasOwnProperty(endpointType)) {
+				checked = '';
+				if (endpointType === endpointname) {
+					checked = ' selected="selected" ';
+				}
+				endpointHTML += '<option value="' + endpointType + '" ' + checked + '>' +
+					SAMLmetaJS.Constants.endpointTypes.sp[endpointType] +
+					'</option>';
+			}
+		}
+
+		endpointHTML += '</select></div>';
+
+		if (endpoint.index) {
+			endpointHTML += '<input type="hidden" class="datafield-index" id="' + randID + '-binding" name="' + randID + '-index-name" value="' +
+				endpoint.index + '" />';
+		}
+
+		// ---- Binding
+		endpointHTML += '<div class="endpointfield"><label for="' + randID + '-binding">Binding: </label>' +
+				'<select class="datafield-binding" name="' + randID + '-binding-name" id="' + randID + '-binding">';
+
+		foundBinding = false;
+		for (binding in SAMLmetaJS.Constants.bindings) {
+			if (SAMLmetaJS.Constants.bindings.hasOwnProperty(binding)) {
+				checked = '';
+				if (endpoint.Binding === binding) {
+					checked = ' selected="selected" ';
+					foundBinding = true;
+				}
+				endpointHTML += '<option value="' + binding + '" ' + checked + '>' +
+					SAMLmetaJS.Constants.bindings[binding] +
+					'</option>';
+			}
+		}
+
+		if (endpoint.Binding && !foundBinding) {
+			endpointHTML += '<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>';
+		}
+		endpointHTML += '</select>' +
+			'</div>';
+
+
+		// Text field for location
+		endpointHTML +=	'<div class="endpointfield endpointfield-location">' +
+				'<label for="' + randID + '-location">	Location</label>' +
+				'<input class="datafield-location" type="text" name="' + randID + '-location-name" id="contact-' + randID + '-location" value="' + (endpoint.Location || '') + '" /></div>';
+
+		// Text field for response location
+		endpointHTML +=	'<div class="endpointfield">' +
+				'<label for="' + randID + '-locationresponse">	Response location</label>' +
+				'<input class="datafield-responselocation" type="text" name="' + randID + '-locationresponse-name" id="contact-' + randID + '-locationresponse" value="' + (endpoint.ResponseLocation || '') + '" />' +
+			'</div>';
+
+		endpointHTML += '<button style="display: block; clear: both" class="remove">Remove</button>' +
+			'</fieldset>';
+
+		$(endpointHTML).appendTo("div#saml2sp > div.content").find('button.remove').click(function(e) {
+			e.preventDefault();
+			$(e.target).closest('fieldset').remove();
+		});
+	}
+
 	$("div#saml2sp button.addendpoint").click(function(e) {
 		e.preventDefault();
-		SAMLmetaJS.UI.addEndpoint({});
+		addEndpoint({});
 	});
 
 	SAMLmetaJS.plugins.saml2sp = {
@@ -12,6 +90,13 @@
 		},
 
 		addTab: function (pluginTabs) {
+			pluginTabs.list.push('<li><a href="#saml2sp">SAML Endpoints</a></li>');
+			pluginTabs.content.push(
+				'<div id="saml2sp">' +
+					'<div class="content"></div>' +
+					'<div><button class="addendpoint">Add new endpoint</button></div>' +
+				'</div>'
+			);
 
 		},
 
@@ -19,12 +104,12 @@
 			var i, endpoint;
 
 			// Add existing endpoints (from XML)
-			SAMLmetaJS.UI.clearEndpoints();
+			clearEndpoints();
 			if (entitydescriptor.saml2sp) {
 				for (endpoint in entitydescriptor.saml2sp) {
 					if (entitydescriptor.saml2sp.hasOwnProperty(endpoint)) {
 						for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
-							SAMLmetaJS.UI.addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
+							addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
 						}
 					}
 				}
