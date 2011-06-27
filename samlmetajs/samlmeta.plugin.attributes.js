@@ -1,6 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
-
 	$("div#attributes button.selectall").click(function(e) {
 		e.preventDefault();
 		$("div#attributes div.content input:checkbox").each(function(index, box) {
@@ -14,7 +12,7 @@
 		});
 	});
 
-	SAMLmetaJS.plugins.info = {
+	SAMLmetaJS.plugins.attributes = {
 		tabClick: function (handler) {
 			handler($("a[href='#attributes']"));
 		},

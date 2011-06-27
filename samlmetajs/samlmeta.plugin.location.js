@@ -1,5 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
 	var geocoder = new google.maps.Geocoder();
 	var map = null;
 	var mapmarker = null;

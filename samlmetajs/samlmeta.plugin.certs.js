@@ -1,6 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
-
 	function clearCerts () {
 		$("div#certs > div.content").empty();
 	}

@@ -33,9 +33,10 @@ if(typeof(DOMParser) === 'undefined') {
 	};
 }
 
+var SAMLmetaJS = {};
+
 (function($) {
 
-	var SAMLmetaJS = {};
 	SAMLmetaJS.plugins = {};
 
 	SAMLmetaJS.pluginEngine = {

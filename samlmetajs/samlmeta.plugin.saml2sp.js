@@ -1,6 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
-
 	function clearEndpoints () {
 		$("div#saml2sp > div.content").empty();
 	}

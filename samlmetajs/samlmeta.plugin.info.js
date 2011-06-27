@@ -1,5 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
 	var UI = {
 		"clearInfoname": function() {
 			$("div#info div#infoname").empty();

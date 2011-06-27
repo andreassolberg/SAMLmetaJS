@@ -1,5 +1,4 @@
 (function($) {
-	var SAMLmetaJS = $.fn.SAMLmetaJS;
 	var UI = {
 		"clearContacts": function() {
 			$("div#contact > div.content").empty();

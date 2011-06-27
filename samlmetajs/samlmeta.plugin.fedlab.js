@@ -1,6 +1,4 @@
 (function($) {
-    var SAMLmetaJS = $.fn.SAMLmetaJS;
-
     SAMLmetaJS.plugins.fedlab = {
 	    'tabClick': function(handler) {
 		    handler($("a[href='#fedlab']"));
