@@ -75,15 +75,6 @@
 		}
 	};
 
-	$("div#info button.addname").click(function(e) {
-		e.preventDefault();
-		UI.addInfoname('en', '');
-	});
-	$("div#info button.adddescr").click(function(e) {
-		e.preventDefault();
-		UI.addInfodescr('en', '');
-	});
-
 	SAMLmetaJS.plugins.info = {
 		tabClick: function (handler) {
 			handler($("a[href='#info']"));
@@ -116,6 +107,17 @@
 
 				'</div>'
 			);
+		},
+
+		setUp: function () {
+			$("div#info button.addname").click(function(e) {
+				e.preventDefault();
+				UI.addInfoname('en', '');
+			});
+			$("div#info button.adddescr").click(function(e) {
+				e.preventDefault();
+				UI.addInfodescr('en', '');
+			});
 		},
 
 		fromXML: function (entitydescriptor) {

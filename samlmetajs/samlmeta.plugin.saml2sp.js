@@ -77,11 +77,6 @@
 		});
 	}
 
-	$("div#saml2sp button.addendpoint").click(function(e) {
-		e.preventDefault();
-		addEndpoint({});
-	});
-
 	SAMLmetaJS.plugins.saml2sp = {
 		tabClick: function (handler) {
 			handler($("a[href='#saml2sp']"));
@@ -96,6 +91,13 @@
 				'</div>'
 			);
 
+		},
+
+		setUp: function () {
+			$("div#saml2sp button.addendpoint").click(function(e) {
+				e.preventDefault();
+				addEndpoint({});
+			});
 		},
 
 		fromXML: function (entitydescriptor) {

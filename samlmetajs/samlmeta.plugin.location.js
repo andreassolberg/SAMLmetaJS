@@ -60,7 +60,9 @@
 					'</div>' +
 				'</div>'
 			);
+		},
 
+		setUp: function () {
 			var latLng = new google.maps.LatLng(53.852527,14.238281);
 			var myOptions = {
 				zoom: 4,
@@ -68,8 +70,8 @@
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
 
-			var map = new google.maps.Map($("#map_canvas")[0], myOptions);
-			var mapmarker = new google.maps.Marker({
+			map = new google.maps.Map($("#map_canvas")[0], myOptions);
+			mapmarker = new google.maps.Marker({
 				position: latLng,
 				title: 'Point A',
 				map: map,
@@ -98,16 +100,13 @@
 				$("input#includeLocation").attr('checked', true);
 			});
 
-			tabnode.tabs({
-				"show": function(event, ui) {
-					if (ui.panel.id === "location") {
-						console.log('google resize');
-						google.maps.event.trigger(map, 'resize');
-						// SAMLmetaJS.map.checkResize();
-					}
+			$("#tabs").bind("tabsshow", function(event, ui) {
+				if (ui.panel.id === "location") {
+					console.log('google resize');
+					google.maps.event.trigger(map, 'resize');
+					// SAMLmetaJS.map.checkResize();
 				}
 			});
-
 		},
 
 		fromXML: function (entitydescriptor) {

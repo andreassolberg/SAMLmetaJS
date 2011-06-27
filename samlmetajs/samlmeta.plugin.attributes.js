@@ -1,17 +1,4 @@
 (function($) {
-	$("div#attributes button.selectall").click(function(e) {
-		e.preventDefault();
-		$("div#attributes div.content input:checkbox").each(function(index, box) {
-			$(box).attr('checked', 'checked');
-		});
-	});
-	$("div#attributes button.unselectall").click(function(e) {
-		e.preventDefault();
-		$("div#attributes div.content input:checkbox").each(function(index, box) {
-			$(box).removeAttr('checked');
-		});
-	});
-
 	SAMLmetaJS.plugins.attributes = {
 		tabClick: function (handler) {
 			handler($("a[href='#attributes']"));
@@ -33,6 +20,21 @@
 			);
 		},
 
+		setUp: function () {
+			$("div#attributes button.selectall").click(function(e) {
+				e.preventDefault();
+				$("div#attributes div.content input:checkbox").each(function(index, box) {
+					$(box).attr('checked', 'checked');
+				});
+			});
+			$("div#attributes button.unselectall").click(function(e) {
+				e.preventDefault();
+				$("div#attributes div.content input:checkbox").each(function(index, box) {
+					$(box).removeAttr('checked');
+				});
+			});
+		},
+
 		fromXML: function (entitydescriptor) {
 			var attributeHTML, checked, attrname;
 			if (!entitydescriptor.attributes) {
@@ -42,11 +44,11 @@
 			// Set attributes
 			attributeHTML = '';
 			for(attrname in SAMLmetaJS.Constants.attributes) {
-                if (SAMLmetaJS.Constants.attributes.hasOwnProperty(attrname)) {
-				    checked = (entitydescriptor.attributes[attrname] ? 'checked="checked"' : '');
-				    attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
-					    '<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
-                }
+				if (SAMLmetaJS.Constants.attributes.hasOwnProperty(attrname)) {
+					checked = (entitydescriptor.attributes[attrname] ? 'checked="checked"' : '');
+					attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
+						'<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
+				}
 			}
 			attributeHTML += '<br style="height: 0px; clear: both" />';
 			$("div#attributes > div.content").empty();

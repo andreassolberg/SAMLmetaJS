@@ -52,11 +52,6 @@
 		}
 	};
 
-	$("div#contact button.addcontact").click(function(e) {
-		e.preventDefault();
-		UI.addContact({});
-	});
-
 	SAMLmetaJS.plugins.contact = {
 		tabClick: function (handler) {
 			handler($("a[href='#contact']"));
@@ -70,6 +65,13 @@
 					'<div><button class="addcontact">Add new contact</button></div>' +
 				'</div>'
 			);
+		},
+
+		setUp: function () {
+			$("div#contact button.addcontact").click(function(e) {
+				e.preventDefault();
+				UI.addContact({});
+			});
 		},
 
 		fromXML: function (entitydescriptor) {

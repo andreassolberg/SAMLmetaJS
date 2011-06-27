@@ -11,15 +11,15 @@
 				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">';
 
 		for (key in SAMLmetaJS.Constants.certusage) {
-            if (SAMLmetaJS.Constants.certusage.hasOwnProperty(key)) {
-			    checked = '';
-			    if (key === use) {
-                    checked = ' selected="selected" ';
-                }
-			    infoHTML += '<option value="' + key + '" ' + checked + '>' +
-				    SAMLmetaJS.Constants.certusage[key] +
-				    '</option>';
-            }
+			if (SAMLmetaJS.Constants.certusage.hasOwnProperty(key)) {
+				checked = '';
+				if (key === use) {
+					checked = ' selected="selected" ';
+				}
+				infoHTML += '<option value="' + key + '" ' + checked + '>' +
+					SAMLmetaJS.Constants.certusage[key] +
+					'</option>';
+			}
 		}
 
 		infoHTML += '</select>' +
@@ -33,24 +33,26 @@
 		});
 	}
 
-	$("div#certs button.addcert").click(function(e) {
-		e.preventDefault();
-		addCert('both', '');
-	});
-
 	SAMLmetaJS.plugins.certs = {
 		tabClick: function (handler) {
 			handler($("a[href='#certs']"));
 		},
 
 		addTab: function (pluginTabs) {
-            pluginTabs.list.push('<li><a href="#certs">Certificates</a></li>');
-            pluginTabs.content.push(
-                '<div id="certs">' +
+			pluginTabs.list.push('<li><a href="#certs">Certificates</a></li>');
+			pluginTabs.content.push(
+				'<div id="certs">' +
 					'<div class="content"></div>' +
 					'<div><button class="addcert">Add new certificate</button></div>' +
 				'</div>'
-            );
+			);
+		},
+
+		setUp: function () {
+			$("div#certs button.addcert").click(function(e) {
+				e.preventDefault();
+				addCert('both', '');
+			});
 		},
 
 		fromXML: function (entitydescriptor) {
