@@ -161,10 +161,6 @@ SAMLmetaJS.UI = {
 						'</ul>');
 		tabnode.append(pluginTabs.content.join(''));
 
-	},
-
-	"setEntityID": function(entityid) {
-		$("input#entityid").val(entityid);
 	}
 
 };

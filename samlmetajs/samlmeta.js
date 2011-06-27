@@ -55,6 +55,10 @@ if(typeof(DOMParser) === 'undefined') {
 
 		var currentTab = 'xml';
 
+	    var setEntityID = function (entityid) {
+		    $("input#entityid").val(entityid);
+	    };
+
 		// This section extracts the information from the Metadata XML document,
 		// and updates the UI elements to reflect that.
 		var fromXML = function () {
@@ -68,7 +72,7 @@ if(typeof(DOMParser) === 'undefined') {
 
 			console.log(entitydescriptor);
 
-			SAMLmetaJS.UI.setEntityID(entitydescriptor.entityid);
+			setEntityID(entitydescriptor.entityid);
 
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
 		};
