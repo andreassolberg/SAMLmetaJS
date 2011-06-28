@@ -38,7 +38,7 @@
 		fromXML: function (entitydescriptor) {
 			var attributeHTML, checked, attrname;
 			if (!entitydescriptor.attributes) {
-				return;
+				entitydescriptor.attributes = {};
 			}
 
 			// Set attributes
