@@ -76,7 +76,7 @@
 
 		fromXML: function (entitydescriptor) {
 			var i;
-			if (!entitydescriptor.entityAttributes) {
+			if (!entitydescriptor.contacts) {
 				return;
 			}
 
