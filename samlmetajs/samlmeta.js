@@ -218,6 +218,7 @@ var SAMLmetaJS = {};
 				'name': {},
 				'descr': {},
 				'contacts': [],
+				'organization': {},
 				'saml2sp': {
 					'AssertionConsumerService': [],
 					'SingleLogoutService': []
