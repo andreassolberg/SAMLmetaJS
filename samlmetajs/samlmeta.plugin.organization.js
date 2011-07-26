@@ -66,7 +66,7 @@
 			pluginTabs.content.push(
 				'<div id="organization">' +
 					'<div class="content"></div>' +
-					'<div><button class="addorganization">Add new organization</button></div>' +
+					'<div><button class="addorganization">Add new organization localization</button></div>' +
 				'</div>'
 			);
 		},
@@ -74,7 +74,7 @@
 		setUp: function () {
 			$("div#organization button.addorganization").click(function(e) {
 				e.preventDefault();
-				UI.addOrganization({});
+				UI.addOrganizationLocalization('en', {});
 			});
 		},
 
