@@ -56,6 +56,10 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 						this.parseContactPerson(resultObject, currentChild);
 						break;
 
+					case 'Organization':
+						this.parseOrganization(resultObject, currentChild);
+						break;
+
 					default:
 						// alert('Unknown child of root: ' + currentChild.localName);
 
@@ -375,9 +379,53 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 			}
 			resultObject.contacts.push(newContact);
 
-		}
+		},
 
-	};
+		"parseOrganization": function (resultObject, node) {
+			if (node.localName !== 'Organization' || node.namespaceURI !== SAMLmetaJS.Constants.ns.md) {
+				throw {'name': 'Organization in parseOrganization() not was not recognized as a node in correct namespace.'};
+			}
+
+			var organization = {};
+			var currentChild = null, lang = null;
+
+			// Iterate the root children
+			for (var i = 0; i < node.childNodes.length; i++ ) {
+				currentChild = node.childNodes[i];
+				// nodeType 1 is Element
+				if (currentChild.nodeType !== 1) {
+					continue;
+				}
+
+				lang = currentChild.getAttribute('lang');
+				if (typeof organization[lang] === 'undefined') {
+					organization[lang] = {};
+				}
+
+				switch(currentChild.localName) {
+
+					case 'OrganizationName':
+						organization[lang].name = SAMLmetaJS.XML.getText(currentChild);
+						break;
+
+					case 'OrganizationDisplayName':
+						organization[lang].displayName = SAMLmetaJS.XML.getText(currentChild);
+						break;
+
+					case 'OrganizationURL':
+						organization[lang].URL = SAMLmetaJS.XML.getText(currentChild);
+						break;
+
+					default:
+						// alert('Unknown child of root: ' + currentChild.localName);
+
+				}
+
+			}
+
+			resultObject.organization = organization;
+		}
+	}
 
 };
 
@@ -400,7 +448,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			console.log('Update XML document');
 
-			var root, spdescriptor, attributeconsumer, extensions, i, attr;
+			var root, spdescriptor, attributeconsumer, extensions, i, attr, lang, node;
 			root = this.addIfNotEntityDescriptor();
 
 			if (entitydescriptor.entityid)
@@ -468,6 +516,17 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 			}
 
+			if (entitydescriptor.organization) {
+				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
+				node = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:Organization');
+				root.appendChild(node);
+				for (lang in entitydescriptor.organization) {
+					if (entitydescriptor.organization.hasOwnProperty(lang)) {
+						this.addOrganizationLocalization(node, lang, entitydescriptor.organization[lang]);
+					}
+				}
+			}
+
 		},
 
 		"addCert": function(node, use, cert) {
@@ -519,6 +578,29 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				newNode.appendChild(emailaddress);
 			}
 			node.appendChild(newNode);
+		},
+		"addOrganizationLocalization": function(node, lang, info) {
+			var newNode;
+			if (info.name) {
+				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationName');
+				newNode.setAttribute('lang', lang);
+				newNode.appendChild(doc.createTextNode(info.name));
+				node.appendChild(newNode);
+			}
+
+			if (info.displayName) {
+				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationDisplayName');
+				newNode.setAttribute('lang', lang);
+				newNode.appendChild(doc.createTextNode(info.displayName));
+				node.appendChild(newNode);
+			}
+
+			if (info.URL) {
+				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationURL');
+				newNode.setAttribute('lang', lang);
+				newNode.appendChild(doc.createTextNode(info.URL));
+				node.appendChild(newNode);
+			}
 		},
 		"updateMDUI": function(node, entitydescriptor) {
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
