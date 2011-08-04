@@ -93,9 +93,11 @@ var SAMLmetaJS = {};
 			'ja': 'Japanese (日本語)'
 		},
 		'contactTypes' : {
-			'admin' : 'Administrative',
+			'administrative' : 'Administrative',
 			'technical': 'Technical',
-			'support': 'Support'
+			'support': 'Support',
+			'billing': 'Billing',
+			'other': 'Other'
 		},
 		'endpointTypes' : {
 			'sp': {
