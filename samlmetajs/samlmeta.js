@@ -1,22 +1,23 @@
-if (typeof console == "undefined" || typeof console.log == "undefined") var console = { log: function() {} };
+if (typeof console === "undefined" || typeof console.log === "undefined") var console = { log: function() {} };
 
 // Hack to initiatlize a DOMParser in browser that do not support this natively.
-// Hack found here: 
-//  https://sites.google.com/a/van-steenbeek.net/archive/explorer_domparser_parsefromstring
-// 
-if(typeof(DOMParser) == 'undefined') {
-	DOMParser = function() {}
+// Hack found here:
+//	https://sites.google.com/a/van-steenbeek.net/archive/explorer_domparser_parsefromstring
+//
+if(typeof(DOMParser) === 'undefined') {
+	DOMParser = function() {};
 	DOMParser.prototype.parseFromString = function(str, contentType) {
+		var xmldata = null;
 
-		if(typeof(ActiveXObject) != 'undefined') {
-			var xmldata = new ActiveXObject('MSXML.DomDocument');
-		
+		if (typeof(ActiveXObject) !== 'undefined') {
+			xmldata = new ActiveXObject('MSXML.DomDocument');
+
 			xmldata.async = false;
 			xmldata.loadXML(str);
 			return xmldata;
-		
-		} else if(typeof(XMLHttpRequest) != 'undefined') {
-			var xmldata = new XMLHttpRequest;
+
+		} else if(typeof(XMLHttpRequest) !== 'undefined') {
+			xmldata = new XMLHttpRequest();
 			if(!contentType) {
 				contentType = 'application/xml';
 			}
@@ -29,280 +30,276 @@ if(typeof(DOMParser) == 'undefined') {
 			xmldata.send(null);
 			return xmldata.responseXML;
 		}
-	}
+	};
 }
 
 var SAMLmetaJS = {};
-SAMLmetaJS.plugins = {};
-
-SAMLmetaJS.pluginEngine = {
-	'execute': function(hook, parameters) {
-		if (!SAMLmetaJS.plugins) return;
-		for(var plugin in SAMLmetaJS.plugins) {
-			if (SAMLmetaJS.plugins[plugin][hook]) {
-				console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
-				SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
-			}
-		}
-	}
-};
-
-
-
-
-
-SAMLmetaJS.sync = function(node, options) {
-
-	var currentTab = 'xml';
-	
-	// This section extracts the information from the Metadata XML document,
-	// and updates the UI elements to reflect that.
-	var fromXML = function () {
-	
-		if (currentTab !== 'xml') return;
-		currentTab = 'other';
-
-		console.log('fromXML()');		
-
-	
-		var parser = SAMLmetaJS.xmlparser($(node).val());
-		var entitydescriptor = parser.getEntityDescriptor();
-
-		console.log(entitydescriptor);
-
-		SAMLmetaJS.UI.setEntityID(entitydescriptor.entityid);
-		
-		// Add existing contacts (from XML)
-		SAMLmetaJS.UI.clearContacts();
-		if (entitydescriptor.contacts) {
-			for(var i= 0; i < entitydescriptor.contacts.length; i++ ) {
-				SAMLmetaJS.UI.addContact(entitydescriptor.contacts[i]);
-			}
-		}
-		
-		// Add name and description
-		SAMLmetaJS.UI.clearInfoname();		
-		if (entitydescriptor.name) {
-			for (var l in entitydescriptor.name) {
-				SAMLmetaJS.UI.addInfoname(l, entitydescriptor.name[l]);
-			}
-		}
-
-		SAMLmetaJS.UI.clearInfodescr();		
-		if (entitydescriptor.descr) {
-			for (var l in entitydescriptor.descr) {
-				SAMLmetaJS.UI.addInfodescr(l, entitydescriptor.descr[l]);
-			}
-		}
-		
-		if (entitydescriptor.location) {
-			SAMLmetaJS.UI.setLocation(entitydescriptor.location);
-			var spl = entitydescriptor.location.split(',');
-			var latLng = new google.maps.LatLng(spl[0],spl[1]);
-			
-			SAMLmetaJS.map.panTo(latLng);
-			SAMLmetaJS.mapmarker.setPosition(latLng);
-		}
-
-
-		SAMLmetaJS.UI.clearCerts();		
-		if (entitydescriptor.certs) {
-			for (var l in entitydescriptor.certs) {
-				SAMLmetaJS.UI.addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
-			}
-		}
-
-		
-		
-		// Add existing endpoints (from XML)
-		SAMLmetaJS.UI.clearEndpoints();
-		if (entitydescriptor.saml2sp) {
-			
-			for (var endpoint in entitydescriptor.saml2sp) {
-				
-				if(entitydescriptor.saml2sp[endpoint].length > 0) {
-					for (var i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
-						SAMLmetaJS.UI.addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
-					}
-				}
-				
-			}
-		}
-
-		// Set attributes
-		SAMLmetaJS.UI.setAttributes(entitydescriptor.attributes);
-		
-		
-		SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
-	};
-	
-	
-	// This section extracts the information from the Metadata UI elements,
-	// and applies this to the XML metadata document.
-	var toXML = function() {
-		if (currentTab !== 'other') return;
-		currentTab = 'xml';
-		console.log('toXML()');
-		
-		var entitydescriptor = {
-			'name': {},
-			'descr': {},
-			'contacts': [],
-			'saml2sp': {
-				'AssertionConsumerService': [],
-				'SingleLogoutService': []
-			},
-			'attributes': {}
-		};
-
-		entitydescriptor.entityid = $('input#entityid').val();
-		
-		$('div#infoname > div').each(function(index, element) {
-			if (!$(element).children('input').attr('value')) return;
-			entitydescriptor.name[$(element).children('select').val()] = $(element).children('input').attr('value');
-		});
-		$('div#infodescr > div').each(function(index, element) {
-			if (!$(element).find('div > textarea').val()) return;
-			entitydescriptor.descr[$(element).find('div > select').val()] = $(element).find('div > textarea').val();
-		});
-		$('div#contact fieldset').each(function(index, element) {
-			
-			if (!$(element).find('input').eq(1).attr('value')) return;
-		
-			var newContact = {};
-			newContact.contactType  = $(element).find('select').val();
-			newContact.givenName  	= $(element).find('input').eq(0).attr('value');
-			newContact.surName  	= $(element).find('input').eq(1).attr('value');
-			newContact.emailAddress	= $(element).find('input').eq(2).attr('value');
-			entitydescriptor.contacts.push(newContact);
-		});
-		$('div#saml2sp fieldset').each(function(index, element) {
-		
-			if (!$(element).find('input').eq(0).attr('value')) return;
-		
-			var newEndpoint = {};
-			var endpointType;
-			endpointType		  			= $(element).find('select.datafield-type').val();
-			newEndpoint.Binding  			= $(element).find('select.datafield-binding').attr('value');
-			newEndpoint.Location  			= $(element).find('input.datafield-location').attr('value');
-			newEndpoint.ResponseLocation  	= $(element).find('input.datafield-responselocation').attr('value');
- 			newEndpoint.index				= $(element).find('input.datafield-index').attr('value');
-			entitydescriptor.saml2sp[endpointType].push(newEndpoint);
-		});
-		$('div#attributes div').each(function(index, element) {
-			
-			$(element).find('input:checked').each(function(index2, element2) {
-				entitydescriptor.attributes[$(element2).attr('name')] = 1;
-			});
-		});
-		
-		if ($("input#includeLocation").attr('checked')) {
-			entitydescriptor.location = $("input#geolocation").val();
-		}
-		
-		delete entitydescriptor.certs;
-		$('div#certs fieldset').each(function(index, element) {
-			
-			var use = $(element).find('select.certuse').val();
-			var cert = $(element).find('textarea.certdata').val();
-			
-			if (!use || !cert) return;
-			
-			if (!entitydescriptor.certs) entitydescriptor.certs = [];
-			entitydescriptor.certs.push({'use': use, 'cert': cert});
-		});
-		
-		SAMLmetaJS.pluginEngine.execute('toXML', [entitydescriptor]);
-
-		console.log(entitydescriptor);
-
-		// --- 
-		// Now the JSON object is created, and now we will apply this to the Metadata XML document
-		// in the textarea.
-		
-		var parser = SAMLmetaJS.xmlupdater($(node).val());
-		parser.updateDocument(entitydescriptor);
-		
-		var xmlstring = parser.getXMLasString();
-		xmlstring = SAMLmetaJS.XML.prettifyXML(xmlstring);
-		$(node).val(xmlstring);
-		
-	};
-	
-	
-	// Add content
-	SAMLmetaJS.UI.embrace(node);
-	
-
-	// Initialization of the automatic reflection between UI elements and XML
-	
-	$("a[href='#rawmetadata']").click(toXML);
-	$("a[href='#info']").click(fromXML);
-	$("a[href='#contact']").click(fromXML);
-	$("a[href='#attributes']").click(fromXML);
-	$("a[href='#location']").click(fromXML);
-	$("a[href='#saml2sp']").click(fromXML);
-	$("a[href='#certs']").click(fromXML);
-	
-	SAMLmetaJS.pluginEngine.execute('tabClick', [
-		function(node) {
-			$(node).click(fromXML);
-		}
-	]);
-	
-	
-	if (options && options.savehook) {
-		$(options.savehook).submit(toXML);
-	}
-
-	// Adding handlers to the other buttons.
-
-	$("div#rawmetadata button.prettify").click(function(e) {
-		e.preventDefault();
-		$(node).val(SAMLmetaJS.XML.prettifyXML($(node).val()));
-	});
-	$("div#rawmetadata button.wipe").click(function(e) {
-		e.preventDefault();
-		$(node).val('');
-	});
-	$("div#info button.addname").click(function(e) {
-		e.preventDefault();
-		SAMLmetaJS.UI.addInfoname('en', '');
-	});
-	$("div#info button.adddescr").click(function(e) {
-		e.preventDefault();
-		SAMLmetaJS.UI.addInfodescr('en', '');
-	});
-	$("div#contact button.addcontact").click(function(e) {
-		e.preventDefault();
-		SAMLmetaJS.UI.addContact({});
-	});
-	$("div#saml2sp button.addendpoint").click(function(e) {
-		e.preventDefault();
-		SAMLmetaJS.UI.addEndpoint({});
-	});
-	$("div#certs button.addcert").click(function(e) {
-		e.preventDefault();
-		SAMLmetaJS.UI.addCert('both', '');
-	});	
-	$("div#attributes button.selectall").click(function(e) {
-		e.preventDefault();
-		$("div#attributes div.content input:checkbox").each(function(index, box) {
-			$(box).attr('checked', 'checked');
-		});
-	});
-	$("div#attributes button.unselectall").click(function(e) {
-		e.preventDefault();
-		$("div#attributes div.content input:checkbox").each(function(index, box) {
-			$(box).removeAttr('checked'); 
-		});
-	});
-	
-
-};
-
 
 (function($) {
+
+	SAMLmetaJS.plugins = {};
+
+	SAMLmetaJS.pluginEngine = {
+		'execute': function(hook, parameters) {
+			var plugin;
+			if (!SAMLmetaJS.plugins) return;
+			for (plugin in SAMLmetaJS.plugins) {
+				if (SAMLmetaJS.plugins[plugin][hook]) {
+					console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
+					SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
+				}
+			}
+		}
+	};
+
+	SAMLmetaJS.Constants = {
+		'ns' : {
+			'md': "urn:oasis:names:tc:SAML:2.0:metadata",
+			'mdui': "urn:oasis:names:tc:SAML:metadata:ui",
+			'mdattr': "urn:oasis:names:tc:SAML:metadata:attribute",
+			'saml': "urn:oasis:names:tc:SAML:2.0:assertion",
+			'xsd': "http://www.w3.org/2001/XMLSchema",
+			'ds': "http://www.w3.org/2000/09/xmldsig#"
+		},
+		'certusage': {
+			'both': 'Both',
+			'signing': 'Signing',
+			'encryption': 'Encryption'
+		},
+		'languages': {
+			'en': 'English',
+			'no': 'Norwegian (bokmål)',
+			'nn': 'Norwegian (nynorsk)',
+			'se': 'Sámegiella',
+			'da': 'Danish',
+			'de': 'German',
+			'sv': 'Swedish',
+			'fi': 'Finnish',
+			'es': 'Español',
+			'fr': 'Français',
+			'it': 'Italian',
+			'nl': 'Nederlands',
+			'lb': 'Luxembourgish',
+			'cs': 'Czech',
+			'sl': 'Slovenščina',
+			'lt': 'Lietuvių kalba',
+			'hr': 'Hrvatski',
+			'hu': 'Magyar',
+			'pl': 'Język polski',
+			'pt': 'Português',
+			'pt-BR': 'Português brasileiro',
+			'tr': 'Türkçe',
+			'el': 'ελληνικά',
+			'ja': 'Japanese (日本語)'
+		},
+		'contactTypes' : {
+			'admin' : 'Administrative',
+			'technical': 'Technical',
+			'support': 'Support'
+		},
+		'endpointTypes' : {
+			'sp': {
+				'AssertionConsumerService': 'AssertionConsumerService',
+				'SingleLogoutService': 'SingleLogoutService'
+			},
+			'idp' : {}
+		},
+		'bindings': {
+			'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect': 'HTTP Redirect',
+			'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST': 'HTTP POST',
+			'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact': 'HTTP Artifact',
+			'urn:oasis:names:tc:SAML:2.0:bindings:SOAP': 'SOAP',
+			'urn:oasis:names:tc:SAML:2.0:bindings:PAOS': 'Reverse SOAP (PAOS)'
+		},
+		'attributes' : {
+			'urn:oid:0.9.2342.19200300.100.1.1': 'uid',
+			'urn:oid:0.9.2342.19200300.100.1.10': 'manager',
+			'urn:oid:0.9.2342.19200300.100.1.2': 'textEncodedORAddress',
+			'urn:oid:0.9.2342.19200300.100.1.20': 'homePhone',
+			'urn:oid:0.9.2342.19200300.100.1.22': 'otherMailbox',
+			'urn:oid:0.9.2342.19200300.100.1.3': 'mail',
+			'urn:oid:0.9.2342.19200300.100.1.39': 'homePostalAddress',
+			'urn:oid:0.9.2342.19200300.100.1.40': 'personalTitle',
+			'urn:oid:0.9.2342.19200300.100.1.41': 'mobile',
+			'urn:oid:0.9.2342.19200300.100.1.42': 'pager',
+			'urn:oid:0.9.2342.19200300.100.1.43': 'co',
+			'urn:oid:0.9.2342.19200300.100.1.6': 'roomNumber',
+			'urn:oid:0.9.2342.19200300.100.1.60': 'jpegPhoto',
+			'urn:oid:0.9.2342.19200300.100.1.7': 'photo',
+			'urn:oid:1.2.840.113549.1.9.1': 'email',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.1': 'norEduOrgUniqueNumber',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.11': 'norEduOrgSchemaVersion',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.12': 'norEduOrgNIN',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.2': 'norEduOrgUnitUniqueNumber',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.3': 'norEduPersonBirthDate',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.4': 'norEduPersonLIN',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.5': 'norEduPersonNIN',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.6': 'norEduOrgAcronym',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.7': 'norEduOrgUniqueIdentifier',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.8': 'norEduOrgUnitUniqueIdentifier',
+			'urn:oid:1.3.6.1.4.1.2428.90.1.9': 'federationFeideSchemaVersion',
+			'urn:oid:1.3.6.1.4.1.250.1.57': 'labeledURI',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.1': 'eduPersonAffiliation',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.10': 'eduPersonTargetedID',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.2': 'eduPersonNickname',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.3': 'eduPersonOrgDN',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.4': 'eduPersonOrgUnitDN',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.5': 'eduPersonPrimaryAffiliation',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.6': 'eduPersonPrincipalName',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.7': 'eduPersonEntitlement',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.8': 'eduPersonPrimaryOrgUnitDN',
+			'urn:oid:1.3.6.1.4.1.5923.1.1.1.9': 'eduPersonScopedAffiliation',
+			'urn:oid:1.3.6.1.4.1.5923.1.2.1.2': 'eduOrgHomePageURI',
+			'urn:oid:1.3.6.1.4.1.5923.1.2.1.3': 'eduOrgIdentityAuthNPolicyURI',
+			'urn:oid:1.3.6.1.4.1.5923.1.2.1.4': 'eduOrgLegalName',
+			'urn:oid:1.3.6.1.4.1.5923.1.2.1.5': 'eduOrgSuperiorURI',
+			'urn:oid:1.3.6.1.4.1.5923.1.2.1.6': 'eduOrgWhitePagesURI',
+			'urn:oid:1.3.6.1.4.1.5923.1.5.1.1': 'isMemberOf',
+			'urn:oid:2.16.840.1.113730.3.1.241': 'displayName',
+			'urn:oid:2.16.840.1.113730.3.1.3': 'employeeNumber',
+			'urn:oid:2.16.840.1.113730.3.1.39': 'preferredLanguage',
+			'urn:oid:2.16.840.1.113730.3.1.4': 'employeeType',
+			'urn:oid:2.16.840.1.113730.3.1.40': 'userSMIMECertificate',
+			'urn:oid:2.5.4.10': 'o',
+			'urn:oid:2.5.4.11': 'ou',
+			'urn:oid:2.5.4.12': 'title',
+			'urn:oid:2.5.4.13': 'description',
+			'urn:oid:2.5.4.16': 'postalAddress',
+			'urn:oid:2.5.4.17': 'postalCode',
+			'urn:oid:2.5.4.18': 'postOfficeBox',
+			'urn:oid:2.5.4.19': 'physicalDeliveryOfficeName',
+			'urn:oid:2.5.4.20': 'telephoneNumber',
+			'urn:oid:2.5.4.21': 'telexNumber',
+			'urn:oid:2.5.4.3': 'cn',
+			'urn:oid:2.5.4.36': 'userCertificate',
+			'urn:oid:2.5.4.4': 'sn',
+			'urn:oid:2.5.4.41': 'name',
+			'urn:oid:2.5.4.42': 'givenName',
+			'urn:oid:2.5.4.7': 'l',
+			'urn:oid:2.5.4.9': 'street'
+		}
+	};
+
+	SAMLmetaJS.sync = function(node, options) {
+
+		var currentTab = 'xml';
+
+		var setEntityID = function (entityid) {
+			$("input#entityid").val(entityid);
+		};
+
+		// This section extracts the information from the Metadata XML document,
+		// and updates the UI elements to reflect that.
+		var fromXML = function () {
+			if (currentTab !== 'xml') return;
+			currentTab = 'other';
+
+			console.log('fromXML()');
+
+			var parser = SAMLmetaJS.xmlparser($(node).val());
+			var entitydescriptor = parser.getEntityDescriptor();
+
+			console.log(entitydescriptor);
+
+			setEntityID(entitydescriptor.entityid);
+
+			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
+		};
+
+
+		// This section extracts the information from the Metadata UI elements,
+		// and applies this to the XML metadata document.
+		var toXML = function() {
+			if (currentTab !== 'other') return;
+			currentTab = 'xml';
+			console.log('toXML()');
+
+			var entitydescriptor = {
+				'name': {},
+				'descr': {},
+				'contacts': [],
+				'saml2sp': {
+					'AssertionConsumerService': [],
+					'SingleLogoutService': []
+				},
+				'attributes': {}
+			};
+
+			entitydescriptor.entityid = $('input#entityid').val();
+
+			SAMLmetaJS.pluginEngine.execute('toXML', [entitydescriptor]);
+
+			console.log(entitydescriptor);
+
+			// ---
+			// Now the JSON object is created, and now we will apply this to the Metadata XML document
+			// in the textarea.
+
+			var parser = SAMLmetaJS.xmlupdater($(node).val());
+			parser.updateDocument(entitydescriptor);
+
+			var xmlstring = parser.getXMLasString();
+			xmlstring = SAMLmetaJS.XML.prettifyXML(xmlstring);
+			$(node).val(xmlstring);
+
+		};
+
+		// Add content
+		var embrace = function () {
+			$(node).wrap('<div id="rawmetadata"></div>');
+			$(node).parent().wrap('<div id="tabs" />');
+
+			var metatab = $(node).parent();
+			var tabnode = $(node).parent().parent();
+
+			var pluginTabs = {'list': [], 'content': []};
+			SAMLmetaJS.pluginEngine.execute('addTab', [pluginTabs]);
+
+			metatab.append('<div>' +
+						   '<button class="prettify">Pretty format</button>' +
+						   '<button class="wipe">Wipe</button>' +
+						   '</div>');
+
+			tabnode.prepend('<ul>' +
+							'<li><a href="#rawmetadata">Metadata</a></li>' +
+							pluginTabs.list.join('') +
+							'</ul>');
+			tabnode.append(pluginTabs.content.join(''));
+
+			tabnode.tabs();
+		};
+
+		embrace();
+
+		// Initialization of the automatic reflection between UI elements and XML
+
+		$("a[href='#rawmetadata']").click(toXML);
+
+		SAMLmetaJS.pluginEngine.execute('tabClick', [
+			function(node) {
+				$(node).click(fromXML);
+			}
+		]);
+
+		if (options && options.savehook) {
+			$(options.savehook).submit(toXML);
+		}
+
+		// Adding handlers to the other buttons.
+
+		$("div#rawmetadata button.prettify").click(function(e) {
+			e.preventDefault();
+			$(node).val(SAMLmetaJS.XML.prettifyXML($(node).val()));
+		});
+		$("div#rawmetadata button.wipe").click(function(e) {
+			e.preventDefault();
+			$(node).val('');
+		});
+
+		SAMLmetaJS.pluginEngine.execute('setUp', []);
+	};
+
+
 	$.vari = "$.vari";
 	$.fn.foo = "$.fn.vari";
 
@@ -313,4 +310,4 @@ SAMLmetaJS.sync = function(node, options) {
 			SAMLmetaJS.sync(this, options);
 		});
 	};
-})(jQuery);
+}(jQuery));
