@@ -1,4 +1,5 @@
-if (typeof console === "undefined" || typeof console.log === "undefined") var console = { log: function() {} };
+/*jslint rhino: true, browser:true, onevar:false*/
+if (typeof console === "undefined" || typeof console.log === "undefined") {var console = { log: function() {} }}
 
 // Hack to initiatlize a DOMParser in browser that do not support this natively.
 // Hack found here:
@@ -42,7 +43,7 @@ var SAMLmetaJS = {};
 	SAMLmetaJS.pluginEngine = {
 		'execute': function(hook, parameters) {
 			var plugin;
-			if (!SAMLmetaJS.plugins) return;
+			if (!SAMLmetaJS.plugins) {return;}
 			for (plugin in SAMLmetaJS.plugins) {
 				if (SAMLmetaJS.plugins[plugin][hook]) {
 					console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');

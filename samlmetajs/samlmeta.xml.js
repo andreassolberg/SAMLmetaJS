@@ -1,4 +1,5 @@
 // MetaLib. Library to handle Metadata XML Parsing.
+/*jslint rhino: true, browser:true, onevar:false*/
 SAMLmetaJS.xmlparser = function(xmlstring) {
 
 	var parser = null;
@@ -12,12 +13,14 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 	return {
 
 		"getEntityDescriptor": function() {
+			
+			var root, i;
 
 			// Reset the result object as we stat over again from scratch.
 			resultObject = {};
 
 			// Peek at the root node, and verify.
-			var root = doc.documentElement;
+			root = doc.documentElement;
 			if (root === null) {
 				console.log('Root is null, the document is probably empty');
 				return resultObject;
@@ -30,7 +33,7 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 			resultObject.entityid = root.getAttribute('entityID');
 
 			// Iterate the root children
-			for (var i = 0; i < root.childNodes.length; i++ ) {
+			for (i = 0; i < root.childNodes.length; i++ ) {
 				var currentChild = root.childNodes[i];
 				// nodeType 1 is Element
 				if (currentChild.nodeType !== 1) continue;
@@ -268,7 +271,7 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 				// nodeType 1 is Element
 				if (currentChild.nodeType !== 1) continue;
 
-				var lang = currentChild.getAttribute('xml:lang') || 'en';
+				var lang = currentChild.getAttribute('xml:lang') || 'en';
 
 				switch(currentChild.localName) {
 
@@ -719,7 +722,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
 				[
 					{'localName': 'SPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'IdPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'IdPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				]
 			));
 			return newNode;
