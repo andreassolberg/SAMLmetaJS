@@ -122,9 +122,6 @@
 
 		fromXML: function (entitydescriptor) {
 			var l;
-			if (!entitydescriptor.entityAttributes) {
-				return;
-			}
 
 			// Add name and description
 			UI.clearInfoname();
