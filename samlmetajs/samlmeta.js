@@ -199,8 +199,14 @@ var SAMLmetaJS = {};
 
 			console.log('fromXML()');
 
-			var parser = SAMLmetaJS.xmlparser($(node).val());
-			var entitydescriptor = parser.getEntityDescriptor();
+			// var parser = SAMLmetaJS.xmlparser($(node).val());
+			// var entitydescriptor = parser.getEntityDescriptor();
+			
+			
+			// REPLACEING XML engine
+			entitydescriptor = mdreader.parseFromString($(node).val());
+			// -----
+			
 
 			console.log(entitydescriptor);
 
