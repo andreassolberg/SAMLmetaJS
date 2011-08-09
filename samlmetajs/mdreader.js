@@ -64,9 +64,9 @@ function dump (node) {
 }
 
 function nodeName (node) {
-	console.log('nodename: ');
-	console.log(node);
-	console.log(isnode);
+	// console.log('nodename: ');
+	// console.log(node);
+	// console.log(isnode);
 	if (isnode) {
 		return node.name();
 	} else {
@@ -339,7 +339,13 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'ServiceName',
 				callback: function(n) {
-					acs.name[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+					var lang = nodeGetAttribute(n, 'xml:lang', 'en');
+					var text = nodeGetTextRecursive(n);
+					acs.name[lang] = text;
+					
+					// console.log('Getting ServiceName: ');
+					// console.log('Language is ' + lang)
+					// console.log(text);
 				}
 			},
 			{	
@@ -369,8 +375,76 @@ parseFromString = function(xmlstring) {
 
 		
 	}
-	
 
+	
+	function parseUIInfo(node) {
+		
+		var mdui = {};
+		
+		expectNode(node, 'UIInfo', constants.ns.mdui);
+		
+		// Process children of EntityDescriptor
+		nodeProcessChildren(node, [
+			{	
+				namespace: constants.ns.mdui, name: 'DisplayName',
+				callback: function(n) {
+					if (!mdui.name) mdui.name = {};
+					mdui.name[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+				}
+			},
+			{	
+				namespace: constants.ns.mdui, name: 'Description',
+				callback: function(n) {
+					if (!mdui.descr) mdui.descr = {};
+					mdui.descr[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+				}
+			},
+			{	
+				namespace: constants.ns.mdui, name: 'GeolocationHint',
+				callback: function(n) {
+					mdui.location = nodeGetTextRecursive(n).substr(4);
+				}
+			}
+		// Fallback	
+		], function(n) {
+			console.log('Not implemented parsing of [' + nodeName(n) + '] in MDUI...');
+		});
+		
+		return mdui;
+		
+	}
+
+
+	
+	function parseSPSSODescriptorExtensions(node, saml2sp) {
+		expectNode(node, 'Extensions', constants.ns.md);
+		
+		// Process children of EntityDescriptor
+		nodeProcessChildren(node, [
+			{	
+				namespace: constants.ns.mdui, name: 'UIInfo',
+				callback: function(n) {
+					console.log('Parsing UIInfo element');
+					saml2sp.mdui = parseUIInfo(n);
+				}
+			},
+			{	
+				namespace: constants.ns.saml,
+				callback: function(n) {
+					throw new MDException('Illegal namespace (saml) in Extensions at SPSSODescriptor: ' + nodeName(n));
+				}
+			},
+			{	
+				namespace: constants.ns.md,
+				callback: function(n) {
+					throw new MDException('Illegal namespace (md) in Extensions at SPSSODescriptor: ' + nodeName(n));
+				}
+			}
+		// Fallback	
+		], function(n) {
+			console.log('Parsing Extensions at SPSSODescriptor with [' + nodeName(n) + '] not implemented...');
+		});
+	}
 	
 	
 	function parseSAML2SP(node) {
@@ -390,6 +464,7 @@ parseFromString = function(xmlstring) {
 				namespace: constants.ns.md, name: 'Extensions',
 				callback: function(n) {
 					console.log('Parsing Extensions not yet implemented at SPSSODescriptor level ...');
+					parseSPSSODescriptorExtensions(n, saml2sp);
 				}
 			},
 			{	
@@ -589,10 +664,35 @@ parseFromString = function(xmlstring) {
 	doc = getDoc(xmlstring);
 	
 //	parseEntitiesDescriptor(doc);
+	
+	var entitydescriptor = parseEntityDescriptor(doc);
+	
+	if (entitydescriptor.name) {
+		// Everthing is OK with the name. No need to override.
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.name) {
+		entitydescriptor.name = entitydescriptor.saml2sp.acs.name;
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.name) {
+		entitydescriptor.name = entitydescriptor.saml2sp.mdui.name;
+	}
+
+	if (entitydescriptor.descr) {
+		// Everthing is OK with the name. No need to override.
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.descr) {
+		entitydescriptor.descr = entitydescriptor.saml2sp.acs.descr;
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.descr) {
+		entitydescriptor.descr = entitydescriptor.saml2sp.mdui.descr;
+	}
+
+	
+	entitydescriptor.getACSname = function() {
+		console.log(this);
+	}
+
+	
 	try {
-		return parseEntityDescriptor(doc);
+		return entitydescriptor;
 	} catch (e) {
-		console.log(e);
+		console.log(e.message);
 	}
 
 	
