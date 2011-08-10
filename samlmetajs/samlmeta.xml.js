@@ -502,11 +502,15 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					}
 				}
 				if (SAMLmetaJS.tools.hasContents(entitydescriptor.name) &&
-						SAMLmetaJS.tools.hasContents(entitydescriptor.attributes)) {
+						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp) &&
+						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs) &&
+						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs.attributes)
+					) {
+						
 					attributeconsumer = this.addIfNotAttributeConsumingService(spdescriptor);
 					this.updateAttributeConsumingService(attributeconsumer, entitydescriptor);
 
-					for (attr in entitydescriptor.attributes) {
+					for (attr in entitydescriptor.saml2sp.acs.attributes) {
 						this.addRequestedAttribute(attributeconsumer, attr);
 					}
 				}

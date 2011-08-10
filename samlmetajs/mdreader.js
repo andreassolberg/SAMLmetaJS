@@ -669,24 +669,24 @@ parseFromString = function(xmlstring) {
 	
 	if (entitydescriptor.name) {
 		// Everthing is OK with the name. No need to override.
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.name) {
-		entitydescriptor.name = entitydescriptor.saml2sp.acs.name;
 	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.name) {
 		entitydescriptor.name = entitydescriptor.saml2sp.mdui.name;
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.name) {
+		entitydescriptor.name = entitydescriptor.saml2sp.acs.name;
 	}
 
 	if (entitydescriptor.descr) {
 		// Everthing is OK with the name. No need to override.
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.descr) {
-		entitydescriptor.descr = entitydescriptor.saml2sp.acs.descr;
 	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.descr) {
 		entitydescriptor.descr = entitydescriptor.saml2sp.mdui.descr;
+	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.descr) {
+		entitydescriptor.descr = entitydescriptor.saml2sp.acs.descr;
 	}
 
 	
-	entitydescriptor.getACSname = function() {
-		console.log(this);
-	}
+	// entitydescriptor.getACSname = function() {
+	// 	console.log(this);
+	// }
 
 	
 	try {

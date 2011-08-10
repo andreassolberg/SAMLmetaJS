@@ -46,7 +46,7 @@ var SAMLmetaJS = {};
 			if (!SAMLmetaJS.plugins) {return;}
 			for (plugin in SAMLmetaJS.plugins) {
 				if (SAMLmetaJS.plugins[plugin][hook]) {
-					console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
+					// console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
 					SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
 				}
 			}
@@ -209,7 +209,7 @@ var SAMLmetaJS = {};
 			
 
 			console.log(entitydescriptor);
-
+			
 			setEntityID(entitydescriptor.entityid);
 
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
@@ -231,8 +231,7 @@ var SAMLmetaJS = {};
 				'saml2sp': {
 					'AssertionConsumerService': [],
 					'SingleLogoutService': []
-				},
-				'attributes': {}
+				}
 			};
 
 			entitydescriptor.entityid = $('input#entityid').val();

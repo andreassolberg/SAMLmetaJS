@@ -1,4 +1,12 @@
 (function($) {
+	
+	function prepareForAttributes (entitydescriptor) {
+		if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
+		if (!entitydescriptor.saml2sp.acs) entitydescriptor.saml2sp.acs = {};
+		if (!entitydescriptor.saml2sp.acs.attributes) entitydescriptor.saml2sp.acs.attributes = {};
+		if (!entitydescriptor.saml2sp.acs.name) entitydescriptor.saml2sp.acs.name = {'en': 'Unnamed'};
+	}
+	
 	SAMLmetaJS.plugins.attributes = {
 		tabClick: function (handler) {
 			handler($("a[href='#attributes']"));
@@ -37,15 +45,14 @@
 
 		fromXML: function (entitydescriptor) {
 			var attributeHTML, checked, attrname;
-			if (!entitydescriptor.attributes) {
-				entitydescriptor.attributes = {};
-			}
+
+			prepareForAttributes(entitydescriptor);
 
 			// Set attributes
 			attributeHTML = '';
 			for(attrname in SAMLmetaJS.Constants.attributes) {
 				if (SAMLmetaJS.Constants.attributes.hasOwnProperty(attrname)) {
-					checked = (entitydescriptor.attributes[attrname] ? 'checked="checked"' : '');
+					checked = (entitydescriptor.saml2sp.acs.attributes[attrname] ? 'checked="checked"' : '');
 					attributeHTML += '<div style="float: left; width: 300px"><input type="checkbox" id="' + attrname + '-id" name="' + attrname + '" ' + checked + '/>' +
 						'<label for="' + attrname + '-id">' + SAMLmetaJS.Constants.attributes[attrname] + '</label></div>';
 				}
@@ -54,11 +61,11 @@
 			$("div#attributes > div.content").empty();
 			$("div#attributes > div.content").append(attributeHTML);
 		},
-
 		toXML: function (entitydescriptor) {
 			$('div#attributes div').each(function(index, element) {
 				$(element).find('input:checked').each(function(index2, element2) {
-					entitydescriptor.attributes[$(element2).attr('name')] = 1;
+					prepareForAttributes(entitydescriptor);
+					entitydescriptor.saml2sp.acs.attributes[$(element2).attr('name')] = 1;
 				});
 			});
 		}
