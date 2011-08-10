@@ -9,6 +9,9 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 
 	parser = new DOMParser();
 	doc = parser.parseFromString(xmlstring, "text/xml");
+	
+
+	
 
 	return {
 

@@ -46,6 +46,44 @@ constants = {
 	}
 };
 
+
+function validateXML(string) {
+
+	// code for IE
+	if (window.ActiveXObject) {
+		
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc.async="false";
+		xmlDoc.loadXML(string);
+
+		if(xmlDoc.parseError.errorCode!=0) {
+			txt="XML Parsing failed error Code: " + xmlDoc.parseError.errorCode + "\n";
+			txt=txt+"Reason: " + xmlDoc.parseError.reason;
+			txt=txt+"Failed at line: " + xmlDoc.parseError.line;
+			throw new MDException(txt);
+		} else	{
+			return true;
+		}
+		
+	// code for Mozilla, Firefox, Opera, etc.
+	} else if (document.implementation.createDocument) {
+
+		var parser=new DOMParser();
+		var xmlDoc=parser.parseFromString(string,"text/xml");
+
+		if (xmlDoc.getElementsByTagName("parsererror").length>0) {
+			//throw new MDException(xmlDoc.getElementsByTagName("parsererror")[0]);
+			throw new MDException('parse error');
+		} else {
+			return true;
+		}
+		
+	} else {
+		throw new MDException('Your browser cannot handle XML validation');
+	}
+}
+
+
 /*
  * Push new element new element 'n' to an array stored in obj[name]. Create the array if not yet exists.
  */
@@ -143,7 +181,9 @@ function nodeGetTextRecursive(node) {
 	return str;
 }
 
-function expectNode (node, name, namepsace) {	
+function expectNode (node, name, namepsace) {
+	if (!node) throw new Exception('Expecting node with name [' + name + '] but node was not defined...');
+	console.log(node);
 	if (nodeName(node) !== name) throw new MDException('Expecting node with name [' + name + '] but found a [' + nodeName(node) + ']');
 	if (nodeNamespace(node) !== namepsace) throw new MDException('Expecting node with namespace [' + namepsace + '] but found a [' + nodeNamespace(node) + ']');
 }
@@ -202,6 +242,10 @@ parseFromString = function(xmlstring) {
 			return parser.parseFromString(xmlstring, "text/xml").documentElement;
 			
 		}
+	}
+	
+	function getNewDoc() {
+		return getDoc('<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"></md:EntityDescriptor>');
 	}
 	
 	function parseKeyDescriptor (node) {
@@ -658,9 +702,14 @@ parseFromString = function(xmlstring) {
 	
 	
 
-	
-	
-	
+	try {
+		validateXML(xmlstring);		
+	} catch (e) {
+		console.log(e.message);
+		doc = getNewDoc();
+		return {};
+	}
+
 	doc = getDoc(xmlstring);
 	
 //	parseEntitiesDescriptor(doc);
@@ -683,22 +732,10 @@ parseFromString = function(xmlstring) {
 		entitydescriptor.descr = entitydescriptor.saml2sp.acs.descr;
 	}
 
-	
-	// entitydescriptor.getACSname = function() {
-	// 	console.log(this);
-	// }
+
 
 	
-	try {
-		return entitydescriptor;
-	} catch (e) {
-		console.log(e.message);
-	}
-
-	
-	// console.log(result);
-	
-	return result;
+	return entitydescriptor;
 }
 
 
