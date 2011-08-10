@@ -183,7 +183,6 @@ function nodeGetTextRecursive(node) {
 
 function expectNode (node, name, namepsace) {
 	if (!node) throw new Exception('Expecting node with name [' + name + '] but node was not defined...');
-	console.log(node);
 	if (nodeName(node) !== name) throw new MDException('Expecting node with name [' + name + '] but found a [' + nodeName(node) + ']');
 	if (nodeNamespace(node) !== namepsace) throw new MDException('Expecting node with namespace [' + namepsace + '] but found a [' + nodeNamespace(node) + ']');
 }
