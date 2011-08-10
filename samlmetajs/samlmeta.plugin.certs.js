@@ -59,10 +59,10 @@
 			var l;
 
 			clearCerts();
-			if (entitydescriptor.certs) {
-				for (l in entitydescriptor.certs) {
-					if (entitydescriptor.certs.hasOwnProperty(l)) {
-						addCert(entitydescriptor.certs[l].use, entitydescriptor.certs[l].cert);
+			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.certs) {
+				for (l in entitydescriptor.saml2sp.certs) {
+					if (entitydescriptor.saml2sp.certs.hasOwnProperty(l)) {
+						addCert(entitydescriptor.saml2sp.certs[l].use, entitydescriptor.saml2sp.certs[l].cert);
 					}
 				}
 			}
@@ -79,10 +79,10 @@
 					return;
 				}
 
-				if (!entitydescriptor.certs) {
-					entitydescriptor.certs = [];
+				if (!entitydescriptor.saml2sp.certs) {
+					entitydescriptor.saml2sp.certs = [];
 				}
-				entitydescriptor.certs.push({'use': use, 'cert': cert});
+				entitydescriptor.saml2sp.certs.push({'use': use, 'cert': cert});
 			});
 		}
 	};

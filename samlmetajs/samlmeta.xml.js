@@ -29,7 +29,6 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 				console.log('Root not was not recognized as a EntityDescriptor node in correct namespace.');
 				return resultObject;
 			}
-			resultObject.certs = [];
 			resultObject.entityid = root.getAttribute('entityID');
 
 			// Iterate the root children
@@ -100,8 +99,9 @@ SAMLmetaJS.xmlparser = function(xmlstring) {
 
 			// We got what we want, now store in result object.
 
-			if(!resultObject.certs) resultObject.certs = [];
-			resultObject.certs.push({'use': use, 'cert': cert});
+			if(!resultObject.saml2sp) resultObject.saml2sp = {};
+			if(!resultObject.saml2sp.certs) resultObject.saml2sp.certs = [];
+			resultObject.saml2sp.certs.push({'use': use, 'cert': cert});
 
 		},
 		"getSAML2SP": function(resultObject, spssodescriptor) {
@@ -481,9 +481,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
-				if (entitydescriptor.certs) {
-					for(i = 0; i< entitydescriptor.certs.length; i++) {
-						this.addCert(spdescriptor, entitydescriptor.certs[i].use, entitydescriptor.certs[i].cert);
+				if (entitydescriptor.saml2sp.certs) {
+					for(i = 0; i< entitydescriptor.saml2sp.certs.length; i++) {
+						this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i].use, entitydescriptor.saml2sp.certs[i].cert);
 					}
 				}
 
