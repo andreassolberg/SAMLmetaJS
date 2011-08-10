@@ -301,14 +301,14 @@ parseFromString = function(xmlstring) {
 			person = {},
 			contacttype
 			;
-			
-		return null;
+
 
 		expectNode(node, 'ContactPerson', constants.ns.md);
 
 		contacttype = nodeGetAttribute(node, 'contactType');
 		person.contactType = contacttype;
 		
+
 		// Process children of ContactPerson
 		nodeProcessChildren(node, [
 			{	
@@ -320,32 +320,32 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'GivenName',
 				callback: function(n) {
-					person.GivenName = nodeGetTextRecursive(n);
+					person.givenName = nodeGetTextRecursive(n);
 				}
 			},
 			{	
 				namespace: constants.ns.md, name: 'SurName',
 				callback: function(n) {
-					person.SurName = nodeGetTextRecursive(n);
+					person.surName = nodeGetTextRecursive(n);
 				}
 			},
 			{	
 				namespace: constants.ns.md, name: 'EmailAddress',
 				callback: function(n) {
-					person.EmailAddress = nodeGetTextRecursive(n);
+					person.emailAddress = nodeGetTextRecursive(n);
 				}
 			},
 
 			{	
 				namespace: constants.ns.md, name: 'Company',
 				callback: function(n) {
-					person.Company = nodeGetTextRecursive(n);
+					person.company = nodeGetTextRecursive(n);
 				}
 			},
 			{	
 				namespace: constants.ns.md, name: 'TelephoneNumber',
 				callback: function(n) {
-					person.TelephoneNumber = nodeGetTextRecursive(n);
+					person.telephoneNumber = nodeGetTextRecursive(n);
 				}
 			}
 
@@ -353,7 +353,6 @@ parseFromString = function(xmlstring) {
 		], function(n) {
 			throw new MDException('Did not expect this element at contactperson level: ' + nodeName(n));
 		});
-
 		return person;
 	}
 	
@@ -385,10 +384,7 @@ parseFromString = function(xmlstring) {
 					var lang = nodeGetAttribute(n, 'xml:lang', 'en');
 					var text = nodeGetTextRecursive(n);
 					acs.name[lang] = text;
-					
-					// console.log('Getting ServiceName: ');
-					// console.log('Language is ' + lang)
-					// console.log(text);
+
 				}
 			},
 			{	
@@ -410,8 +406,7 @@ parseFromString = function(xmlstring) {
 		], function(n) {
 			throw new MDException('Did not expect this element at AttributeConsumingService level: ' + nodeName(n));
 		});
-		
-		// console.log(acs);
+	
 		
 
 		return acs;
@@ -467,7 +462,6 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.mdui, name: 'UIInfo',
 				callback: function(n) {
-					console.log('Parsing UIInfo element');
 					saml2sp.mdui = parseUIInfo(n);
 				}
 			},
