@@ -529,12 +529,30 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (entitydescriptor.organization) {
 				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
 				node = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:Organization');
-				root.appendChild(node);
-				for (lang in entitydescriptor.organization) {
-					if (entitydescriptor.organization.hasOwnProperty(lang)) {
-						this.addOrganizationLocalization(node, lang, entitydescriptor.organization[lang]);
-					}
+				
+				if (entitydescriptor.organization.name) {
+					for (lang in entitydescriptor.organization.name) {
+						if (entitydescriptor.organization.name.hasOwnProperty(lang)) {
+							this.addOrganizationElement(node, 'OrganizationName', lang, entitydescriptor.organization.name[lang]);
+						}
+					}	
 				}
+				if (entitydescriptor.organization.displayname) {
+					for (lang in entitydescriptor.organization.displayname) {
+						if (entitydescriptor.organization.displayname.hasOwnProperty(lang)) {
+							this.addOrganizationElement(node, 'OrganizationDisplayName', lang, entitydescriptor.organization.displayname[lang]);
+						}
+					}	
+				}
+				if (entitydescriptor.organization.url) {
+					for (lang in entitydescriptor.organization.url) {
+						if (entitydescriptor.organization.url.hasOwnProperty(lang)) {
+							this.addOrganizationElement(node, 'OrganizationURL', lang, entitydescriptor.organization.url[lang]);
+						}
+					}	
+				}
+				
+				root.appendChild(node);
 			}
 
 		},
@@ -589,29 +607,16 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 			node.appendChild(newNode);
 		},
-		"addOrganizationLocalization": function(node, lang, info) {
+		
+		"addOrganizationElement": function(orgnode, type, lang, value) {
 			var newNode;
-			if (info.name) {
-				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationName');
-				newNode.setAttribute('lang', lang);
-				newNode.appendChild(doc.createTextNode(info.name));
-				node.appendChild(newNode);
-			}
+			newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:' + type);
+			newNode.setAttribute('xml:lang', lang);
+			newNode.appendChild(doc.createTextNode(value));
 
-			if (info.displayName) {
-				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationDisplayName');
-				newNode.setAttribute('lang', lang);
-				newNode.appendChild(doc.createTextNode(info.displayName));
-				node.appendChild(newNode);
-			}
-
-			if (info.URL) {
-				newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:OrganizationURL');
-				newNode.setAttribute('lang', lang);
-				newNode.appendChild(doc.createTextNode(info.URL));
-				node.appendChild(newNode);
-			}
+			orgnode.appendChild(newNode);
 		},
+		
 		"updateMDUI": function(node, entitydescriptor) {
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
