@@ -15,6 +15,7 @@
 
 		for (endpointType in SAMLmetaJS.Constants.endpointTypes.sp) {
 			if (SAMLmetaJS.Constants.endpointTypes.sp.hasOwnProperty(endpointType)) {
+
 				checked = '';
 				if (endpointType === endpointname) {
 					checked = ' selected="selected" ';
@@ -108,6 +109,13 @@
 			if (entitydescriptor.saml2sp) {
 				for (endpoint in entitydescriptor.saml2sp) {
 					if (entitydescriptor.saml2sp.hasOwnProperty(endpoint)) {
+						
+						if (endpoint !== 'AssertionConsumerService' &&
+							endpoint !== 'SingleLogoutService'
+						) {
+							continue;
+						}
+						
 						for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
 							addEndpoint(entitydescriptor.saml2sp[endpoint][i], endpoint);
 						}
