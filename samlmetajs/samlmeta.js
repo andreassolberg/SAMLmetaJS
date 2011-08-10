@@ -224,14 +224,14 @@ var SAMLmetaJS = {};
 			console.log('toXML()');
 
 			var entitydescriptor = {
-				'name': {},
-				'descr': {},
-				'contacts': [],
-				'organization': {},
-				'saml2sp': {
-					'AssertionConsumerService': [],
-					'SingleLogoutService': []
-				}
+				// 'name': {},
+				// 'descr': {},
+				// 'contacts': [],
+				// 'organization': {},
+				// 'saml2sp': {
+				// 	'AssertionConsumerService': [],
+				// 	'SingleLogoutService': []
+				// }
 			};
 
 			entitydescriptor.entityid = $('input#entityid').val();

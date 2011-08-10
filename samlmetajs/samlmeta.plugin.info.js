@@ -149,6 +149,7 @@
 				if (!value) {
 					return;
 				}
+				if (!entitydescriptor.name) entitydescriptor.name = {};
 				entitydescriptor.name[$(element).children('select').val()] = value;
 			});
 			$('div#infodescr > div').each(function (index, element) {
@@ -156,6 +157,7 @@
 				if (!value) {
 					return;
 				}
+				if (!entitydescriptor.descr) entitydescriptor.descr = {};
 				entitydescriptor.descr[$(element).find('div > select').val()] = value;
 			});
 		}

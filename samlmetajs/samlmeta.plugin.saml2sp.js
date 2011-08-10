@@ -130,6 +130,8 @@
 				newEndpoint.Location = $(element).find('input.datafield-location').attr('value');
 				newEndpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
 				newEndpoint.index = $(element).find('input.datafield-index').attr('value');
+				if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
+				if (!entitydescriptor.saml2sp[endpointType]) entitydescriptor.saml2sp[endpointType] = [];
 				entitydescriptor.saml2sp[endpointType].push(newEndpoint);
 			});
 		}

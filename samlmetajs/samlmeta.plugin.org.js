@@ -232,6 +232,7 @@
 				include = true;
 			});
 			
+
 			if (include) entitydescriptor.organization = org;
 			
 		}

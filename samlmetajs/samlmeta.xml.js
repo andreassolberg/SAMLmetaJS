@@ -469,19 +469,23 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					this.addAttribute(entityAttributes, entitydescriptor.entityAttributes[name]);
 				}
 			}
-
+			
+			if (
+				SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
+				SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
+				entitydescriptor.location
+			) {
+				spdescriptor = this.addIfNotSPSSODescriptor(root);
+				extensions = this.addIfNotExtensions(spdescriptor);
+				mdui = this.addIfNotMDUI(extensions);
+				this.updateMDUI(mdui, entitydescriptor);
+			}
+			
+			
+			
 			if (entitydescriptor.saml2sp) {
 				spdescriptor = this.addIfNotSPSSODescriptor(root);
 
-				if (
-					SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
-					SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
-					entitydescriptor.location
-				) {
-					extensions = this.addIfNotExtensions(spdescriptor);
-					mdui = this.addIfNotMDUI(extensions);
-					this.updateMDUI(mdui, entitydescriptor);
-				}
 
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
 				if (entitydescriptor.saml2sp.certs) {

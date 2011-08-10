@@ -101,6 +101,7 @@
 				newContact.givenName = $(element).find('input').eq(0).attr('value');
 				newContact.surName = $(element).find('input').eq(1).attr('value');
 				newContact.emailAddress = $(element).find('input').eq(2).attr('value');
+				if (!entitydescriptor.contacts) entitydescriptor.contacts = [];
 				entitydescriptor.contacts.push(newContact);
 			});
 		}
