@@ -4,7 +4,7 @@
 		if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
 		if (!entitydescriptor.saml2sp.acs) entitydescriptor.saml2sp.acs = {};
 		if (!entitydescriptor.saml2sp.acs.attributes) entitydescriptor.saml2sp.acs.attributes = {};
-		if (!entitydescriptor.saml2sp.acs.name) entitydescriptor.saml2sp.acs.name = {'en': 'Unnamed'};
+		if (!SAMLmetaJS.tools.hasContents(entitydescriptor.name)) entitydescriptor.name = {'en': 'Unnamed'};
 	}
 	
 	SAMLmetaJS.plugins.attributes = {
