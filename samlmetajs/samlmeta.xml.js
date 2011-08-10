@@ -470,64 +470,74 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 			}
 			
+			
+			spdescriptor = this.addIfNotSPSSODescriptor(root);
+			
 			if (
 				SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
 				SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
 				entitydescriptor.location
 			) {
-				spdescriptor = this.addIfNotSPSSODescriptor(root);
 				extensions = this.addIfNotExtensions(spdescriptor);
 				mdui = this.addIfNotMDUI(extensions);
 				this.updateMDUI(mdui, entitydescriptor);
+			} else {
+				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
 			
 			
 			
-			if (entitydescriptor.saml2sp) {
-				spdescriptor = this.addIfNotSPSSODescriptor(root);
+	
 
-
-				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
-				if (entitydescriptor.saml2sp.certs) {
-					for(i = 0; i< entitydescriptor.saml2sp.certs.length; i++) {
-						this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i].use, entitydescriptor.saml2sp.certs[i].cert);
-					}
-				}
-
-				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'AssertionConsumerService');
-				if (entitydescriptor.saml2sp.AssertionConsumerService &&
-						entitydescriptor.saml2sp.AssertionConsumerService.length > 0) {
-					for(i = 0; i< entitydescriptor.saml2sp.AssertionConsumerService.length; i++) {
-						this.addEndpoint(spdescriptor, 'AssertionConsumerService', entitydescriptor.saml2sp.AssertionConsumerService[i]);
-					}
-				}
-
-				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'SingleLogoutService');
-				if (entitydescriptor.saml2sp.SingleLogoutService && entitydescriptor.saml2sp.SingleLogoutService.length > 0) {
-					for(i = 0; i< entitydescriptor.saml2sp.SingleLogoutService.length; i++) {
-						this.addEndpoint(spdescriptor, 'SingleLogoutService', entitydescriptor.saml2sp.SingleLogoutService[i]);
-					}
-				}
-				if (SAMLmetaJS.tools.hasContents(entitydescriptor.name) &&
-						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp) &&
-						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs) &&
-						SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs.attributes)
-					) {
-						
-					attributeconsumer = this.addIfNotAttributeConsumingService(spdescriptor);
-					this.updateAttributeConsumingService(attributeconsumer, entitydescriptor);
-
-					for (attr in entitydescriptor.saml2sp.acs.attributes) {
-						this.addRequestedAttribute(attributeconsumer, attr);
-					}
+			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
+			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.certs) {
+				for(i = 0; i< entitydescriptor.saml2sp.certs.length; i++) {
+					this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i].use, entitydescriptor.saml2sp.certs[i].cert);
 				}
 			}
+
+			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'AssertionConsumerService');
+			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.AssertionConsumerService &&
+					entitydescriptor.saml2sp.AssertionConsumerService.length > 0) {
+				for(i = 0; i< entitydescriptor.saml2sp.AssertionConsumerService.length; i++) {
+					this.addEndpoint(spdescriptor, 'AssertionConsumerService', entitydescriptor.saml2sp.AssertionConsumerService[i]);
+				}
+			}
+
+			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'SingleLogoutService');
+			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.SingleLogoutService && entitydescriptor.saml2sp.SingleLogoutService.length > 0) {
+				for(i = 0; i< entitydescriptor.saml2sp.SingleLogoutService.length; i++) {
+					this.addEndpoint(spdescriptor, 'SingleLogoutService', entitydescriptor.saml2sp.SingleLogoutService[i]);
+				}
+			}
+			//this.clearRequestedAttributes();
+			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name) &&
+					entitydescriptor.saml2sp &&
+					entitydescriptor.saml2sp.acs &&
+					SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs.attributes)
+				) {
+					
+				attributeconsumer = this.addIfNotAttributeConsumingService(spdescriptor);
+				this.updateAttributeConsumingService(attributeconsumer, entitydescriptor);
+
+				for (attr in entitydescriptor.saml2sp.acs.attributes) {
+					this.addRequestedAttribute(attributeconsumer, attr);
+
+				}
+
+			} else {
+				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'AttributeConsumingService');
+			}
+
+
 
 			if (entitydescriptor.contacts) {
 				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'ContactPerson');
 				for(i = 0; i < entitydescriptor.contacts.length; i++) {
 					this.addContact(root, entitydescriptor.contacts[i])
 				}
+			} else {
+				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'ContactPerson');
 			}
 
 			if (entitydescriptor.organization) {
@@ -557,6 +567,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 				
 				root.appendChild(node);
+			} else {
+				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
 			}
 
 		},
