@@ -15,17 +15,44 @@ var
 	isnode = false,
 	libxmljs,
 	parseFromString,
+	settings = {},
 	
 	MDException,
+	TestResult,
 	constants;
 
 if (typeof window == 'undefined') {
 	
 	// Node.js external requirements
 	libxmljs = require("libxmljs");
-	
 	isnode = true;
 	
+}
+
+TestResult = function(id, text, value, significance) {
+	this.id = id;
+	this.significance = null;
+	
+	if (typeof value !== 'undefined') {
+		this.value = value;
+	} else {
+		this.value = 2;
+	}
+
+	if (typeof significance !== 'undefined') {
+		this.significance = significance;
+	}
+
+	this.text = text;
+}
+
+TestResult.prototype.html = function() {
+	var 
+		html;
+		
+	html = this.id + ' ' + this.value + ' ' + this.text;
+	html = '<div class="samlmetajs_testentry">' + html + '</div>';
+	return html;
 }
 
 
@@ -45,6 +72,12 @@ constants = {
 		'idpdisc': 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol'
 	}
 };
+
+function processTest(t) {
+	// console.log('processTest(t) ');
+	// console.log(t);
+	if (settings.testProcessor) settings.testProcessor(t);
+}
 
 
 function validateXML(string) {
@@ -223,6 +256,20 @@ reader = function() {
 	
 };
 
+validateEmail = function(string) {
+	var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+	return reg.test(string);
+}
+
+validateURL = function(string) {
+	var reg = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+	return reg.test(string);	
+}
+
+isHTTPS = function(string) {
+	var reg = /(https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+	return reg.test(string);
+}
 
 parseFromString = function(xmlstring) {
 
@@ -291,6 +338,11 @@ parseFromString = function(xmlstring) {
 		// console.log('found certificate');
 		// console.log(cert);
 		
+		if (!cert.cert) {
+			processTest(new TestResult('certdatamissing', 'Could not extract certificate data properly from KeyDescriptor element ', 0, 1));
+		}
+
+	
 		
 		return cert;
 	}
@@ -314,7 +366,7 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'Extensions',
 				callback: function(n) {
-					console.log('Parsing Extensions within ContactPerson not yet implemented...');
+					processTest(new TestResult('contactextension', 'SAMLmetaJS has not yet implemented support for parsing Extensions in ContactPerson'));
 				}
 			},
 			{	
@@ -333,6 +385,9 @@ parseFromString = function(xmlstring) {
 				namespace: constants.ns.md, name: 'EmailAddress',
 				callback: function(n) {
 					person.emailAddress = nodeGetTextRecursive(n);
+					if (!validateEmail(person.emailAddress)) {
+						processTest(new TestResult('emailaddressformat', 'EmailAddress of ContactPerson was in invalid format', 0, 1));
+					}
 				}
 			},
 
@@ -351,7 +406,7 @@ parseFromString = function(xmlstring) {
 
 		// Fallback			
 		], function(n) {
-			throw new MDException('Did not expect this element at contactperson level: ' + nodeName(n));
+			processTest(new TestResult('unknowncontactpersonelement', 'Unexpected child element of ContactPerson [' + nodeName(n) + ']', 0, 1));
 		});
 		return person;
 	}
@@ -404,7 +459,7 @@ parseFromString = function(xmlstring) {
 			}
 		// Fallback			
 		], function(n) {
-			throw new MDException('Did not expect this element at AttributeConsumingService level: ' + nodeName(n));
+			processTest(new TestResult('acsunknownchild', 'Unexpected child element of AttributeConsumingService [' + nodeName(n) + ']', 0, 1));
 		});
 	
 		
@@ -445,7 +500,7 @@ parseFromString = function(xmlstring) {
 			}
 		// Fallback	
 		], function(n) {
-			console.log('Not implemented parsing of [' + nodeName(n) + '] in MDUI...');
+			processTest(new TestResult('mduiunknownchild', 'Parsing of this child element of MDUI not yet implemented [' + nodeName(n) + ']'));
 		});
 		
 		return mdui;
@@ -468,18 +523,21 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.saml,
 				callback: function(n) {
-					throw new MDException('Illegal namespace (saml) in Extensions at SPSSODescriptor: ' + nodeName(n));
+					processTest(new TestResult('extillegalnamespacesaml', 'Illegal namespace (saml) in Extensions at SPSSODescriptor [' + nodeName(n) + ']', 0, 2));
+					//throw new MDException('Illegal namespace (saml) in Extensions at SPSSODescriptor: ' + nodeName(n));
 				}
 			},
 			{	
 				namespace: constants.ns.md,
 				callback: function(n) {
-					throw new MDException('Illegal namespace (md) in Extensions at SPSSODescriptor: ' + nodeName(n));
+					processTest(new TestResult('extillegalnamespacemd', 'Illegal namespace (md) in Extensions at SPSSODescriptor [' + nodeName(n) + ']', 0, 2));
+					//throw new MDException('Illegal namespace (md) in Extensions at SPSSODescriptor: ' + nodeName(n));
 				}
 			}
 		// Fallback	
 		], function(n) {
-			console.log('Parsing Extensions at SPSSODescriptor with [' + nodeName(n) + '] not implemented...');
+			processTest(new TestResult('notimplementedssoext', 'Parsing Extensions at SPSSODescriptor with [' + nodeName(n) + '] not implemented'));
+			// console.log('Parsing Extensions at SPSSODescriptor with [' + nodeName(n) + '] not implemented...');
 		});
 	}
 	
@@ -490,17 +548,13 @@ parseFromString = function(xmlstring) {
 			saml2sp = {}
 			;
 		
-
-
 		expectNode(node, 'SPSSODescriptor', constants.ns.md);
-
 
 		// Process children of EntityDescriptor
 		nodeProcessChildren(node, [
 			{	
 				namespace: constants.ns.md, name: 'Extensions',
 				callback: function(n) {
-					console.log('Parsing Extensions not yet implemented at SPSSODescriptor level ...');
 					parseSPSSODescriptorExtensions(n, saml2sp);
 				}
 			},
@@ -513,13 +567,21 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'SingleLogoutService',
 				callback: function(n) {
-					apush(saml2sp, 'SingleLogoutService', parseEndpoint(n));
+					var e = parseEndpoint(n);
+					apush(saml2sp, 'SingleLogoutService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('SingleLogoutServiceInvalidURL', 'SingleLogoutService/@Location was not a valid URL', 0, 2));
+					}
 				}
 			},
 			{	
 				namespace: constants.ns.md, name: 'AssertionConsumerService',
 				callback: function(n) {
-					apush(saml2sp, 'AssertionConsumerService', parseEndpoint(n));
+					var e = parseEndpoint(n);
+					apush(saml2sp, 'AssertionConsumerService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('AssertionConsumerServiceInvalidURL', 'AssertionConsumerService/@Location was not a valid URL', 0, 2));
+					}
 				}
 			},
 			{	
@@ -530,7 +592,7 @@ parseFromString = function(xmlstring) {
 			}
 		// Fallback			
 		], function(n) {
-			throw new MDException('Did not expect this element at SPSSODescr level: ' + nodeName(n));
+			processTest(new TestResult('saml2spunknownchild', 'Parsing this child of SPSSODescr not yet implemented [' + nodeName(n) + ']'));
 		});
 		
 		
@@ -568,7 +630,11 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'OrganizationURL',
 				callback: function(n) {
-					organization.url[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+					var url = nodeGetTextRecursive(n);
+					organization.url[nodeGetAttribute(n, 'xml:lang', 'en')] = url;
+					if (!validateURL(url)) {
+						processTest(new TestResult('OrganizationURLInvalidURL', 'OrganizationURL was not a valid URL', 0, 2));
+					}
 				}
 			}
 		// Fallback			
@@ -629,7 +695,7 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'IDPSSODescriptor',
 				callback: function(n) {
-					console.log('Parsing IDPSSODescriptor not yet implemented...');
+					processTest(new TestResult('idpssodescriptor', 'SAMLmetaJS has not yet implemented support for parsing this element [' + nodeName(n) + ']'));
 				}
 			},
 			{	
@@ -653,11 +719,10 @@ parseFromString = function(xmlstring) {
 
 		// Fallback			
 		], function(n) {
-			throw new MDException('Did not expect this element at entity level: ' + nodeName(n));
+			processTest(new TestResult('unknowntoplevelelement', 'SAMLmetaJS found an unexpected element as a child of the EntityDescriptor [' + nodeName(n) + ']', 0, 1));
 		});
 		
 		
-		console.log(entity);
 		
 		return entity;
 	}
@@ -726,17 +791,30 @@ parseFromString = function(xmlstring) {
 	}
 
 
-
+	if (!entitydescriptor.name) {
+		processTest(new TestResult('noentityname', 'The entity did not include a name', 0, 1));
+	}
+	if (!entitydescriptor.descr) {
+		processTest(new TestResult('noentitydescr', 'The entity did not include a description', 0, 1));
+	}
+	if (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService) {
+		processTest(new TestResult('noacsendpoint', 'The entity did not include an AssertionConsumerService endpoint', 0, 2));
+	}
 	
 	return entitydescriptor;
 }
 
+
+function setup (s) {
+	settings = s;	
+}
 
 if (isnode) {
 	exports.parseFromString = parseFromString;
 } else {
 	window.mdreader = {};
 	window.mdreader.parseFromString = parseFromString;
+	window.mdreader.setup = setup;
 }
 
 

@@ -53,6 +53,8 @@ var SAMLmetaJS = {};
 		}
 	};
 
+	
+
 	SAMLmetaJS.Constants = {
 		'ns' : {
 			'md': "urn:oasis:names:tc:SAML:2.0:metadata",
@@ -182,6 +184,25 @@ var SAMLmetaJS = {};
 			'urn:oid:2.5.4.9': 'street'
 		}
 	};
+	
+	SAMLmetaJS.TestEngine = function(ruleset) {
+		this.ruleset = ruleset;
+		this.tests = [];
+	}
+	
+	SAMLmetaJS.TestEngine.prototype.addTest = function(test) {
+		if (this.ruleset[test.id]) test.significance = this.ruleset[test.id];
+		this.tests.push(test);
+	}
+	
+	SAMLmetaJS.TestEngine.prototype.getResult = function() {
+		return this.tests;
+	}
+
+	SAMLmetaJS.TestEngine.prototype.reset = function() {
+		this.tests = [];
+	}
+
 
 	SAMLmetaJS.sync = function(node, options) {
 
@@ -190,6 +211,26 @@ var SAMLmetaJS = {};
 		var setEntityID = function (entityid) {
 			$("input#entityid").val(entityid);
 		};
+		
+		var testEngine;
+
+
+		var showTestResults = function() {
+			var 
+				result = testEngine.getResult(),
+				i = 0,
+				testnode;
+
+			testnode = $(node).parent().parent().find('div#samlmetajs_testresults');
+
+			$(testnode).empty();
+			
+			for(i = 0; i < result.length; i ++) {
+				$(testnode).append(result[i].html() );
+			}
+			
+		}
+
 
 		// This section extracts the information from the Metadata XML document,
 		// and updates the UI elements to reflect that.
@@ -198,20 +239,16 @@ var SAMLmetaJS = {};
 			currentTab = 'other';
 
 			console.log('fromXML()');
+			
+			
 
-			// var parser = SAMLmetaJS.xmlparser($(node).val());
-			// var entitydescriptor = parser.getEntityDescriptor();
-			
-			
-			// REPLACEING XML engine
+
+			testEngine.reset();
 			entitydescriptor = mdreader.parseFromString($(node).val());
-			// -----
-			
-
-			console.log(entitydescriptor);
-			
 			setEntityID(entitydescriptor.entityid);
-
+			
+			showTestResults(testEngine);
+			
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
 		};
 
@@ -268,17 +305,33 @@ var SAMLmetaJS = {};
 						   '<button class="prettify">Pretty format</button>' +
 						   '<button class="wipe">Wipe</button>' +
 						   '</div>');
-
+				
 			tabnode.prepend('<ul>' +
 							'<li><a href="#rawmetadata">Metadata</a></li>' +
 							pluginTabs.list.join('') +
 							'</ul>');
+			tabnode.prepend('<div id="samlmetajs_testresults"></div>');
 			tabnode.append(pluginTabs.content.join(''));
 
 			tabnode.tabs();
 		};
 
 		embrace();
+		
+		testEngine = new SAMLmetaJS.TestEngine(
+			{
+				'certincluded': 0
+			}
+		);
+		
+		mdreader.setup({
+			testProcessor: function(t) {
+				// console.log('testProcessor (t) ');
+				// console.log(t);
+				// console.log(testEngine);
+				testEngine.addTest(t);
+			}
+		});
 
 		// Initialization of the automatic reflection between UI elements and XML
 
