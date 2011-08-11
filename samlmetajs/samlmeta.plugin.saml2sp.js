@@ -143,9 +143,11 @@
 				newEndpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
 				
 				index  = $(element).find('input.datafield-index').attr('value');
-				if (endpointType === 'AssertionConsumerService' && !index) {
-					while(indextaken[indexcounter]) { indexcounter++; }
-					index = indexcounter;
+				if (!index) {
+					if (endpointType === 'AssertionConsumerService') {
+						while(indextaken[indexcounter]) { indexcounter++; }
+						index = indexcounter;						
+					}
 				}
 				if (index) {
 					indextaken[index] = 1;
