@@ -639,7 +639,7 @@ parseFromString = function(xmlstring) {
 			}
 		// Fallback			
 		], function(n) {
-			throw new MDException('Did not expect this element at organization level: ' + nodeName(n));
+			processTest(new TestResult('OrganizationunknownElement', 'Child element of Organization ' + nodeName(n) + ' not yet implemented'));
 		});
 		
 		
@@ -677,7 +677,7 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'Extensions',
 				callback: function(n) {
-					console.log('Parsing Extensions not yet implemented...');
+					processTest(new TestResult('entityextensionnotyetimplemented', 'Extension on entity level not yet implemented'));
 				}
 			},
 			{	
@@ -690,12 +690,13 @@ parseFromString = function(xmlstring) {
 				namespace: constants.ns.md, name: 'AttributeAuthorityDescriptor',
 				callback: function(n) {
 					console.log('Parsing AttributeAuthorityDescriptor not yet implemented...');
+					processTest(new TestResult('AttributeAuthorityDescriptorNotImplemented', 'Parsing AttributeAuthorityDescriptor not yet implemented'));
 				}
 			},
 			{	
 				namespace: constants.ns.md, name: 'IDPSSODescriptor',
 				callback: function(n) {
-					processTest(new TestResult('idpssodescriptor', 'SAMLmetaJS has not yet implemented support for parsing this element [' + nodeName(n) + ']'));
+					processTest(new TestResult('IDPSSODescriptorNotImplemented', 'Parsing IDPSSODescriptor not yet implemented'));
 				}
 			},
 			{	
@@ -713,7 +714,7 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.ds, name: 'Signature',
 				callback: function(n) {
-					console.log('Metadata document contains a signature at entity level.');
+					// console.log('Metadata document contains a signature at entity level.');
 				}
 			}
 
@@ -799,6 +800,13 @@ parseFromString = function(xmlstring) {
 	}
 	if (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService) {
 		processTest(new TestResult('noacsendpoint', 'The entity did not include an AssertionConsumerService endpoint', 0, 2));
+	}
+	
+	if (!entitydescriptor.organization) {
+		processTest(new TestResult('noorganization', 'The entity does not have information about the Organization', 0, 1));
+	}
+	if (!entitydescriptor.contacts) {
+		processTest(new TestResult('nocontacts', 'The entity does not have information about ContactPersons at all', 0, 1));
 	}
 	
 	return entitydescriptor;
