@@ -125,19 +125,33 @@
 		},
 
 		toXML: function (entitydescriptor) {
+			var 
+				indexcounter = 1,
+				indextaken = {};
+				
 			$('div#saml2sp fieldset').each(function (index, element) {
 				var newEndpoint = {};
-				var endpointType;
+				var endpointType, index;
 
 				if (!$(element).find('input').eq(0).attr('value')) {
 					return;
 				}
 
 				endpointType = $(element).find('select.datafield-type').val();
-				newEndpoint.Binding = $(element).find('select.datafield-binding').attr('value');
+				newEndpoint.Binding = $(element).find('select.datafield-binding').attr('value');				
 				newEndpoint.Location = $(element).find('input.datafield-location').attr('value');
 				newEndpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
-				newEndpoint.index = $(element).find('input.datafield-index').attr('value');
+				
+				index  = $(element).find('input.datafield-index').attr('value');
+				if (endpointType === 'AssertionConsumerService' && !index) {
+					while(indextaken[indexcounter]) { indexcounter++; }
+					index = indexcounter;
+				}
+				if (index) {
+					indextaken[index] = 1;
+					newEndpoint.index = index;					
+				}
+				
 				if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
 				if (!entitydescriptor.saml2sp[endpointType]) entitydescriptor.saml2sp[endpointType] = [];
 				entitydescriptor.saml2sp[endpointType].push(newEndpoint);
