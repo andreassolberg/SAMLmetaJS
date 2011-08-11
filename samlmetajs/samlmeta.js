@@ -240,8 +240,6 @@ var SAMLmetaJS = {};
 
 			console.log('fromXML()');
 			
-			
-
 
 			testEngine.reset();
 			entitydescriptor = mdreader.parseFromString($(node).val());

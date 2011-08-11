@@ -48,10 +48,18 @@ TestResult = function(id, text, value, significance) {
 
 TestResult.prototype.html = function() {
 	var 
-		html;
+		html,
+		valueClass,
+		significanceClass;
+	
+	valueClass = 'samlmetajs_testvalue' + this.value;
+	significanceClass = '';
+	if (this.significance !== null) {
+		significanceClass = 'samlmetajs_sigvalue' + this.significance;
+	}
 		
-	html = this.id + ' ' + this.value + ' ' + this.text;
-	html = '<div class="samlmetajs_testentry">' + html + '</div>';
+	html = this.text;
+	html = '<div class="samlmetajs_testentry samlmetajs_testentry_' + this.id + ' ' + valueClass + ' ' + significanceClass + '">' + html + '</div>';
 	return html;
 }
 

@@ -41,6 +41,29 @@ div#tabs button {
 }
 
 
+/* Verification box */
+div#tabs div#samlmetajs_testresults div.samlmetajs_testentry {
+	margin: 2px;
+	padding: 2px 1em 0px 20px;
+	background-repeat:no-repeat;
+	min-height: 16px;
+	border-top: 1px solid #ddd;
+}
+div#tabs div#samlmetajs_testresults div.samlmetajs_testentry.samlmetajs_testvalue1 {
+	background-image: url('../icons/accept.png');
+}
+div#tabs div#samlmetajs_testresults div.samlmetajs_testentry.samlmetajs_testvalue0.samlmetajs_sigvalue1 {
+	background-image: url('../icons/error.png');
+}
+div#tabs div#samlmetajs_testresults div.samlmetajs_testentry.samlmetajs_testvalue0.samlmetajs_sigvalue2 {
+	background-image: url('../icons/exclamation.png');
+}
+div#tabs div#samlmetajs_testresults div.samlmetajs_testentry.samlmetajs_testvalue2 {
+	background-image: url('../icons/information.png');
+}
+
+
+
 /* Metadata tab */
 
 
