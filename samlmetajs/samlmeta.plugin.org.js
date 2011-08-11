@@ -165,13 +165,13 @@
 
 		fromXML: function (entitydescriptor) {
 			var l;
-			
+		
+			UI.clearOrgname();
+			UI.clearOrgdisplayname();
+			UI.clearOrgurl();	
 			
 			if (entitydescriptor.organization) {
-				UI.clearOrgname();
-				UI.clearOrgdisplayname();
-				UI.clearOrgurl();
-				
+
 				if (entitydescriptor.organization.name) {
 					for (l in entitydescriptor.organization.name) {
 						if (entitydescriptor.organization.name.hasOwnProperty(l)) {
