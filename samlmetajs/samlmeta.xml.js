@@ -416,17 +416,59 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			return newNode;
 		},
 		"addEndpoint": function(node, endpointtype, endpoint) {
-			var newNode;
+			var newNode, beforeNode;
 			newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:' + endpointtype);
 			if (endpoint.Binding) newNode.setAttribute('Binding', endpoint.Binding);
 			if (endpoint.Location) newNode.setAttribute('Location', endpoint.Location);
 			if (endpoint.ResponseLocation) newNode.setAttribute('ResponseLocation', endpoint.ResponseLocation);
 			if (endpoint.index) newNode.setAttribute('index', endpoint.index);
-			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
-				[
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
-				]
-			));
+			
+			/*
+			 * Order of elements from XSD:
+				
+				From SSORoleDescriptorType
+					<element ref="md:ArtifactResolutionService" minOccurs="0" maxOccurs="unbounded"/>
+		            <element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
+		            <element ref="md:ManageNameIDService" minOccurs="0" maxOccurs="unbounded"/>
+		            <element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
+				
+				From SPSSORoleDescriptor
+					<element ref="md:AssertionConsumerService" maxOccurs="unbounded"/>
+		            <element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
+			*/
+			if (endpointtype = 'ArtifactResolutionService') {
+				beforeNode = [
+					{'localName': 'SingleLogoutService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'ManageNameIDService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+				];
+			} else if (endpointtype = 'SingleLogoutService') {
+				beforeNode = [
+					{'localName': 'ManageNameIDService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+				];
+			} else if (endpointtype = 'ManageNameIDService') {
+				beforeNode = [
+					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+				];
+			} else if (endpointtype = 'NameIDFormat') {
+				beforeNode = [
+					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+				];
+			} else {
+				beforeNode = [
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+				];
+			}
+
+			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node, beforeNode) );
 		},
 
 		"addIfNotSPSSODescriptor": function(node) {
