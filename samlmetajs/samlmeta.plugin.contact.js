@@ -76,12 +76,11 @@
 
 		fromXML: function (entitydescriptor) {
 			var i;
-			if (!entitydescriptor.contacts) {
-				return;
-			}
 
-			// Add existing contacts (from XML)
+			// Clear contacts
 			UI.clearContacts();
+			
+			// Add existing contacts (from XML)			
 			if (entitydescriptor.contacts) {
 				for (i = 0; i < entitydescriptor.contacts.length; i++ ) {
 					UI.addContact(entitydescriptor.contacts[i]);
