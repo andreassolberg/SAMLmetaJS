@@ -126,7 +126,14 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					}	
 				}
 				
-				root.appendChild(node);
+				//	root.appendChild(node);
+				root.insertBefore(node, SAMLmetaJS.XML.findChildElement(root,
+					[
+						{'localName': 'ContactPerson', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+						{'localName': 'AdditionalMetadataLocation', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
+					]
+				));
+				
 			} else {
 				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
 			}
@@ -145,7 +152,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			keyinfo = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:KeyInfo');
 			x509data = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:X509Data');
 			x509cert = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:X509Certificate');
-			x509cert.appendChild( doc.createTextNode(cert));
+			x509cert.appendChild(doc.createTextNode(cert));
 			x509data.appendChild(x509cert);
 			keyinfo.appendChild(x509data);
 			keydescriptor.appendChild(keyinfo);
@@ -181,7 +188,12 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				emailaddress.appendChild(doc.createTextNode(contact.emailAddress));
 				newNode.appendChild(emailaddress);
 			}
-			node.appendChild(newNode);
+//			node.appendChild(newNode);
+			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
+				[
+					{'localName': 'AdditionalMetadataLocation', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
+				]
+			));
 		},
 		
 		"addOrganizationElement": function(orgnode, type, lang, value) {
@@ -191,6 +203,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			newNode.appendChild(doc.createTextNode(value));
 
 			orgnode.appendChild(newNode);
+			
+
 		},
 		
 		"updateMDUI": function(node, entitydescriptor) {
