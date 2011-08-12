@@ -43,12 +43,19 @@
 	<script type="text/javascript">
 	    $(document).ready(function(){
 			var options = {
-				'ruleset': {
-					'noentityname': 2,
-					'noentitydescr': 2,
-					'noorganization': 2,
-					'nocontacts': 2
- 				}
+				// 'ruleset': {
+				// 	'noentityname': 2,
+				// 	'noentitydescr': 2,
+				// 	'noorganization': 2,
+				// 	'nocontacts': 2
+				//	},
+				'showValidation': true,
+				'showValidationLevel': {
+					'info': false,
+					'ok': false,
+					'warning': true,
+					'error': true
+				}
 			};
 	        $("textarea#metadata").SAMLmetaJS(options);
 	

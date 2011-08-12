@@ -221,7 +221,14 @@ var SAMLmetaJS = {};
 
 		var 
 			currentTab = 'xml',
-			mdreaderSetup = undefined;
+			mdreaderSetup = undefined,
+			showValidation = false,
+			showValidationLevel = {
+				'info': true,
+				'warning': true,
+				'error': true,
+				'ok': true
+			};
 
 		var setEntityID = function (entityid) {
 			$("input#entityid").val(entityid);
@@ -230,7 +237,7 @@ var SAMLmetaJS = {};
 		var testEngine;
 
 
-		var showTestResults = function() {
+		var showTestResults = function(testEngine, showLevel) {
 			var 
 				result = testEngine.getResult(),
 				i = 0,
@@ -241,7 +248,15 @@ var SAMLmetaJS = {};
 			$(testnode).empty();
 			
 			for(i = 0; i < result.length; i ++) {
-				$(testnode).append(result[i].html() );
+				console.log('Considering:');
+				console.log(result[i]);
+				console.log(result[i].getLevel());
+				console.log(showLevel);
+				console.log(showLevel[result[i].getLevel()]);
+
+				if (showLevel[result[i].getLevel()]) {
+					$(testnode).append(result[i].html() );					
+				}
 			}
 			
 		}
@@ -260,7 +275,9 @@ var SAMLmetaJS = {};
 			entitydescriptor = mdreader.parseFromString($(node).val());
 			setEntityID(entitydescriptor.entityid);
 			
-			showTestResults(testEngine);
+			if (showValidation === true) {
+				showTestResults(testEngine, showValidationLevel);
+			}
 			
 			SAMLmetaJS.pluginEngine.execute('fromXML', [entitydescriptor]);
 		};
@@ -295,10 +312,12 @@ var SAMLmetaJS = {};
 			/*
 			 * Then parse the generated XML again, to perform the validation..
 			 */
-			testEngine.reset();
-			entitydescriptor = mdreader.parseFromString($(node).val());
-			setEntityID(entitydescriptor.entityid);
-			showTestResults(testEngine);
+			if (showValidation === true) {
+				testEngine.reset();
+				entitydescriptor = mdreader.parseFromString($(node).val());
+				setEntityID(entitydescriptor.entityid);
+				showTestResults(testEngine, showValidationLevel);				
+			}
 			// ---
 
 		};
@@ -335,14 +354,18 @@ var SAMLmetaJS = {};
 			mdreaderSetup = options.ruleset;
 		}
 		
+		if (options.showValidation) {
+			showValidation = options.showValidation;
+		}
+		if (options.showValidationLevel) {
+			showValidationLevel = options.showValidationLevel;
+		}
+		
 		
 		testEngine = new SAMLmetaJS.TestEngine(mdreaderSetup);
 		
 		mdreader.setup({
 			testProcessor: function(t) {
-				// console.log('testProcessor (t) ');
-				// console.log(t);
-				// console.log(testEngine);
 				testEngine.addTest(t);
 			}
 		});

@@ -288,6 +288,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		"addRequestedAttribute": function(node, attr) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:RequestedAttribute');
 			newNode.setAttribute('Name', attr);
+			newNode.setAttribute('NameFormat', 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri');
 			node.appendChild(newNode);
 		},
 		"addAttribute": function(node, attr) {

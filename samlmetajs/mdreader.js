@@ -46,7 +46,20 @@ TestResult = function(id, text, value, significance) {
 	this.text = text;
 }
 
-TestResult.prototype.html = function() {
+TestResult.prototype.getLevel = function () {
+	if (this.significance === 0 || this.value === 2) {
+		return 'info';
+	} else if (this.value === 1) {
+		return 'ok';
+	} else if (this.significance === 1) {
+		return 'warning';
+	} else {
+		return 'error';
+	}
+	
+}
+
+TestResult.prototype.html = function () {
 	var 
 		html,
 		valueClass,
