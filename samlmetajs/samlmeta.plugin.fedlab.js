@@ -37,7 +37,12 @@
 	    },
 
 	    'fromXML': function(entitydescriptor) {
-		    if (!entitydescriptor.entityAttributes) return;
+			// 		    if (!entitydescriptor.entityAttributes) {
+			//     $("div#fedlab > div.content input#fedlab_initsso").val(initsso);
+			//     $("div#fedlab > div.content input#fedlab_attributeurl").val(attributeurl);
+			//     $("div#fedlab > div.content input#fedlab_initslo").val(initslo);
+			// 	return;
+			// }
 
 		    var initsso 		= SAMLmetaJS.plugins.fedlab._getAttribute(entitydescriptor.entityAttributes, 'https://www.fed-lab.org/attributes/initsso');
 		    var attributeurl 	= SAMLmetaJS.plugins.fedlab._getAttribute(entitydescriptor.entityAttributes, 'https://www.fed-lab.org/attributes/attributeurl');
@@ -95,6 +100,7 @@
     };
 
     SAMLmetaJS.plugins.fedlab._getAttribute = function(entityAttributes, name) {
+		console.log('Looking up attribute [' + name+ ']')
 	    if (!entityAttributes) return '';
 	    if (!entityAttributes[name]) return '';
 	    if (!entityAttributes[name]['values']) return '';

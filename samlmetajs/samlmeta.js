@@ -267,6 +267,8 @@ var SAMLmetaJS = {};
 			entitydescriptor = mdreader.parseFromString($(node).val());
 			setEntityID(entitydescriptor.entityid);
 			
+			console.log(entitydescriptor);
+			
 			if (showValidation === true) {
 				showTestResults(testEngine, showValidationLevel);
 			}
@@ -308,7 +310,9 @@ var SAMLmetaJS = {};
 				testEngine.reset();
 				entitydescriptor = mdreader.parseFromString($(node).val());
 				setEntityID(entitydescriptor.entityid);
-				showTestResults(testEngine, showValidationLevel);				
+				showTestResults(testEngine, showValidationLevel);		
+				
+				console.log(entitydescriptor);		
 			}
 			// ---
 

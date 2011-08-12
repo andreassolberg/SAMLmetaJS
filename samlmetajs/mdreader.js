@@ -532,8 +532,36 @@ parseFromString = function(xmlstring) {
 		
 
 		return acs;
+	}
 
+
+	function parseAttribute (node) {
 		
+		var 
+			attribute = {}, 
+			values = [];
+		
+		expectNode(node, 'Attribute', constants.ns.saml);
+		
+		attribute.name = nodeGetAttribute(node, 'Name', null);
+		attribute.nameFormat = nodeGetAttribute(node, 'NameFormat', null);
+
+
+		// Process children of EntityDescriptor
+		nodeProcessChildren(node, [
+			{	
+				namespace: constants.ns.saml, name: 'AttributeValue',
+				callback: function(n) {
+					values.push(nodeGetTextRecursive(n));
+				}
+			}
+		// Fallback			
+		], function(n) {
+			processTest(new TestResult('unknownattributecontent', 'Unexpected child element of Attribute [' + nodeName(n) + ']', 0, 1));
+		});
+		
+		attribute.values = values;
+		return attribute;
 	}
 
 	
@@ -706,11 +734,73 @@ parseFromString = function(xmlstring) {
 			processTest(new TestResult('OrganizationunknownElement', 'Child element of Organization ' + nodeName(n) + ' not yet implemented'));
 		});
 		
-		
-		// console.log(organization);
-		
+		// console.log(organization);		
 		return organization;
+	}
+	
+	function parseEntityAttributes (node) {
 		
+		var attributes = {};
+		
+		expectNode(node, 'EntityAttributes', constants.ns.mdattr);
+		
+		// Process children of EntityDescriptor
+		nodeProcessChildren(node, [
+			{	
+				namespace: constants.ns.saml, name: 'Attribute',
+				callback: function(n) {
+					var newAttr = parseAttribute(n);
+					if (newAttr.name) attributes[newAttr.name] = newAttr;
+				}
+			},
+			{	
+				namespace: constants.ns.saml, name: 'Assertion',
+				callback: function(n) {
+					processTest(new TestResult('notimplementedentattributesassertion', 'Parsing EntityAttributes with <Assertion> is not yet implemented'));
+				}
+			},
+			{	
+				namespace: constants.ns.md,
+				callback: function(n) {
+					processTest(new TestResult('extillegalnamespacemdent', 'Illegal namespace (md) in Extensions at EntityDescriptor [' + nodeName(n) + ']', 0, 2));
+				}
+			}
+		// Fallback	
+		], function(n) {
+			processTest(new TestResult('notimplementedentext', 'Parsing Extensions at EntityDescriptor with [' + nodeName(n) + '] not implemented'));
+		});	
+		
+		return attributes;
+	}
+	
+	
+	function parseEntityExtensions (node, entity) {
+		expectNode(node, 'Extensions', constants.ns.md);
+		
+		// Process children of EntityDescriptor
+		nodeProcessChildren(node, [
+			{	
+				namespace: constants.ns.mdattr, name: 'EntityAttributes',
+				callback: function(n) {
+					entity.entityAttributes = parseEntityAttributes(n);
+				}
+			},
+			{	
+				namespace: constants.ns.saml,
+				callback: function(n) {
+					processTest(new TestResult('extillegalnamespacesamlent', 'Illegal namespace (saml) in Extensions at EntityDescriptor [' + nodeName(n) + ']', 0, 2));
+				}
+			},
+			{	
+				namespace: constants.ns.md,
+				callback: function(n) {
+					processTest(new TestResult('extillegalnamespacemdent', 'Illegal namespace (md) in Extensions at EntityDescriptor [' + nodeName(n) + ']', 0, 2));
+				}
+			}
+		// Fallback	
+		], function(n) {
+			processTest(new TestResult('notimplementedentext', 'Parsing Extensions at EntityDescriptor with [' + nodeName(n) + '] not implemented'));
+		});
 		
 	}
 	
@@ -741,7 +831,8 @@ parseFromString = function(xmlstring) {
 			{	
 				namespace: constants.ns.md, name: 'Extensions',
 				callback: function(n) {
-					processTest(new TestResult('entityextensionnotyetimplemented', 'Extension on entity level not yet implemented'));
+					parseEntityExtensions(n, entity);
+					// processTest(new TestResult('entityextensionnotyetimplemented', 'Extension on entity level not yet implemented'));
 				}
 			},
 			{	
