@@ -186,12 +186,25 @@ var SAMLmetaJS = {};
 	};
 	
 	SAMLmetaJS.TestEngine = function(ruleset) {
-		this.ruleset = ruleset;
+		if (
+			(typeof ruleset === 'undefined') ||
+			(ruleset === null)
+		 	){
+			
+			this.ruleset = {}
+		} else {
+			this.ruleset = ruleset;			
+		}
 		this.tests = [];
 	}
 	
 	SAMLmetaJS.TestEngine.prototype.addTest = function(test) {
-		if (this.ruleset[test.id]) test.significance = this.ruleset[test.id];
+		if (this.ruleset.hasOwnProperty(test.id)) {
+			console.log('Overriding significance from [' + test.significance + '] to [' + this.ruleset[test.id] + '] for [' + test.id + ']');
+			test.significance = this.ruleset[test.id];			
+		}
+		console.log('Did not override significance from [' + test.significance + ']  for [' + test.id + ']');
+		console.log(this.ruleset);
 		this.tests.push(test);
 	}
 	
@@ -206,7 +219,9 @@ var SAMLmetaJS = {};
 
 	SAMLmetaJS.sync = function(node, options) {
 
-		var currentTab = 'xml';
+		var 
+			currentTab = 'xml',
+			mdreaderSetup = undefined;
 
 		var setEntityID = function (entityid) {
 			$("input#entityid").val(entityid);
@@ -316,11 +331,12 @@ var SAMLmetaJS = {};
 
 		embrace();
 		
-		testEngine = new SAMLmetaJS.TestEngine(
-			{
-				'certincluded': 0
-			}
-		);
+		if (options.ruleset) {
+			mdreaderSetup = options.ruleset;
+		}
+		
+		
+		testEngine = new SAMLmetaJS.TestEngine(mdreaderSetup);
 		
 		mdreader.setup({
 			testProcessor: function(t) {

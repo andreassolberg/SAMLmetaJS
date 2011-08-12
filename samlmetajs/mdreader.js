@@ -58,7 +58,7 @@ TestResult.prototype.html = function() {
 		significanceClass = 'samlmetajs_sigvalue' + this.significance;
 	}
 		
-	html = this.text;
+	html = this.text; // + ' [' + this.significance + '] [' + this.id + ']';
 	html = '<div class="samlmetajs_testentry samlmetajs_testentry_' + this.id + ' ' + valueClass + ' ' + significanceClass + '">' + html + '</div>';
 	return html;
 }
@@ -602,10 +602,7 @@ parseFromString = function(xmlstring) {
 		], function(n) {
 			processTest(new TestResult('saml2spunknownchild', 'Parsing this child of SPSSODescr not yet implemented [' + nodeName(n) + ']'));
 		});
-		
-		
-		// console.log(entity);
-		
+				
 		return saml2sp;
 	}
 	
@@ -749,7 +746,6 @@ parseFromString = function(xmlstring) {
 					if (entity.entityid) {
 						result[entity.entityid] = entity;
 					}
-					// console.log('EntityDescriptor found... nice..');
 				}
 			},
 			{
@@ -777,8 +773,6 @@ parseFromString = function(xmlstring) {
 	}
 
 	doc = getDoc(xmlstring);
-	
-//	parseEntitiesDescriptor(doc);
 	
 	var entitydescriptor = parseEntityDescriptor(doc);
 	
@@ -831,8 +825,6 @@ if (isnode) {
 	window.mdreader.parseFromString = parseFromString;
 	window.mdreader.setup = setup;
 }
-
-
 
 
 })();

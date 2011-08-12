@@ -42,7 +42,16 @@
 	
 	<script type="text/javascript">
 	    $(document).ready(function(){
-	        $("textarea#metadata").SAMLmetaJS();                
+			var options = {
+				'ruleset': {
+					'noentityname': 2,
+					'noentitydescr': 2,
+					'noorganization': 2,
+					'nocontacts': 2
+ 				}
+			};
+	        $("textarea#metadata").SAMLmetaJS(options);
+	
 	    });
 	</script>
 
@@ -57,11 +66,8 @@
 	<h1>Demo of SAMLmetaJS</h1>
 
 	<form action="?" method="post">
-		
 		<textarea name="metadata" id="metadata" style="width: 100%"></textarea>
-		
-		<input type="submit" name="s" value="Complete »" />
-		
+		<input type="submit" name="s" value="Complete »" />		
 	</form>
 
 
