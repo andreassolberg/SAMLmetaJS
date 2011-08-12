@@ -29,6 +29,24 @@ if (typeof window == 'undefined') {
 	
 }
 
+
+
+/*
+ * Class: TestResult
+ * Contains information about a single test performed regarding metadata.
+ * The objects contain the following properties:
+ * 
+ * id: an identifier, unique for this type of test.
+ * text: a human readable textual description of the test.
+ * value: Whether the test succeeded or failed.
+ *		0	failed
+ * 		1	suceeded
+ *		2	NA
+ * significance: How signficant is it that this test fails.
+ *		0	Not signficant at all. Just informative.
+ *		1	Fail means a 'warning' (usually a SHOULD statement that is violated)
+ *		2	Fail means a critical error (failed requirement)
+ */
 TestResult = function(id, text, value, significance) {
 	this.id = id;
 	this.significance = null;
@@ -56,7 +74,6 @@ TestResult.prototype.getLevel = function () {
 	} else {
 		return 'error';
 	}
-	
 }
 
 TestResult.prototype.html = function () {
