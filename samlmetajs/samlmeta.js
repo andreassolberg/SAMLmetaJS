@@ -203,8 +203,6 @@ var SAMLmetaJS = {};
 			console.log('Overriding significance from [' + test.significance + '] to [' + this.ruleset[test.id] + '] for [' + test.id + ']');
 			test.significance = this.ruleset[test.id];			
 		}
-		console.log('Did not override significance from [' + test.significance + ']  for [' + test.id + ']');
-		console.log(this.ruleset);
 		this.tests.push(test);
 	}
 	
@@ -248,12 +246,6 @@ var SAMLmetaJS = {};
 			$(testnode).empty();
 			
 			for(i = 0; i < result.length; i ++) {
-				console.log('Considering:');
-				console.log(result[i]);
-				console.log(result[i].getLevel());
-				console.log(showLevel);
-				console.log(showLevel[result[i].getLevel()]);
-
 				if (showLevel[result[i].getLevel()]) {
 					$(testnode).append(result[i].html() );					
 				}

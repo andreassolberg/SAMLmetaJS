@@ -32,6 +32,35 @@ if (typeof window == 'undefined') {
 
 
 /*
+ * Class MDEntityDescriptor
+ * 
+ * This is representing the entitydescriptor object. A prototype is added
+ * to make easily accessible helper function to get content, such as endpoints.
+ */
+MDEntityDescriptor = function() {
+	
+}
+
+/*
+ * Look for certiciate of a specific type.
+ * type can be 'signing' or 'encryption'
+ */
+MDEntityDescriptor.prototype.hasCertOfType = function (type) {
+	var 
+		i;
+	
+	if (!this.saml2sp || !this.saml2sp.certs) return false;
+	
+	for(i = 0; i < this.saml2sp.certs.length; i++) {
+		// console.log('Looking for certificate of type:'); console.log(type); console.log(this.saml2sp.certs[i]);
+		if (this.saml2sp.certs[i].use === 'both') return true;
+		if (this.saml2sp.certs[i].use === type) return true;
+	}
+	return false;
+}
+
+
+/*
  * Class: TestResult
  * Contains information about a single test performed regarding metadata.
  * The objects contain the following properties:
@@ -689,9 +718,10 @@ parseFromString = function(xmlstring) {
 	function parseEntityDescriptor (node) {
 		
 		var 
-			entity = {},
+			entity,
 			validuntil, validuntilDate;
 
+		entity = new MDEntityDescriptor();
 
 
 		expectNode(node, 'EntityDescriptor', constants.ns.md);
@@ -839,6 +869,18 @@ parseFromString = function(xmlstring) {
 	if (!entitydescriptor.contacts) {
 		processTest(new TestResult('nocontacts', 'The entity does not have information about ContactPersons at all', 0, 1));
 	}
+	
+	if (entitydescriptor.hasCertOfType('signing')) {
+		processTest(new TestResult('hascertsigning', 'The entity does have a signing certificate', 1, 1));
+	} else {
+		processTest(new TestResult('hascertsigning', 'The entity does NOT have a signing certificate', 0, 1));		
+	}
+	if (entitydescriptor.hasCertOfType('encryption')) {
+		processTest(new TestResult('hascertencryption', 'The entity does have a encryption certificate', 1, 1));
+	} else {
+		processTest(new TestResult('hascertencryption', 'The entity does NOT have a encryption certificate', 0, 1));		
+	}
+
 	
 	return entitydescriptor;
 }
