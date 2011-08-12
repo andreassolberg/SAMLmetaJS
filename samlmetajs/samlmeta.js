@@ -258,16 +258,7 @@ var SAMLmetaJS = {};
 			currentTab = 'xml';
 			console.log('toXML()');
 
-			var entitydescriptor = {
-				// 'name': {},
-				// 'descr': {},
-				// 'contacts': [],
-				// 'organization': {},
-				// 'saml2sp': {
-				// 	'AssertionConsumerService': [],
-				// 	'SingleLogoutService': []
-				// }
-			};
+			var entitydescriptor = {};
 
 			entitydescriptor.entityid = $('input#entityid').val();
 
@@ -285,6 +276,15 @@ var SAMLmetaJS = {};
 			var xmlstring = parser.getXMLasString();
 			xmlstring = SAMLmetaJS.XML.prettifyXML(xmlstring);
 			$(node).val(xmlstring);
+			
+			/*
+			 * Then parse the generated XML again, to perform the validation..
+			 */
+			testEngine.reset();
+			entitydescriptor = mdreader.parseFromString($(node).val());
+			setEntityID(entitydescriptor.entityid);
+			showTestResults(testEngine);
+			// ---
 
 		};
 

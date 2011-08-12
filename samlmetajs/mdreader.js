@@ -349,8 +349,8 @@ parseFromString = function(xmlstring) {
 		if (!cert.cert) {
 			processTest(new TestResult('certdatamissing', 'Could not extract certificate data properly from KeyDescriptor element ', 0, 1));
 		}
+		
 
-	
 		
 		return cert;
 	}
@@ -670,7 +670,6 @@ parseFromString = function(xmlstring) {
 		expectNode(node, 'EntityDescriptor', constants.ns.md);
 		
 		entity.entityid = nodeGetAttribute(node, 'entityID');
-
 
 		
 		validuntil = nodeGetAttribute(node, 'validUntil');
