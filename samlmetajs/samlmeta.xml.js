@@ -48,14 +48,14 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.init, 'RequestInitiator');
 				if (hasRequestInitiator) {
 					for (i = 0; i < entitydescriptor.saml2sp.RequestInitiator.length; i += 1) {
-						this.addRequestInitiator(extensions, entitydescriptor.saml2sp.RequestInitiator[i]);
+						this.addExtensionEndpoint(extensions, entitydescriptor.saml2sp.RequestInitiator[i], 'init:RequestInitiator', SAMLmetaJS.Constants.ns.init);
 					}
 				}
 
 				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.idpdisc, 'DiscoveryResponse');
 				if (hasDiscoveryResponse) {
 					for (i = 0; i < entitydescriptor.saml2sp.DiscoveryResponse.length; i += 1) {
-						this.addDiscoveryResponse(extensions, entitydescriptor.saml2sp.DiscoveryResponse[i]);
+						this.addExtensionEndpoint(extensions, entitydescriptor.saml2sp.DiscoveryResponse[i], 'idpdisc:DiscoveryResponse', SAMLmetaJS.Constants.ns.idpdisc);
 					}
 				}
 
@@ -324,23 +324,13 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 			node.appendChild(newNode);
 		},
-		"addRequestInitiator": function (node, requestInitiator) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.init, 'init:RequestInitiator');
-			if (requestInitiator.Binding) {
-				newNode.setAttribute('Binding', requestInitiator.Binding);
+		"addExtensionEndpoint": function (node, endpoint, endpointname, ns) {
+			var newNode = doc.createElementNS(ns, endpointname);
+			if (endpoint.Binding) {
+				newNode.setAttribute('Binding', endpoint.Binding);
 			}
-			if (requestInitiator.Location) {
-				newNode.setAttribute('Location', requestInitiator.Location);
-			}
-			node.appendChild(newNode);
-		},
-		"addDiscoveryResponse": function (node, discoveryResponse) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.idpdisc, 'idpdisc:DiscoveryResponse');
-			if (discoveryResponse.Binding) {
-				newNode.setAttribute('Binding', discoveryResponse.Binding);
-			}
-			if (discoveryResponse.Location) {
-				newNode.setAttribute('Location', discoveryResponse.Location);
+			if (endpoint.Location) {
+				newNode.setAttribute('Location', endpoint.Location);
 			}
 			node.appendChild(newNode);
 		},
