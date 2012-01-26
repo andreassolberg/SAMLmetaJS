@@ -208,6 +208,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 		
 		"updateMDUI": function(node, entitydescriptor) {
+			var hasKeywords = false;
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
 				for(lang in entitydescriptor.name) {
@@ -218,6 +219,16 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Description');
 				for(lang in entitydescriptor.descr) {
 					this.addMDUIDescription(node, lang, entitydescriptor.descr[lang]);
+				}
+			}
+			hasKeywords = (entitydescriptor.saml2sp
+						&& entitydescriptor.saml2sp.mdui
+						&& entitydescriptor.saml2sp.mdui.keywords
+						&& SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.mdui.keywords));
+			if (hasKeywords) {
+				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
+				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
+					this.addMDUIKeywords(node, lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
 				}
 			}
 			SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'GeolocationHint');
@@ -242,6 +253,13 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 		"addMDUIDescription": function(node, lang, text) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Description');
+			var text = doc.createTextNode(text);
+			newNode.setAttribute('xml:lang', lang);
+			newNode.appendChild(text);
+			node.appendChild(newNode);
+		},
+		"addMDUIKeywords": function(node, lang, text) {
+			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords');
 			var text = doc.createTextNode(text);
 			newNode.setAttribute('xml:lang', lang);
 			newNode.appendChild(text);

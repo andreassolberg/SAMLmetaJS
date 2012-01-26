@@ -592,6 +592,13 @@ parseFromString = function(xmlstring) {
 				callback: function(n) {
 					mdui.location = nodeGetTextRecursive(n).substr(4);
 				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'Keywords',
+				callback: function (n) {
+					if (!mdui.keywords) mdui.keywords = {};
+					mdui.keywords[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+				}
 			}
 		// Fallback	
 		], function(n) {

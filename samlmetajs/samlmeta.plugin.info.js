@@ -6,6 +6,9 @@
 		"clearInfodescr": function() {
 			$("div#info div#infodescr").empty();
 		},
+		"clearInfokeywords": function () {
+			$("div#info div#infokeywords").empty();
+		},
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">' +
@@ -72,6 +75,39 @@
 				e.preventDefault();
 				$(e.target).closest('div.infodescrdiv').remove();
 			});
+		},
+		"addInfokeywords": function (lang, keywords) {
+			var randID = 'infokeywords' + Math.floor(Math.random() * 10000 + 1000);
+			var infoHTML = '<div class="infokeywordsdiv">' +
+				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
+			var languageFound = false;
+			var language, checked;
+
+			for (language in SAMLmetaJS.Constants.languages) {
+				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
+					checked = '';
+					if (lang === language) {
+						checked = ' selected="selected" ';
+						languageFound = true;
+					}
+					infoHTML += '<option value="' + language + '" ' + checked + '>' +
+						SAMLmetaJS.Constants.languages[language] +
+						'</option>';
+				}
+			}
+			if (!languageFound) {
+				infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
+			}
+
+			infoHTML += '</select>' +
+				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
+				'<button style="" class="removekeywords">Remove</button>' +
+				'</div>';
+
+			$(infoHTML).appendTo("div#info div#infokeywords").find('button.removekeywords').click(function (e) {
+				e.preventDefault();
+				$(e.target).closest('div.infokeywordsdiv').remove();
+			});
 		}
 	};
 
@@ -94,14 +130,21 @@
 					'<fieldset class="name"><legend>Name of Service</legend>' +
 						'<div id="infoname"></div>' +
 						'<div>' +
-							'<button class="addname">Add name in one more language</button>' +
+							'<button class="addname">Add name in one more languages</button>' +
 						'</div>' +
 					'</fieldset>' +
 
 					'<fieldset class="description"><legend>Description of Service</legend>' +
 						'<div id="infodescr"></div>' +
 						'<div>' +
-							'<button class="adddescr">Add description in one more language</button>' +
+							'<button class="adddescr">Add description in one more languages</button>' +
+						'</div>' +
+					'</fieldset>' +
+
+					'<fieldset class="keywords"><legend>Keywords (space separated)</legend>' +
+						'<div id="infokeywords"></div>' +
+						'<div>' +
+							'<button class="addkeywords">Add keywords in one more languages</button>' +
 						'</div>' +
 					'</fieldset>' +
 
@@ -118,12 +161,16 @@
 				e.preventDefault();
 				UI.addInfodescr('en', '');
 			});
+			$("div#info button.addkeywords").click(function(e) {
+				e.preventDefault();
+				UI.addInfokeywords('en', '');
+			});
 		},
 
 		fromXML: function (entitydescriptor) {
 			var l;
 
-			// Add name and description
+			// Add name, description and keywords
 			UI.clearInfoname();
 			if (entitydescriptor.name) {
 				for (l in entitydescriptor.name) {
@@ -138,6 +185,17 @@
 				for (l in entitydescriptor.descr) {
 					if (entitydescriptor.descr.hasOwnProperty(l)) {
 						UI.addInfodescr(l, entitydescriptor.descr[l]);
+					}
+				}
+			}
+
+			UI.clearInfokeywords();
+			if (entitydescriptor.saml2sp
+				&& entitydescriptor.saml2sp.mdui
+				&& entitydescriptor.saml2sp.mdui.keywords) {
+				for (l in entitydescriptor.saml2sp.mdui.keywords) {
+					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(l)) {
+						UI.addInfokeywords(l, entitydescriptor.saml2sp.mdui.keywords[l]);
 					}
 				}
 			}
@@ -159,6 +217,22 @@
 				}
 				if (!entitydescriptor.descr) entitydescriptor.descr = {};
 				entitydescriptor.descr[$(element).find('div > select').val()] = value;
+			});
+			$('div#infokeywords > div').each(function (index, element) {
+				var value = $(element).children('input').attr('value');
+				if (!value) {
+					return;
+				}
+				if (!entitydescriptor.saml2sp) {
+					entitydescriptor.saml2sp = {};
+				}
+				if (!entitydescriptor.saml2sp.mdui) {
+					entitydescriptor.saml2sp.mdui = {};
+				}
+				if (!entitydescriptor.saml2sp.mdui.keywords) {
+					entitydescriptor.saml2sp.mdui.keywords = {};
+				}
+				entitydescriptor.saml2sp.mdui.keywords[$(element).children('select').val()] = value;
 			});
 		}
 	};
