@@ -294,6 +294,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		"addAttribute": function(node, attr) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.saml, 'saml:Attribute');
 			newNode.setAttribute('Name', attr.name);
+			if (attr.friendlyName) {
+				newNode.setAttribute('FriendlyName', attr.friendlyName);
+			}
 			if (attr.nameFormat) {
 				newNode.setAttribute('NameFormat', attr.nameFormat);
 			}
