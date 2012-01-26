@@ -638,6 +638,16 @@ parseFromString = function(xmlstring) {
 						processTest(new TestResult('RequestInitiatorInvalidURL', 'RequestInitiator/@Location was not a valid URL', 0, 2));
 					}
 				}
+			},
+			{
+				namespace: constants.ns.idpdisc, namee: 'DiscoveryResponse',
+				callback: function (n) {
+					var e = parseEndpoint(n);
+					apush(saml2sp, 'DiscoveryResponse', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('DiscoveryResponseInvalidURL', 'DiscoveryResponse/@Location was not a valid URL', 0, 2));
+					}
+				}
 			}
 		// Fallback	
 		], function(n) {

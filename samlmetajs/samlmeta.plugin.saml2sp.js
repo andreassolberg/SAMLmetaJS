@@ -112,7 +112,8 @@
 						
 						if (endpoint !== 'AssertionConsumerService' &&
 							endpoint !== 'SingleLogoutService' &&
-							endpoint !== 'RequestInitiator'
+							endpoint !== 'RequestInitiator' &&
+							endpoint !== 'DiscoveryResponse'
 						) {
 							continue;
 						}

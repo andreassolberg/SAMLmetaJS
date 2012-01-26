@@ -62,6 +62,7 @@ var SAMLmetaJS = {};
 			'mdattr': "urn:oasis:names:tc:SAML:metadata:attribute",
 			'saml': "urn:oasis:names:tc:SAML:2.0:assertion",
 			'init': "urn:oasis:names:tc:SAML:profiles:SSO:request-init",
+			'idpdisc': "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol",
 			'xsd': "http://www.w3.org/2001/XMLSchema",
 			'ds': "http://www.w3.org/2000/09/xmldsig#"
 		},
@@ -107,7 +108,8 @@ var SAMLmetaJS = {};
 			'sp': {
 				'AssertionConsumerService': 'AssertionConsumerService',
 				'SingleLogoutService': 'SingleLogoutService',
-				'RequestInitiator': 'RequestInitiator'
+				'RequestInitiator': 'RequestInitiator',
+				'DiscoveryResponse': 'DiscoveryResponse'
 			},
 			'idp' : {}
 		},
@@ -117,7 +119,8 @@ var SAMLmetaJS = {};
 			'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact': 'HTTP Artifact',
 			'urn:oasis:names:tc:SAML:2.0:bindings:SOAP': 'SOAP',
 			'urn:oasis:names:tc:SAML:2.0:bindings:PAOS': 'Reverse SOAP (PAOS)',
-			'urn:oasis:names:tc:SAML:profiles:SSO:request-init': 'Request Initiator'
+			'urn:oasis:names:tc:SAML:profiles:SSO:request-init': 'Request Initiator',
+			'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol': 'Discovery Response'
 		},
 		'attributes' : {
 			'urn:oid:0.9.2342.19200300.100.1.1': 'uid',

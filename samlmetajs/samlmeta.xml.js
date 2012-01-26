@@ -14,7 +14,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			console.log('Update XML document');
 
-			var root, spdescriptor, attributeconsumer, extensions, i, attr, lang, node, hasRequestInitiator;
+			var root, spdescriptor, attributeconsumer, extensions, i, attr, lang, node, hasRequestInitiator, hasDiscoveryResponse;
 			root = this.addIfNotEntityDescriptor();
 
 			if (entitydescriptor.entityid)
@@ -36,13 +36,20 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				entitydescriptor.saml2sp.RequestInitiator.length > 0
 			);
 
+			hasDiscoveryResponse = (
+				entitydescriptor.saml2sp &&
+				entitydescriptor.saml2sp.DiscoveryResponse &&
+				entitydescriptor.saml2sp.DiscoveryResponse.length > 0
+			);
+
 			spdescriptor = this.addIfNotSPSSODescriptor(root);
 			
 			if (
 				SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
 				SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
 				entitydescriptor.location ||
-				hasRequestInitiator
+				hasRequestInitiator ||
+				hasDiscoveryResponse
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
 				mdui = this.addIfNotMDUI(extensions);
@@ -53,6 +60,14 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 						this.addRequestInitiator(extensions, entitydescriptor.saml2sp.RequestInitiator[i]);
 					}
 				}
+
+				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.idpdisc, 'DiscoveryResponse');
+				if (hasDiscoveryResponse) {
+					for (i = 0; i < entitydescriptor.saml2sp.DiscoveryResponse.length; i += 1) {
+						this.addDiscoveryResponse(extensions, entitydescriptor.saml2sp.DiscoveryResponse[i]);
+					}
+				}
+
 			} else {
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
@@ -326,6 +341,16 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 			if (requestInitiator.Location) {
 				newNode.setAttribute('Location', requestInitiator.Location);
+			}
+			node.appendChild(newNode);
+		},
+		"addDiscoveryResponse": function (node, discoveryResponse) {
+			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.idpdisc, 'idpdisc:DiscoveryResponse');
+			if (discoveryResponse.Binding) {
+				newNode.setAttribute('Binding', discoveryResponse.Binding);
+			}
+			if (discoveryResponse.Location) {
+				newNode.setAttribute('Location', discoveryResponse.Location);
 			}
 			node.appendChild(newNode);
 		},
