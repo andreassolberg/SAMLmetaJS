@@ -14,7 +14,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			console.log('Update XML document');
 
-			var root, spdescriptor, attributeconsumer, extensions, i, attr, lang, node;
+			var root, spdescriptor, attributeconsumer, extensions, i, attr, lang, node, hasRequestInitiator;
 			root = this.addIfNotEntityDescriptor();
 
 			if (entitydescriptor.entityid)
@@ -29,18 +29,30 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					this.addAttribute(entityAttributes, entitydescriptor.entityAttributes[name]);
 				}
 			}
-			
-			
+
+			hasRequestInitiator = (
+				entitydescriptor.saml2sp &&
+				entitydescriptor.saml2sp.RequestInitiator &&
+				entitydescriptor.saml2sp.RequestInitiator.length > 0
+			);
+
 			spdescriptor = this.addIfNotSPSSODescriptor(root);
 			
 			if (
 				SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
 				SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
-				entitydescriptor.location
+				entitydescriptor.location ||
+				hasRequestInitiator
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
 				mdui = this.addIfNotMDUI(extensions);
 				this.updateMDUI(mdui, entitydescriptor);
+				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.init, 'RequestInitiator');
+				if (hasRequestInitiator) {
+					for (i = 0; i < entitydescriptor.saml2sp.RequestInitiator.length; i += 1) {
+						this.addRequestInitiator(extensions, entitydescriptor.saml2sp.RequestInitiator[i]);
+					}
+				}
 			} else {
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
@@ -304,6 +316,16 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					newNode.appendChild(newValue);
 				}
 
+			}
+			node.appendChild(newNode);
+		},
+		"addRequestInitiator": function (node, requestInitiator) {
+			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.init, 'init:RequestInitiator');
+			if (requestInitiator.Binding) {
+				newNode.setAttribute('Binding', requestInitiator.Binding);
+			}
+			if (requestInitiator.Location) {
+				newNode.setAttribute('Location', requestInitiator.Location);
 			}
 			node.appendChild(newNode);
 		},

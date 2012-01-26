@@ -111,7 +111,8 @@
 					if (entitydescriptor.saml2sp.hasOwnProperty(endpoint)) {
 						
 						if (endpoint !== 'AssertionConsumerService' &&
-							endpoint !== 'SingleLogoutService'
+							endpoint !== 'SingleLogoutService' &&
+							endpoint !== 'RequestInitiator'
 						) {
 							continue;
 						}
