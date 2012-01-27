@@ -16,7 +16,8 @@ var
 	libxmljs,
 	parseFromString,
 	settings = {},
-	
+	isEmpty,
+	hasProp,
 	MDException,
 	TestResult,
 	constants;
@@ -30,6 +31,25 @@ if (typeof window == 'undefined') {
 }
 
 
+/*
+ * Check if an object is empty (e.g. has no properties)
+*/
+isEmpty = function (obj) {
+	var prop;
+	for (prop in obj) {
+		if (obj.hasOwnProperty(prop)) {
+			return false;
+		}
+	}
+	return true;
+};
+
+/*
+ * Check if an object has a given property.
+*/
+hasProp = function (obj, prop) {
+	return typeof obj[prop] !== 'undefined';
+};
 
 /*
  * Class MDEntityDescriptor
@@ -59,6 +79,38 @@ MDEntityDescriptor.prototype.hasCertOfType = function (type) {
 	return false;
 }
 
+/*
+ * Look for logo in any language.
+ */
+MDEntityDescriptor.prototype.hasLogo = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
+			hasProp(this.saml2sp.mdui, 'logo') && !isEmpty(this.saml2sp.mdui.logo));
+};
+
+/*
+ * Add an logo in the specified language.
+ * An logo is an object with three required attributes:
+ *	- location: url of the image
+ *	- width: width in pixels
+ *	- height: height in pixels
+ */
+MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) {
+	if (!this.saml2sp) {
+		this.saml2sp = {};
+	}
+	if (!this.saml2sp.mdui) {
+		this.saml2sp.mdui = {};
+	}
+	if (!this.saml2sp.mdui.logo) {
+		this.saml2sp.mdui.logo = {};
+	}
+	this.saml2sp.mdui.logo[lang] = {
+		location: location,
+		width: width,
+		height: height
+	};
+};
 
 /*
  * Class: TestResult
@@ -585,6 +637,19 @@ parseFromString = function(xmlstring) {
 				callback: function(n) {
 					if (!mdui.descr) mdui.descr = {};
 					mdui.descr[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'Logo',
+				callback: function(n) {
+					if (!mdui.logo) {
+						mdui.logo = {};
+					}
+					mdui.logo[nodeGetAttribute(n, 'xml:lang', 'en')] = {
+						location: nodeGetTextRecursive(n),
+						width: nodeGetAttribute(n, 'width', ''),
+						height: nodeGetAttribute(n, 'height', '')
+					}
 				}
 			},
 			{	

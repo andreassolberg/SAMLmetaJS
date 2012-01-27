@@ -6,6 +6,9 @@
 		"clearInfodescr": function() {
 			$("div#info div#infodescr").empty();
 		},
+		"clearInfologo": function() {
+			$("div#info div#infologo").empty();
+		},
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">' +
@@ -72,6 +75,57 @@
 				e.preventDefault();
 				$(e.target).closest('div.infodescrdiv').remove();
 			});
+		},
+		"addInfologo": function(lang, logo) {
+			var randID = 'infologo' + Math.floor(Math.random() * 10000 + 1000);
+			var infoHTML = '<div class="infologodiv">' +
+				'<div>' +
+				'<label for="logo-' + randID + '-lang-name">Language :</label>' +
+				'<select name="logo-' + randID + '-lang-name" id="logo-' + randID + '-lang">';
+			var languageFound = false;
+			var language, checked;
+
+			for (language in SAMLmetaJS.Constants.languages) {
+				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
+					checked = '';
+					if (lang === language) {
+						checked = ' selected="selected" ';
+						languageFound = true;
+					}
+					infoHTML += '<option value="' + language + '" ' + checked + '>' +
+						SAMLmetaJS.Constants.languages[language] +
+						'</option>';
+				}
+			}
+			if (!languageFound) {
+				infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
+			}
+
+			infoHTML += '</select>' +
+				'</div>' +
+
+				'<div>' +
+				'<label for="logo-' + randID + '-location">Location: </label>' +
+				'<input type="url" name="logo-' + randID + '-location-name" id="logo-' + randID + '-location" value="' + (logo.location ||'') + '" />' +
+				'</div>' +
+
+				'<div>' +
+				'<label for="logo-' + randID + '-width">Width: </label>' +
+				'<input type="number" min="0" name="logo-' + randID + '-width-name" id="logo-' + randID + '-width" value="' + (logo.width ||'') + '" />' +
+				'</div>' +
+
+				'<div>' +
+				'<label for="logo-' + randID + '-height">Height: </label>' +
+				'<input type="number" min="0" name="logo-' + randID + '-height-name" id="logo-' + randID + '-height" value="' + (logo.height ||'') + '" />' +
+				'</div>' +
+
+				'<button style="" class="removelogo">Remove</button>' +
+				'</div>';
+
+			$(infoHTML).appendTo("div#info div#infologo").find('button.removelogo').click(function (e) {
+				e.preventDefault();
+				$(e.target).closest('div.infologodiv').remove();
+			});
 		}
 	};
 
@@ -82,31 +136,39 @@
 
 		addTab: function (pluginTabs) {
 			pluginTabs.list.push('<li><a href="#info">Information</a></li>');
-			pluginTabs.content.push(
-				'<div id="info">' +
-					'<fieldset class="entityid"><legend>Entity ID</legend>' +
-						'<div id="div-entityid">' +
-							'<input style="width: 600px" type="text" name="entityid" id="entityid" value="" />' +
-							'<p style="margin: 0px">The format MUST be an URI.</p>' +
-						'</div>' +
-					'</fieldset>' +
+			pluginTabs.content.push([
+				'<div id="info">',
 
-					'<fieldset class="name"><legend>Name of Service</legend>' +
-						'<div id="infoname"></div>' +
-						'<div>' +
-							'<button class="addname">Add name in one more language</button>' +
-						'</div>' +
-					'</fieldset>' +
+				'<fieldset class="entityid"><legend>Entity ID</legend>',
+				'<div id="div-entityid">',
+				'<input style="width: 600px" type="text" name="entityid" id="entityid" value="" />',
+				'<p style="margin: 0px">The format MUST be an URI.</p>',
+				'</div>',
+				'</fieldset>',
 
-					'<fieldset class="description"><legend>Description of Service</legend>' +
-						'<div id="infodescr"></div>' +
-						'<div>' +
-							'<button class="adddescr">Add description in one more language</button>' +
-						'</div>' +
-					'</fieldset>' +
+				'<fieldset class="name"><legend>Name of Service</legend>',
+				'<div id="infoname"></div>',
+				'<div>',
+				'<button class="addname">Add name in one more language</button>',
+				'</div>',
+				'</fieldset>',
+
+				'<fieldset class="description"><legend>Description of Service</legend>',
+				'<div id="infodescr"></div>',
+				'<div>',
+				'<button class="adddescr">Add description in one more language</button>',
+				'</div>',
+				'</fieldset>',
+
+				'<fieldset class="logo"><legend>Logo of Service</legend>',
+				'<div id="infologo"></div>',
+				'<div>',
+				'<button class="addlogo">Add logo in one more language</button>',
+				'</div>',
+				'</fieldset>',
 
 				'</div>'
-			);
+			].join(''));
 		},
 
 		setUp: function () {
@@ -117,6 +179,10 @@
 			$("div#info button.adddescr").click(function(e) {
 				e.preventDefault();
 				UI.addInfodescr('en', '');
+			});
+			$("div#info button.addlogo").click(function(e) {
+				e.preventDefault();
+				UI.addInfologo('en', '');
 			});
 		},
 
@@ -141,6 +207,15 @@
 					}
 				}
 			}
+
+			UI.clearInfologo();
+			if (entitydescriptor.hasLogo()) {
+				for (l in entitydescriptor.saml2sp.mdui.logo) {
+					if (entitydescriptor.saml2sp.mdui.logo.hasOwnProperty(l)) {
+						UI.addInfologo(l, entitydescriptor.saml2sp.mdui.logo[l]);
+					}
+				}
+			}
 		},
 
 		toXML: function (entitydescriptor) {
@@ -159,6 +234,17 @@
 				}
 				if (!entitydescriptor.descr) entitydescriptor.descr = {};
 				entitydescriptor.descr[$(element).find('div > select').val()] = value;
+			});
+			$('div#infologo > div').each(function (index, element) {
+				var $inputs = $(element).find('input'),
+					location = $inputs.eq(0).val(),
+					width = $inputs.eq(1).val(),
+					height = $inputs.eq(2).val(),
+					lang = $(element).find('div > select').val();
+				if (!location || !width || !height) {
+					return;
+				}
+				entitydescriptor.addLogo(lang, location, width, height);
 			});
 		}
 	};
