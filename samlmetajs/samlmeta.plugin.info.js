@@ -144,6 +144,18 @@
 				}).end()
 				.find('input').change(function (e) {
 					refreshLogo($(this).parents('div.infologodiv'));
+				}).end()
+				.find('img').load(function (e) {
+					var $div = $(this).parents('div.infologodiv'),
+						$width = $div.find('input').eq(1),
+						$height = $div.find('input').eq(2);
+
+					if (!$width.val()) {
+						$width.val(this.width);
+					}
+					if (!$height.val()) {
+						$height.val(this.height);
+					}
 				});
 		}
 	};
