@@ -1,4 +1,13 @@
 (function($) {
+	var refreshLogo = function ($logodiv) {
+		var $inputs = $logodiv.find('input'),
+			attrs = {
+				src: $inputs.eq(0).val(),
+				width: $inputs.eq(1).val(),
+				height: $inputs.eq(2).val()
+			};
+		$logodiv.find('img').attr(attrs).parent('a').attr('href', attrs.src);
+	};
 	var UI = {
 		"clearInfoname": function() {
 			$("div#info div#infoname").empty();
@@ -80,7 +89,6 @@
 			var randID = 'infologo' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infologodiv">' +
 				'<div>' +
-				'<label for="logo-' + randID + '-lang-name">Language :</label>' +
 				'<select name="logo-' + randID + '-lang-name" id="logo-' + randID + '-lang">';
 			var languageFound = false;
 			var language, checked;
@@ -102,14 +110,18 @@
 			}
 
 			infoHTML += '</select>' +
-				'</div>' +
-
-				'<div>' +
-				'<label for="logo-' + randID + '-location">Location: </label>' +
 				'<input type="url" name="logo-' + randID + '-location-name" id="logo-' + randID + '-location" value="' + (logo.location ||'') + '" />' +
+				'<button class="removelogo">Remove</button>' +
 				'</div>' +
 
 				'<div>' +
+				'<figure class="logopreview">' +
+				'<figcaption>Logo preview <button class="refresh">Refresh</button></figcaption>' +
+				'<a href="' + (logo.location || '#') + '">' +
+				'<img src="' + (logo.location || '') + '" width="' + (logo.width || '') + '" height="' + (logo.height || '') + '" alt="Logo preview" />' +
+				'</a>' +
+
+				'</figure>' +
 				'<label for="logo-' + randID + '-width">Width: </label>' +
 				'<input type="number" min="0" name="logo-' + randID + '-width-name" id="logo-' + randID + '-width" value="' + (logo.width ||'') + '" />' +
 				'</div>' +
@@ -119,13 +131,20 @@
 				'<input type="number" min="0" name="logo-' + randID + '-height-name" id="logo-' + randID + '-height" value="' + (logo.height ||'') + '" />' +
 				'</div>' +
 
-				'<button style="" class="removelogo">Remove</button>' +
 				'</div>';
 
-			$(infoHTML).appendTo("div#info div#infologo").find('button.removelogo').click(function (e) {
-				e.preventDefault();
-				$(e.target).closest('div.infologodiv').remove();
-			});
+			$(infoHTML).appendTo("div#info div#infologo")
+				.find('button.removelogo').click(function (e) {
+					e.preventDefault();
+					$(e.target).closest('div.infologodiv').remove();
+				}).end()
+				.find('button.refresh').click(function (e) {
+					refreshLogo($(this).parents('div.infologodiv'));
+					e.preventDefault();
+				}).end()
+				.find('input').change(function (e) {
+					refreshLogo($(this).parents('div.infologodiv'));
+				});
 		}
 	};
 
