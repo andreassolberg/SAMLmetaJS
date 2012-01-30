@@ -1,4 +1,28 @@
 (function($) {
+	var addLanguageSelect = function (randID, lang, suffix) {
+		var languageFound = false, result = [], language, checked;
+		result.push('<select name="' + randID + '-lang-' + suffix + '" id="' + randID + '-lang">');
+		for (language in SAMLmetaJS.Constants.languages) {
+			if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
+				checked = '';
+				if (lang === language) {
+					checked = ' selected="selected" ';
+					languageFound = true;
+				}
+				result.push('<option value="' + language + '" ' + checked + '>');
+				result.push(SAMLmetaJS.Constants.languages[language]);
+				result.push('</option>');
+			}
+		}
+
+		if (!languageFound) {
+			result.push('<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>');
+		}
+
+		result.push('</select>');
+		return result.join('');
+	};
+
 	var UI = {
 		"clearInfoname": function() {
 			$("div#info div#infoname").empty();
@@ -11,28 +35,9 @@
 		},
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
-			var infoHTML = '<div class="infonamediv">' +
-				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-			var languageFound = false;
-			var language, checked;
-			for (language in SAMLmetaJS.Constants.languages) {
-				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
-					checked = '';
-					if (lang === language) {
-						checked = ' selected="selected" ';
-						languageFound = true;
-					}
-					infoHTML += '<option value="' + language + '" ' + checked + '>' +
-						SAMLmetaJS.Constants.languages[language] +
-						'</option>';
-				}
-			}
-			if (!languageFound) {
-				infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
-			}
-
-			infoHTML += '</select>' +
-				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
+			var infoHTML = '<div class="infonamediv">';
+			infoHTML += addLanguageSelect(randID, lang, 'name');
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
 				'</div>';
 
@@ -43,33 +48,12 @@
 		},
 		"addInfodescr": function(lang, descr) {
 			var randID = 'infodescr' + Math.floor(Math.random() * 10000 + 1000);
-			var infoHTML = '<div class="infodescrdiv"><div>' +
-				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-			var languageFound = false;
-			var language, checked;
-
-			for (language in SAMLmetaJS.Constants.languages) {
-				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
-					checked = '';
-					if (lang === language) {
-						checked = ' selected="selected" ';
-						languageFound = true;
-					}
-					infoHTML += '<option value="' + language + '" ' + checked + '>' +
-						SAMLmetaJS.Constants.languages[language] +
-						'</option>';
-				}
-			}
-			if (!languageFound) {
-				infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
-			}
-
-			infoHTML += '</select>' +
-				'<button style="" class="removedescr">Remove</button>' +
+			var infoHTML = '<div class="infodescrdiv"><div>';
+			infoHTML += addLanguageSelect(randID, lang, 'descr');
+			infoHTML += '<button style="" class="removedescr">Remove</button>' +
 				'</div><div>' +
 				'<textarea name="' + randID + '-name-name" id="' + randID + '-name">' + (descr || '') + '</textarea>' +
-
-			'</div></div>';
+				'</div></div>';
 
 			$(infoHTML).appendTo("div#info div#infodescr").find('button.removedescr').click(function (e) {
 				e.preventDefault();
@@ -78,29 +62,9 @@
 		},
 		"addInfokeywords": function (lang, keywords) {
 			var randID = 'infokeywords' + Math.floor(Math.random() * 10000 + 1000);
-			var infoHTML = '<div class="infokeywordsdiv">' +
-				'<select name="' + randID + '-lang-name" id="' + randID + '-lang">';
-			var languageFound = false;
-			var language, checked;
-
-			for (language in SAMLmetaJS.Constants.languages) {
-				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
-					checked = '';
-					if (lang === language) {
-						checked = ' selected="selected" ';
-						languageFound = true;
-					}
-					infoHTML += '<option value="' + language + '" ' + checked + '>' +
-						SAMLmetaJS.Constants.languages[language] +
-						'</option>';
-				}
-			}
-			if (!languageFound) {
-				infoHTML += '<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>';
-			}
-
-			infoHTML += '</select>' +
-				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
+			var infoHTML = '<div class="infokeywordsdiv">';
+			infoHTML += addLanguageSelect(randID, lang, 'keywords');
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
 				'<button style="" class="removekeywords">Remove</button>' +
 				'</div>';
 
