@@ -84,6 +84,10 @@ div#org fieldset.description legend, div#info fieldset.description legend {
 	background-image: url('../icons/note_edit.png');
 }
 
+div#info fieldset.logo legend {
+	background-image: url('../icons/image.png');
+}
+
 div#tabs div#info div.infologodiv select { width: auto; }
 div#tabs div#info div.infologodiv input[type=url] { width: 400px; }
 div#tabs div#info div.infologodiv button { width: auto; }
