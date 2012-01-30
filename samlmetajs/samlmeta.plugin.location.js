@@ -2,41 +2,32 @@
 	var geocoder = new google.maps.Geocoder();
 	var map = null;
 	var mapmarker = null;
+	var UI = {
+		updateMarkerAddress: function (str) {
+			$("#locationDescr").html(str);
+		},
+		geocodePosition: function (pos) {
+			geocoder.geocode({
+				latLng: pos
+			}, function (responses) {
+				if (responses && responses.length > 0) {
+					UI.updateMarkerAddress(responses[0].formatted_address);
+				} else {
+					UI.updateMarkerAddress('Cannot determine address at this location.');
+				}
+			});
+		},
 
-	function updateMarkerAddress (str) {
-		$("#locationDescr").html(str);
-//			document.getElementById('address').innerHTML = str;
-	}
+		updateMarkerPosition: function (latLng) {
+			$("input#geolocation").val(latLng.lat() + ',' + latLng.lng());
+		},
 
-	function geocodePosition (pos) {
-		geocoder.geocode({
-			latLng: pos
-		}, function(responses) {
-			if (responses && responses.length > 0) {
-				updateMarkerAddress(responses[0].formatted_address);
-			} else {
-				updateMarkerAddress('Cannot determine address at this location.');
-			}
-		});
-	}
+		setLocation: function (location) {
+			$("input#geolocation").val(location);
+			$("input#includeLocation").attr('checked', true);
+		}
 
-	function updateMarkerStatus (str) {
-//			$("#locationDescr").html(str);
-//			document.getElementById('markerStatus').innerHTML = str;
-	}
-
-	function updateMarkerPosition (latLng) {
-		$("input#geolocation").val(latLng.lat() + ',' + latLng.lng());
-		// document.getElementById('info').innerHTML = [
-		// latLng.lat(),
-		// latLng.lng()
-		// ].join(', ');
-	}
-
-	function setLocation (location) {
-		$("input#geolocation").val(location);
-		$("input#includeLocation").attr('checked', true);
-	}
+	};
 
 	SAMLmetaJS.plugins.location = {
 		tabClick: function (handler) {
@@ -63,7 +54,7 @@
 		},
 
 		setUp: function () {
-			var latLng = new google.maps.LatLng(53.852527,14.238281);
+			var latLng = new google.maps.LatLng(53.852527, 14.238281);
 			var myOptions = {
 				zoom: 4,
 				center: latLng,
@@ -79,28 +70,26 @@
 			});
 
 			// Update current position info.
-			updateMarkerPosition(latLng);
-			geocodePosition(latLng);
+			UI.updateMarkerPosition(latLng);
+			UI.geocodePosition(latLng);
 
 			// Add dragging event listeners.
-			google.maps.event.addListener(mapmarker, 'dragstart', function() {
-				updateMarkerAddress('Dragging...');
+			google.maps.event.addListener(mapmarker, 'dragstart', function () {
+				UI.updateMarkerAddress('Dragging...');
 			});
 
-			google.maps.event.addListener(mapmarker, 'drag', function() {
-				updateMarkerStatus('Dragging...');
-				updateMarkerPosition(mapmarker.getPosition());
+			google.maps.event.addListener(mapmarker, 'drag', function () {
+				UI.updateMarkerPosition(mapmarker.getPosition());
 			});
 
-			google.maps.event.addListener(mapmarker, 'dragend', function() {
-				updateMarkerStatus('Drag ended');
-				updateMarkerPosition(mapmarker.getPosition());
-				geocodePosition(mapmarker.getPosition());
+			google.maps.event.addListener(mapmarker, 'dragend', function () {
+				UI.updateMarkerPosition(mapmarker.getPosition());
+				UI.geocodePosition(mapmarker.getPosition());
 
 				$("input#includeLocation").attr('checked', true);
 			});
 
-			$("#tabs").bind("tabsshow", function(event, ui) {
+			$("#tabs").bind("tabsshow", function (event, ui) {
 				if (ui.panel.id === "location") {
 					console.log('google resize');
 					google.maps.event.trigger(map, 'resize');
@@ -110,25 +99,23 @@
 		},
 
 		fromXML: function (entitydescriptor) {
-			var spl, latLng;
+			var spl, latLng, location;
 
-			if (!entitydescriptor.entityAttributes) {
-				return;
-			}
-
-			if (entitydescriptor.location) {
-				SAMLmetaJS.UI.setLocation(entitydescriptor.location);
-				spl = entitydescriptor.location.split(',');
-				latLng = new google.maps.LatLng(spl[0],spl[1]);
+			if (entitydescriptor.hasLocation()) {
+				location = entitydescriptor.getLocation();
+				UI.setLocation(location);
+				spl = location.split(',');
+				latLng = new google.maps.LatLng(spl[0], spl[1]);
 
 				map.panTo(latLng);
 				mapmarker.setPosition(latLng);
+				UI.geocodePosition(latLng);
 			}
 		},
 
 		toXML: function (entitydescriptor) {
 			if ($("input#includeLocation").attr('checked')) {
-				entitydescriptor.location = $("input#geolocation").val();
+				entitydescriptor.setLocation($("input#geolocation").val());
 			}
 		}
 	};
