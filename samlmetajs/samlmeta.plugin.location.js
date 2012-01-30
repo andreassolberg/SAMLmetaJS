@@ -28,6 +28,14 @@
 		}
 
 	};
+	var guessLocationHandler = function (position) {
+		console.log(position);
+		var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		map.panTo(latLng);
+		mapmarker.setPosition(latLng);
+		UI.geocodePosition(latLng);
+		UI.setLocation('' + position.coords.latitude + ',' + position.coords.longitude);
+	};
 
 	SAMLmetaJS.plugins.location = {
 		tabClick: function (handler) {
@@ -35,6 +43,10 @@
 		},
 
 		addTab: function (pluginTabs) {
+			var hasgeolocation = (
+				typeof navigator.geolocation !== 'undefined' &&
+				typeof navigator.geolocation.getCurrentPosition !== 'undefined'
+			);
 			pluginTabs.list.push('<li><a href="#location">Location</a></li>');
 			pluginTabs.content.push(
 				'<div id="location">' +
@@ -43,9 +55,10 @@
 							'<p><input type="checkbox" id="includeLocation" name="includeLocation" /> ' +
 							'<label for="includeLocation">Associate this entity with the location below.' +
 							'Drag the marker to set the correct location.</label></p>' +
-							'<p><input type="input" id="geolocation" style="width: 30em" disabled="disabled" name="location" value="" />' +
+							'<p><input type="input" id="geolocation" style="width: 20em" disabled="disabled" name="location" value="" />' +
 							'<span id="locationDescr"></span>' +
 							'</p>' +
+							(hasgeolocation ? '<button id="guessLocation">Guess my location</button>' : '') +
 						'</div>' +
 						'<div id="map_canvas" style="width:100%; height:500px"></div>' +
 					'</div>' +
@@ -95,6 +108,11 @@
 					google.maps.event.trigger(map, 'resize');
 					// SAMLmetaJS.map.checkResize();
 				}
+			});
+
+			$("#guessLocation").click(function (event) {
+				event.preventDefault();
+				navigator.geolocation.getCurrentPosition(guessLocationHandler);
 			});
 		},
 
