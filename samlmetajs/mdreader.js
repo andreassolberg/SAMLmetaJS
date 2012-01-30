@@ -642,13 +642,20 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'Logo',
 				callback: function(n) {
+					var lang = nodeGetAttribute(n, 'xml:lang', 'en');
 					if (!mdui.logo) {
 						mdui.logo = {};
 					}
-					mdui.logo[nodeGetAttribute(n, 'xml:lang', 'en')] = {
+					mdui.logo[lang] = {
 						location: nodeGetTextRecursive(n),
 						width: nodeGetAttribute(n, 'width', ''),
 						height: nodeGetAttribute(n, 'height', '')
+					}
+					if (!validateURL(mdui.logo[lang].location)) {
+						processTest(new TestResult('MDUILogoInvalidURL', 'Location of Logo was in invalid format', 0, 1));
+					}
+					if (!isHTTPS(mdui.logo[lang].location)) {
+						processTest(new TestResult('MDUILogoURLNotHttps', 'Location of Logo should use the https protocol', 0, 1));
 					}
 				}
 			},
