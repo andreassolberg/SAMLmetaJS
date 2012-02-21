@@ -284,7 +284,7 @@ var SAMLmetaJS = {};
 			currentTab = 'xml';
 			console.log('toXML()');
 
-			var entitydescriptor = {};
+			var entitydescriptor = new MDEntityDescriptor();
 
 			entitydescriptor.entityid = $('input#entityid').val();
 
