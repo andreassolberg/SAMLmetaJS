@@ -1,5 +1,11 @@
-(c) Andreas Åkre Solberg, UNINETT, 2011
+SAMLmetaJS is a joint effort between UNINETT AS and Yaco Sistemas.
+
+The initial effort on SAMLmetaJS was provided by
+
+Andreas Åkre Solberg, UNINETT, 2011-2012
 andreas.solberg@uninett.no
+
+but along the way Yaco Sistemas done significant updates to the project.
 
 More information and documentation available at:
 http://samlmetajs.simplesamlphp.org
