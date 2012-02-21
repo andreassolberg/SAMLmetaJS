@@ -545,6 +545,7 @@ parseFromString = function(xmlstring) {
 		
 		attribute.name = nodeGetAttribute(node, 'Name', null);
 		attribute.nameFormat = nodeGetAttribute(node, 'NameFormat', null);
+		attribute.friendlyName = nodeGetAttribute(node, 'FriendlyName', null);
 
 
 		// Process children of EntityDescriptor
