@@ -41,7 +41,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				entitydescriptor.location ||
 				hasRequestInitiator ||
 				hasDiscoveryResponse ||
-				entitydescriptor.hasLogo()
+				entitydescriptor.hasLogo() ||
+				entitydescriptor.hasLocation()
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
 				mdui = this.addIfNotMDUI(extensions);
@@ -258,10 +259,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 			}
 			SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'GeolocationHint');
-			if (entitydescriptor.location) {
-				this.addMDUILocation(node, entitydescriptor.location);
+			if (entitydescriptor.hasLocation()) {
+				this.addMDUILocation(node, entitydescriptor.getLocation());
 			}
-
 		},
 		"addMDUILogo": function(node, lang, logo) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Logo');
@@ -495,13 +495,13 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				
 				From SSORoleDescriptorType
 					<element ref="md:ArtifactResolutionService" minOccurs="0" maxOccurs="unbounded"/>
-		            <element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
-		            <element ref="md:ManageNameIDService" minOccurs="0" maxOccurs="unbounded"/>
-		            <element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="md:ManageNameIDService" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
 				
 				From SPSSORoleDescriptor
 					<element ref="md:AssertionConsumerService" maxOccurs="unbounded"/>
-		            <element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
 			*/
 			if (endpointtype = 'ArtifactResolutionService') {
 				beforeNode = [

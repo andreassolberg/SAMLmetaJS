@@ -30,7 +30,6 @@ if (typeof window == 'undefined') {
 	
 }
 
-
 /*
  * Check if an object is empty (e.g. has no properties)
 */
@@ -113,6 +112,41 @@ MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) 
 };
 
 /*
+ * Look for location.
+ */
+MDEntityDescriptor.prototype.hasLocation = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
+			hasProp(this.saml2sp.mdui, 'location') && !isEmpty(this.saml2sp.mdui.location));
+};
+
+/*
+ * Get the geolocation or null if the entity does not have any.
+ */
+MDEntityDescriptor.prototype.getLocation = function () {
+	if (!this.hasLocation()) {
+		return null;
+	} else {
+		return this.saml2sp.mdui.location;
+	}
+};
+
+/*
+ * Safely set the geolocation for this entity creating
+ * nested structures as needed.
+ */
+MDEntityDescriptor.prototype.setLocation = function (location) {
+	if (!hasProp(this, 'saml2sp')) {
+		this.saml2sp = {};
+	}
+	if (!hasProp(this.saml2sp, 'mdui')) {
+		this.saml2sp.mdui = {};
+	}
+	this.saml2sp.mdui.location = location;
+};
+
+
+/*
  * Class: TestResult
  * Contains information about a single test performed regarding metadata.
  * The objects contain the following properties:
@@ -121,7 +155,7 @@ MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) 
  * text: a human readable textual description of the test.
  * value: Whether the test succeeded or failed.
  *		0	failed
- * 		1	suceeded
+ *		1	suceeded
  *		2	NA
  * significance: How signficant is it that this test fails.
  *		0	Not signficant at all. Just informative.
