@@ -246,8 +246,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					if (entitydescriptor.saml2sp.mdui.logo.hasOwnProperty(lang)) {
 						this.addMDUILogo(node, lang, entitydescriptor.saml2sp.mdui.logo[lang]);
 					}
-                }
-            }
+				}
+			}
 			hasKeywords = (entitydescriptor.saml2sp
 						&& entitydescriptor.saml2sp.mdui
 						&& entitydescriptor.saml2sp.mdui.keywords
@@ -597,15 +597,15 @@ SAMLmetaJS.tools = {
 		}
 		return false;
 	},
-    hasEndpoint: function (obj, endpoint) {
-        if (!obj.saml2sp) {
-            return false;
-        }
-        if (!obj.saml2sp[endpoint]) {
-            return false;
-        }
-        return obj.saml2sp[endpoint].length > 0;
-    }
+	hasEndpoint: function (obj, endpoint) {
+		if (!obj.saml2sp) {
+			return false;
+		}
+		if (!obj.saml2sp[endpoint]) {
+			return false;
+		}
+		return obj.saml2sp[endpoint].length > 0;
+	}
 };
 
 SAMLmetaJS.XML = {

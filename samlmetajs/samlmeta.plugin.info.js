@@ -41,7 +41,7 @@
 		},
 		"clearInfologo": function() {
 			$("div#info div#infologo").empty();
-        },
+		},
 		"clearInfokeywords": function () {
 			$("div#info div#infokeywords").empty();
 		},
@@ -84,7 +84,7 @@
 				e.preventDefault();
 				$(e.target).closest('div.infokeywordsdiv').remove();
 			});
-        },
+		},
 		"addInfologo": function(lang, logo) {
 			var randID = 'infologo' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infologodiv"><div>';
@@ -177,12 +177,12 @@
 				'</div>',
 				'</fieldset>',
 
-                '<fieldset class="keywords"><legend>Keywords (space separated)</legend>',
-                '<div id="infokeywords"></div>',
-                '<div>',
-                '<button class="addkeywords">Add keywords in one more languages</button>',
-                '</div>',
-                '</fieldset>',
+				'<fieldset class="keywords"><legend>Keywords (space separated)</legend>',
+				'<div id="infokeywords"></div>',
+				'<div>',
+				'<button class="addkeywords">Add keywords in one more languages</button>',
+				'</div>',
+				'</fieldset>',
 
 				'</div>'
 			].join(''));
@@ -200,7 +200,7 @@
 			$("div#info button.addlogo").click(function(e) {
 				e.preventDefault();
 				UI.addInfologo('en', '');
-            });
+			});
 			$("div#info button.addkeywords").click(function(e) {
 				e.preventDefault();
 				UI.addInfokeywords('en', '');
@@ -234,9 +234,9 @@
 				for (l in entitydescriptor.saml2sp.mdui.logo) {
 					if (entitydescriptor.saml2sp.mdui.logo.hasOwnProperty(l)) {
 						UI.addInfologo(l, entitydescriptor.saml2sp.mdui.logo[l]);
-                    }
-                }
-            }
+					}
+				}
+			}
 
 			UI.clearInfokeywords();
 			if (entitydescriptor.saml2sp
@@ -277,7 +277,7 @@
 					return;
 				}
 				entitydescriptor.addLogo(lang, location, width, height);
-            });
+			});
 			$('div#infokeywords > div').each(function (index, element) {
 				var value = $(element).children('input').attr('value');
 				if (!value) {
