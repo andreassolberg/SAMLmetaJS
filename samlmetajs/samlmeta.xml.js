@@ -34,7 +34,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			hasDiscoveryResponse = SAMLmetaJS.tools.hasEndpoint(entitydescriptor, 'DiscoveryResponse');
 
 			spdescriptor = this.addIfNotSPSSODescriptor(root);
-			
+
 			if (
 				SAMLmetaJS.tools.hasContents(entitydescriptor.name) ||
 				SAMLmetaJS.tools.hasContents(entitydescriptor.descr) ||
@@ -65,10 +65,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			} else {
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
-			
-			
-			
-	
 
 			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
 			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.certs) {
@@ -96,7 +92,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					entitydescriptor.saml2sp.acs &&
 					SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.acs.attributes)
 				) {
-					
+
 				attributeconsumer = this.addIfNotAttributeConsumingService(spdescriptor);
 				this.updateAttributeConsumingService(attributeconsumer, entitydescriptor);
 
@@ -123,29 +119,29 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (entitydescriptor.organization) {
 				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
 				node = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:Organization');
-				
+
 				if (entitydescriptor.organization.name) {
 					for (lang in entitydescriptor.organization.name) {
 						if (entitydescriptor.organization.name.hasOwnProperty(lang)) {
 							this.addOrganizationElement(node, 'OrganizationName', lang, entitydescriptor.organization.name[lang]);
 						}
-					}	
+					}
 				}
 				if (entitydescriptor.organization.displayname) {
 					for (lang in entitydescriptor.organization.displayname) {
 						if (entitydescriptor.organization.displayname.hasOwnProperty(lang)) {
 							this.addOrganizationElement(node, 'OrganizationDisplayName', lang, entitydescriptor.organization.displayname[lang]);
 						}
-					}	
+					}
 				}
 				if (entitydescriptor.organization.url) {
 					for (lang in entitydescriptor.organization.url) {
 						if (entitydescriptor.organization.url.hasOwnProperty(lang)) {
 							this.addOrganizationElement(node, 'OrganizationURL', lang, entitydescriptor.organization.url[lang]);
 						}
-					}	
+					}
 				}
-				
+
 				//	root.appendChild(node);
 				root.insertBefore(node, SAMLmetaJS.XML.findChildElement(root,
 					[
@@ -153,7 +149,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 						{'localName': 'AdditionalMetadataLocation', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 					]
 				));
-				
+
 			} else {
 				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Organization');
 			}
@@ -215,7 +211,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				]
 			));
 		},
-		
+
 		"addOrganizationElement": function(orgnode, type, lang, value) {
 			var newNode;
 			newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:' + type);
@@ -223,10 +219,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			newNode.appendChild(doc.createTextNode(value));
 
 			orgnode.appendChild(newNode);
-			
 
 		},
-		
+
 		"updateMDUI": function(node, entitydescriptor) {
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
@@ -502,16 +497,16 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (endpoint.Location) newNode.setAttribute('Location', endpoint.Location);
 			if (endpoint.ResponseLocation) newNode.setAttribute('ResponseLocation', endpoint.ResponseLocation);
 			if (endpoint.index) newNode.setAttribute('index', endpoint.index);
-			
+
 			/*
 			 * Order of elements from XSD:
-				
+
 				From SSORoleDescriptorType
 					<element ref="md:ArtifactResolutionService" minOccurs="0" maxOccurs="unbounded"/>
 					<element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
 					<element ref="md:ManageNameIDService" minOccurs="0" maxOccurs="unbounded"/>
 					<element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
-				
+
 				From SPSSORoleDescriptor
 					<element ref="md:AssertionConsumerService" maxOccurs="unbounded"/>
 					<element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
@@ -522,29 +517,29 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					{'localName': 'ManageNameIDService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				];
 			} else if (endpointtype = 'SingleLogoutService') {
 				beforeNode = [
 					{'localName': 'ManageNameIDService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				];
 			} else if (endpointtype = 'ManageNameIDService') {
 				beforeNode = [
 					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				];
 			} else if (endpointtype = 'NameIDFormat') {
 				beforeNode = [
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				];
 			} else {
 				beforeNode = [
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}	
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				];
 			}
 
