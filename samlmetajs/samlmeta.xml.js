@@ -226,13 +226,17 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
 				for(lang in entitydescriptor.name) {
-					this.addMDUIDisplayName(node, lang, entitydescriptor.name[lang]);
+					if (entitydescriptor.name.hasOwnProperty(lang)) {
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:DisplayName', lang, entitydescriptor.name[lang]);
+					}
 				}
 			}
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.descr)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Description');
 				for(lang in entitydescriptor.descr) {
-					this.addMDUIDescription(node, lang, entitydescriptor.descr[lang]);
+					if (entitydescriptor.descr.hasOwnProperty(lang)) {
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Description', lang, entitydescriptor.descr[lang]);
+					}
 				}
 			}
 			if (entitydescriptor.hasLogo()) {
@@ -247,7 +251,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
 				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
 					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(lang)) {
-						this.addMDUIKeywords(node, lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.descr[lang]);
 					}
 				}
 			}
@@ -255,7 +259,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'InformationURL');
 				for(lang in entitydescriptor.saml2sp.mdui.informationURL) {
 					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(lang)) {
-						this.addMDUIInformationURL(node, lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.descr[lang]);
 					}
 				}
 			}
@@ -273,40 +277,18 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			newNode.setAttribute('height', logo.height);
 			node.appendChild(newNode);
 		},
+		"addSimpleLocalizedAttribute": function(node, ns, name, lang, value) {
+			var newNode = doc.createElementNS(ns, name);
+			newNode.appendChild(doc.createTextNode(value););
+			newNode.setAttribute('xml:lang', lang);
+			node.appendChild(newNode);
+		},
 		"addMDUILocation": function(node, location) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:GeolocationHint');
 			var text = doc.createTextNode('geo:' + location);
 			newNode.appendChild(text);
 			node.appendChild(newNode);
 
-		},
-		"addMDUIDisplayName": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:DisplayName');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
-		},
-		"addMDUIDescription": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Description');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
-		},
-		"addMDUIKeywords": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
-		},
-		"addMDUIInformationURL": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
 		},
 		"updateAttributeConsumingService": function(node, entitydescriptor) {
 			var i, lang;
@@ -322,29 +304,19 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			if (entitydescriptor.name) {
 				for(lang in entitydescriptor.name) {
-					this.addName(node, lang, entitydescriptor.name[lang]);
+					if (entitydescriptor.name.hasOwnProperty(lang)) {
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.md, 'md:ServiceName', lang, entitydescriptor.name[lang]);
+					}
 				}
 			}
 			if (entitydescriptor.descr) {
 				for(lang in entitydescriptor.descr) {
-					this.addDescr(node, lang, entitydescriptor.descr[lang]);
+					if (entitydescriptor.descr.hasOwnProperty(lang)) {
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.md, 'md:ServiceDescription', lang, entitydescriptor.descr[lang]);
+					}
 				}
 			}
 
-		},
-		"addName": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:ServiceName');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
-		},
-		"addDescr": function(node, lang, text) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:ServiceDescription');
-			var text = doc.createTextNode(text);
-			newNode.setAttribute('xml:lang', lang);
-			newNode.appendChild(text);
-			node.appendChild(newNode);
 		},
 		"addRequestedAttribute": function(node, attr) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:RequestedAttribute');
