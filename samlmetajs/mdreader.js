@@ -145,6 +145,57 @@ MDEntityDescriptor.prototype.setLocation = function (location) {
 	this.saml2sp.mdui.location = location;
 };
 
+/*
+ * Look for keywords in any language.
+ */
+MDEntityDescriptor.prototype.hasKeywords = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
+			hasProp(this.saml2sp.mdui, 'keywords') && !isEmpty(this.saml2sp.mdui.keywords));
+};
+
+/*
+ * Add a set of keywords in the specified language.
+ */
+MDEntityDescriptor.prototype.addKeywords = function (lang, keywords) {
+	if (!this.saml2sp) {
+		this.saml2sp = {};
+	}
+	if (!this.saml2sp.mdui) {
+		this.saml2sp.mdui = {};
+	}
+	if (!this.saml2sp.mdui.keywords) {
+		this.saml2sp.mdui.keywords = {};
+	}
+	this.saml2sp.mdui.keywords[lang] = keywords;
+};
+
+
+/*
+ * Look for InformationURL in any language.
+ */
+MDEntityDescriptor.prototype.hasInformationURL = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
+			hasProp(this.saml2sp.mdui, 'informationURL') && !isEmpty(this.saml2sp.mdui.informationURL));
+};
+
+/*
+ * Add an Information URL in the specified language.
+ */
+MDEntityDescriptor.prototype.addInformationURL = function (lang, url) {
+	if (!this.saml2sp) {
+		this.saml2sp = {};
+	}
+	if (!this.saml2sp.mdui) {
+		this.saml2sp.mdui = {};
+	}
+	if (!this.saml2sp.mdui.informationURL) {
+		this.saml2sp.mdui.informationURL = {};
+	}
+	this.saml2sp.mdui.informationURL[lang] = url;
+};
+
 
 /*
  * Class: TestResult
@@ -703,8 +754,19 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'Keywords',
 				callback: function (n) {
-					if (!mdui.keywords) mdui.keywords = {};
+					if (!mdui.keywords) {
+						mdui.keywords = {};
+					}
 					mdui.keywords[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'InformationURL',
+				callback: function (n) {
+					if (!mdui.informationURL) {
+						mdui.informationURL = {};
+					}
+					mdui.informationURL[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
 				}
 			}
 		// Fallback	

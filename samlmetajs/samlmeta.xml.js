@@ -42,6 +42,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				hasRequestInitiator ||
 				hasDiscoveryResponse ||
 				entitydescriptor.hasLogo() ||
+				entitydescriptor.hasInformationURL() ||
 				entitydescriptor.hasLocation()
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
@@ -227,7 +228,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 		
 		"updateMDUI": function(node, entitydescriptor) {
-			var hasKeywords = false;
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
 				for(lang in entitydescriptor.name) {
@@ -248,14 +248,20 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					}
 				}
 			}
-			hasKeywords = (entitydescriptor.saml2sp
-						&& entitydescriptor.saml2sp.mdui
-						&& entitydescriptor.saml2sp.mdui.keywords
-						&& SAMLmetaJS.tools.hasContents(entitydescriptor.saml2sp.mdui.keywords));
-			if (hasKeywords) {
+			if (entitydescriptor.hasKeywords()) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
 				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
-					this.addMDUIKeywords(node, lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
+					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(lang)) {
+						this.addMDUIKeywords(node, lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
+					}
+				}
+			}
+			if (entitydescriptor.hasInformationURL()) {
+				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'InformationURL');
+				for(lang in entitydescriptor.saml2sp.mdui.informationURL) {
+					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(lang)) {
+						this.addMDUIInformationURL(node, lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
+					}
 				}
 			}
 			SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'GeolocationHint');
@@ -295,6 +301,13 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 		"addMDUIKeywords": function(node, lang, text) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords');
+			var text = doc.createTextNode(text);
+			newNode.setAttribute('xml:lang', lang);
+			newNode.appendChild(text);
+			node.appendChild(newNode);
+		},
+		"addMDUIInformationURL": function(node, lang, text) {
+			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL');
 			var text = doc.createTextNode(text);
 			newNode.setAttribute('xml:lang', lang);
 			newNode.appendChild(text);

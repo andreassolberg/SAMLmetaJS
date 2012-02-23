@@ -45,6 +45,9 @@
 		"clearInfokeywords": function () {
 			$("div#info div#infokeywords").empty();
 		},
+		"clearInformationURL": function () {
+			$("div#info div#infoinformationurl").empty();
+		},
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">';
@@ -136,7 +139,20 @@
 						$height.val(this.height);
 					}
 				});
-		}
+		},
+		"addInformationURL": function (lang, informationUrl) {
+			var randID = 'informationurl' + Math.floor(Math.random() * 10000 + 1000);
+			var infoHTML = '<div class="informationurldiv">';
+			infoHTML += addLanguageSelect(randID, lang, 'informationurl');
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (informationUrl || '') + '" />' +
+				'<button style="" class="removeinformationurl">Remove</button>' +
+				'</div>';
+
+			$(infoHTML).appendTo("div#info div#infoinformationurl").find('button.removeinformationurl').click(function (e) {
+				e.preventDefault();
+				$(e.target).closest('div.informationurldiv').remove();
+			});
+		},
 	};
 
 	SAMLmetaJS.plugins.info = {
@@ -180,7 +196,14 @@
 				'<fieldset class="keywords"><legend>Keywords (space separated)</legend>',
 				'<div id="infokeywords"></div>',
 				'<div>',
-				'<button class="addkeywords">Add keywords in one more languages</button>',
+				'<button class="addkeywords">Add keywords in one more language</button>',
+				'</div>',
+				'</fieldset>',
+
+				'<fieldset class="informationurl"><legend>URL to information about the service</legend>',
+				'<div id="infoinformationurl"></div>',
+				'<div>',
+				'<button class="addinformationurl">Add URL in one more language</button>',
 				'</div>',
 				'</fieldset>',
 
@@ -205,12 +228,15 @@
 				e.preventDefault();
 				UI.addInfokeywords('en', '');
 			});
+			$("div#info button.addinformationurl").click(function(e) {
+				e.preventDefault();
+				UI.addInformationURL('en', '');
+			});
 		},
 
 		fromXML: function (entitydescriptor) {
 			var l;
 
-			// Add name, description and keywords
 			UI.clearInfoname();
 			if (entitydescriptor.name) {
 				for (l in entitydescriptor.name) {
@@ -239,12 +265,19 @@
 			}
 
 			UI.clearInfokeywords();
-			if (entitydescriptor.saml2sp
-				&& entitydescriptor.saml2sp.mdui
-				&& entitydescriptor.saml2sp.mdui.keywords) {
+			if (entitydescriptor.hasKeywords()) {
 				for (l in entitydescriptor.saml2sp.mdui.keywords) {
 					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(l)) {
 						UI.addInfokeywords(l, entitydescriptor.saml2sp.mdui.keywords[l]);
+					}
+				}
+			}
+
+			UI.clearInformationURL();
+			if (entitydescriptor.hasInformationURL()) {
+				for (l in entitydescriptor.saml2sp.mdui.informationURL) {
+					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(l)) {
+						UI.addInformationURL(l, entitydescriptor.saml2sp.mdui.informationURL[l]);
 					}
 				}
 			}
@@ -252,20 +285,26 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#infoname > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value');
+				var value = $(element).children('input').attr('value'),
+					lang = $(element).find('div > select').val();
 				if (!value) {
 					return;
 				}
-				if (!entitydescriptor.name) entitydescriptor.name = {};
-				entitydescriptor.name[$(element).children('select').val()] = value;
+				if (!entitydescriptor.name) {
+				    entitydescriptor.name = {};
+				}
+				entitydescriptor.name[lang] = value;
 			});
 			$('div#infodescr > div').each(function (index, element) {
-				var value = $(element).find('div > textarea').val();
+				var value = $(element).find('div > textarea').val(),
+					lang = $(element).find('div > select').val();
 				if (!value) {
 					return;
 				}
-				if (!entitydescriptor.descr) entitydescriptor.descr = {};
-				entitydescriptor.descr[$(element).find('div > select').val()] = value;
+				if (!entitydescriptor.descr) {
+				    entitydescriptor.descr = {};
+				}
+				entitydescriptor.descr[lang] = value;
 			});
 			$('div#infologo > div').each(function (index, element) {
 				var $inputs = $(element).find('input'),
@@ -279,20 +318,20 @@
 				entitydescriptor.addLogo(lang, location, width, height);
 			});
 			$('div#infokeywords > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value');
+				var value = $(element).children('input').attr('value'),
+					lang = $(element).children('select').val();
 				if (!value) {
 					return;
 				}
-				if (!entitydescriptor.saml2sp) {
-					entitydescriptor.saml2sp = {};
+				entitydescriptor.addKeywords(lang, value);
+			});
+			$('div#infoinformationurl > div').each(function (index, element) {
+				var value = $(element).children('input').attr('value'),
+					lang = $(element).children('select').val();
+				if (!value) {
+					return;
 				}
-				if (!entitydescriptor.saml2sp.mdui) {
-					entitydescriptor.saml2sp.mdui = {};
-				}
-				if (!entitydescriptor.saml2sp.mdui.keywords) {
-					entitydescriptor.saml2sp.mdui.keywords = {};
-				}
-				entitydescriptor.saml2sp.mdui.keywords[$(element).children('select').val()] = value;
+				entitydescriptor.addInformationURL(lang, value);
 			});
 		}
 	};
