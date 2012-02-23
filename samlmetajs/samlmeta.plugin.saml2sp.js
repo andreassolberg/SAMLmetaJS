@@ -61,12 +61,12 @@
 		// Text field for location
 		endpointHTML +=	'<div class="endpointfield endpointfield-location">' +
 				'<label for="' + randID + '-location">	Location</label>' +
-				'<input class="datafield-location" type="text" name="' + randID + '-location-name" id="contact-' + randID + '-location" value="' + (endpoint.Location || '') + '" /></div>';
+				'<input class="datafield-location" type="text" name="' + randID + '-location-name" id="contact-' + randID + '-location" value="' + (endpoint.Location || '') + '" /></div>';
 
 		// Text field for response location
 		endpointHTML +=	'<div class="endpointfield">' +
 				'<label for="' + randID + '-locationresponse">	Response location</label>' +
-				'<input class="datafield-responselocation" type="text" name="' + randID + '-locationresponse-name" id="contact-' + randID + '-locationresponse" value="' + (endpoint.ResponseLocation || '') + '" />' +
+				'<input class="datafield-responselocation" type="text" name="' + randID + '-locationresponse-name" id="contact-' + randID + '-locationresponse" value="' + (endpoint.ResponseLocation || '') + '" />' +
 			'</div>';
 
 		endpointHTML += '<button style="display: block; clear: both" class="remove">Remove</button>' +

@@ -52,7 +52,7 @@
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">';
 			infoHTML += addLanguageSelect(randID, lang, 'name');
-			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
 				'</div>';
 
@@ -67,7 +67,7 @@
 			infoHTML += addLanguageSelect(randID, lang, 'descr');
 			infoHTML += '<button style="" class="removedescr">Remove</button>' +
 				'</div><div>' +
-				'<textarea name="' + randID + '-name-name" id="' + randID + '-name">' + (descr || '') + '</textarea>' +
+				'<textarea name="' + randID + '-name-name" id="' + randID + '-name">' + (descr || '') + '</textarea>' +
 				'</div></div>';
 
 			$(infoHTML).appendTo("div#info div#infodescr").find('button.removedescr').click(function (e) {
@@ -79,7 +79,7 @@
 			var randID = 'infokeywords' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infokeywordsdiv">';
 			infoHTML += addLanguageSelect(randID, lang, 'keywords');
-			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
 				'<button style="" class="removekeywords">Remove</button>' +
 				'</div>';
 
@@ -144,7 +144,7 @@
 			var randID = 'informationurl' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="informationurldiv">';
 			infoHTML += addLanguageSelect(randID, lang, 'informationurl');
-			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (informationUrl || '') + '" />' +
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (informationUrl || '') + '" />' +
 				'<button style="" class="removeinformationurl">Remove</button>' +
 				'</div>';
 

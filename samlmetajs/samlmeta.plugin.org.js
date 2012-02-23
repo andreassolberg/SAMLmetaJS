@@ -34,7 +34,7 @@
 			}
 
 			infoHTML += '</select>' +
-				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
+				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
 				'</div>';
 
@@ -67,7 +67,7 @@
 			}
 
 			infoHTML += '</select>' +
-				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
+				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
 				'</div>';
 
@@ -100,7 +100,7 @@
 			}
 
 			infoHTML += '</select>' +
-				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
+				'<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
 				'</div>';
 

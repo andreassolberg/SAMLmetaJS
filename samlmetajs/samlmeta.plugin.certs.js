@@ -23,7 +23,7 @@
 		}
 
 		infoHTML += '</select>' +
-			'<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>' +
+			'<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>' +
 			'<button style="display: block" class="removecert">Remove</button>' +
 			'</fieldset>';
 
@@ -75,7 +75,7 @@
 				var use = $(element).find('select.certuse').val();
 				var cert = $(element).find('textarea.certdata').val();
 
-				if (!use || !cert) {
+				if (!use || !cert) {
 					return;
 				}
 				

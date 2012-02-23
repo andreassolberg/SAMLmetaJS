@@ -68,7 +68,7 @@ MDEntityDescriptor.prototype.hasCertOfType = function (type) {
 	var
 		i;
 
-	if (!this.saml2sp || !this.saml2sp.certs) return false;
+	if (!this.saml2sp || !this.saml2sp.certs) return false;
 
 	for(i = 0; i < this.saml2sp.certs.length; i++) {
 		// console.log('Looking for certificate of type:'); console.log(type); console.log(this.saml2sp.certs[i]);
@@ -1138,7 +1138,7 @@ parseFromString = function(xmlstring) {
 	if (!entitydescriptor.descr) {
 		processTest(new TestResult('noentitydescr', 'The entity did not include a description', 0, 1));
 	}
-	if (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService) {
+	if (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService) {
 		processTest(new TestResult('noacsendpoint', 'The entity did not include an AssertionConsumerService endpoint', 0, 2));
 	}
 

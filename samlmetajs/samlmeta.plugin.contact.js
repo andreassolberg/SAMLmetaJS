@@ -28,12 +28,12 @@
 
 				'<div class="contactfield">' +
 					'<label for="contact-' + randID + '-givenname">Given name: </label>' +
-					'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-givenname" value="' + (contact.givenName || '') + '" />' +
+					'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-givenname" value="' + (contact.givenName || '') + '" />' +
 				'</div>' +
 
 				'<div class="contactfield">' +
 					'<label for="contact-' + randID + '-surname">Surname: </label>' +
-					'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-surname" value="' + (contact.surName || '') + '" />' +
+					'<input type="text" name="contact-' + randID + '-givenname-name" id="contact-' + randID + '-surname" value="' + (contact.surName || '') + '" />' +
 				'</div>' +
 
 				'<div class="contactfield">' +

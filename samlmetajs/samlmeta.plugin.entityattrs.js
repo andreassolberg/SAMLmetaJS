@@ -11,17 +11,17 @@
 					'<fieldset><legend>Attribute</legend>',
 					'<div class="entityattrfield" style="float:left; margin-right: 50px;">',
 					'<label for="entityattr-' + randID + '-NameFormat">Name format: </label>',
-					'<input type="text" name="entityattr-' + randID + '-NameFormat-name" id="entityattr-' + randID + '-NameFormat" value="' + (entityattr.nameFormat || '') + '" />',
+					'<input type="text" name="entityattr-' + randID + '-NameFormat-name" id="entityattr-' + randID + '-NameFormat" value="' + (entityattr.nameFormat || '') + '" />',
 					'</div>',
 
 					'<div class="entityattrfield">',
 					'<label for="entityattr-' + randID + '-Name">Name: </label>',
-					'<input type="text" name="entityattr-' + randID + '-Name-name" id="entityattr-' + randID + '-Name" value="' + (entityattr.name || '') + '" />',
+					'<input type="text" name="entityattr-' + randID + '-Name-name" id="entityattr-' + randID + '-Name" value="' + (entityattr.name || '') + '" />',
 					'</div>',
 
 					'<div class="entityattrfield" style="float:left; margin-right: 50px;">',
 					'<label for="entityattr-' + randID + '-FriendlyName">Friendly name: </label>',
-					'<input type="text" name="entityattr-' + randID + '-FriendlyName-name" id="entityattr-' + randID + '-FriendlyName" value="' + (entityattr.friendlyName || '') + '" />',
+					'<input type="text" name="entityattr-' + randID + '-FriendlyName-name" id="entityattr-' + randID + '-FriendlyName" value="' + (entityattr.friendlyName || '') + '" />',
 					'</div>',
 
 					'<div class="entityattrfield">',

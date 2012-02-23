@@ -161,7 +161,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			keydescriptor = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:KeyDescriptor');
 
-			if (use === 'signing' || use === 'encryption') {
+			if (use === 'signing' || use === 'encryption') {
 				keydescriptor.setAttribute('use', use);
 			}
 
