@@ -196,6 +196,31 @@ MDEntityDescriptor.prototype.addInformationURL = function (lang, url) {
 	this.saml2sp.mdui.informationURL[lang] = url;
 };
 
+/*
+ * Look for PrivacyStatementURL in any language.
+ */
+MDEntityDescriptor.prototype.hasPrivacyStatementURL = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
+			hasProp(this.saml2sp.mdui, 'privacyStatementURL') && !isEmpty(this.saml2sp.mdui.privacyStatementURL));
+};
+
+/*
+ * Add an Privacy Statement URL in the specified language.
+ */
+MDEntityDescriptor.prototype.addPrivacyStatementURL = function (lang, url) {
+	if (!this.saml2sp) {
+		this.saml2sp = {};
+	}
+	if (!this.saml2sp.mdui) {
+		this.saml2sp.mdui = {};
+	}
+	if (!this.saml2sp.mdui.privacyStatementURL) {
+		this.saml2sp.mdui.privacyStatementURL = {};
+	}
+	this.saml2sp.mdui.privacyStatementURL[lang] = url;
+};
+
 
 /*
  * Class: TestResult
@@ -760,10 +785,27 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'InformationURL',
 				callback: function (n) {
+					var url = nodeGetTextRecursive(n);
 					if (!mdui.informationURL) {
 						mdui.informationURL = {};
 					}
-					mdui.informationURL[nodeGetAttribute(n, 'xml:lang', 'en')] = nodeGetTextRecursive(n);
+					mdui.informationURL[nodeGetAttribute(n, 'xml:lang', 'en')] = url;
+					if (!validateURL(url)) {
+						processTest(new TestResult('InformationURLInvalidURL', 'InformationURL was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'PrivacyStatementURL',
+				callback: function (n) {
+					var url = nodeGetTextRecursive(n);
+					if (!mdui.privacyStatementURL) {
+						mdui.privacyStatementURL = {};
+					}
+					mdui.privacyStatementURL[nodeGetAttribute(n, 'xml:lang', 'en')] = url;
+					if (!validateURL(url)) {
+						processTest(new TestResult('PrivacyStatementURL', 'PrivacyStatementURL was not a valid URL', 0, 2));
+					}
 				}
 			}
 		// Fallback

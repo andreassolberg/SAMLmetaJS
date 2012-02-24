@@ -43,6 +43,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				hasDiscoveryResponse ||
 				entitydescriptor.hasLogo() ||
 				entitydescriptor.hasInformationURL() ||
+				entitydescriptor.hasPrivacyStatementURL() ||
 				entitydescriptor.hasLocation()
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
@@ -251,7 +252,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
 				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
 					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.descr[lang]);
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
 					}
 				}
 			}
@@ -259,7 +260,15 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'InformationURL');
 				for(lang in entitydescriptor.saml2sp.mdui.informationURL) {
 					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.descr[lang]);
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
+					}
+				}
+			}
+			if (entitydescriptor.hasPrivacyStatementURL()) {
+				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'PrivacyStatementURL');
+				for(lang in entitydescriptor.saml2sp.mdui.privacyStatementURL) {
+					if (entitydescriptor.saml2sp.mdui.privacyStatementURL.hasOwnProperty(lang)) {
+						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:PrivacyStatementURL', lang, entitydescriptor.saml2sp.mdui.privacyStatementURL[lang]);
 					}
 				}
 			}
@@ -279,7 +288,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 		"addSimpleLocalizedAttribute": function(node, ns, name, lang, value) {
 			var newNode = doc.createElementNS(ns, name);
-			newNode.appendChild(doc.createTextNode(value););
+			newNode.appendChild(doc.createTextNode(value));
 			newNode.setAttribute('xml:lang', lang);
 			node.appendChild(newNode);
 		},

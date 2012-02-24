@@ -48,6 +48,9 @@
 		"clearInformationURL": function () {
 			$("div#info div#infoinformationurl").empty();
 		},
+		"clearPrivacyStatementURL": function () {
+			$("div#info div#infoprivacystatementurl").empty();
+		},
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">';
@@ -153,6 +156,19 @@
 				$(e.target).closest('div.informationurldiv').remove();
 			});
 		},
+		"addPrivacyStatementURL": function (lang, privacyStatementUrl) {
+			var randID = 'informationurl' + Math.floor(Math.random() * 10000 + 1000);
+			var infoHTML = '<div class="privacystatementurldiv">';
+			infoHTML += addLanguageSelect(randID, lang, 'privacystatementurl');
+			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (privacyStatementUrl || '') + '" />' +
+				'<button style="" class="removeprivacystatementurl">Remove</button>' +
+				'</div>';
+
+			$(infoHTML).appendTo("div#info div#infoprivacystatementurl").find('button.removeprivacystatementurl').click(function (e) {
+				e.preventDefault();
+				$(e.target).closest('div.privacystatementurldiv').remove();
+			});
+		}
 	};
 
 	SAMLmetaJS.plugins.info = {
@@ -207,6 +223,13 @@
 				'</div>',
 				'</fieldset>',
 
+				'<fieldset class="informationurl"><legend>URL to privacy statement about the service</legend>',
+				'<div id="infoprivacystatementurl"></div>',
+				'<div>',
+				'<button class="addprivacystatementurl">Add URL in one more language</button>',
+				'</div>',
+				'</fieldset>',
+
 				'</div>'
 			].join(''));
 		},
@@ -231,6 +254,10 @@
 			$("div#info button.addinformationurl").click(function(e) {
 				e.preventDefault();
 				UI.addInformationURL('en', '');
+			});
+			$("div#info button.addprivacystatementurl").click(function(e) {
+				e.preventDefault();
+				UI.addPrivacyStatementURL('en', '');
 			});
 		},
 
@@ -278,6 +305,15 @@
 				for (l in entitydescriptor.saml2sp.mdui.informationURL) {
 					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(l)) {
 						UI.addInformationURL(l, entitydescriptor.saml2sp.mdui.informationURL[l]);
+					}
+				}
+			}
+
+			UI.clearPrivacyStatementURL();
+			if (entitydescriptor.hasPrivacyStatementURL()) {
+				for (l in entitydescriptor.saml2sp.mdui.privacyStatementURL) {
+					if (entitydescriptor.saml2sp.mdui.privacyStatementURL.hasOwnProperty(l)) {
+						UI.addPrivacyStatementURL(l, entitydescriptor.saml2sp.mdui.privacyStatementURL[l]);
 					}
 				}
 			}
@@ -332,6 +368,14 @@
 					return;
 				}
 				entitydescriptor.addInformationURL(lang, value);
+			});
+			$('div#infoprivacystatementurl > div').each(function (index, element) {
+				var value = $(element).children('input').attr('value'),
+					lang = $(element).children('select').val();
+				if (!value) {
+					return;
+				}
+				entitydescriptor.addPrivacyStatementURL(lang, value);
 			});
 		}
 	};
