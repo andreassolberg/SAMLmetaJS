@@ -78,7 +78,7 @@
 				if (!use || !cert) {
 					return;
 				}
-				
+
 				if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
 				if (!entitydescriptor.saml2sp.certs) {
 					entitydescriptor.saml2sp.certs = [];
