@@ -223,6 +223,28 @@ MDEntityDescriptor.prototype.addPrivacyStatementURL = function (lang, url) {
 
 
 /*
+ * Look for Certificates
+ */
+MDEntityDescriptor.prototype.hasCertificate = function () {
+	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
+			hasProp(this.saml2sp, 'certs') && !isEmpty(this.saml2sp.certs));
+};
+
+/*
+ * Add an Certificate.
+ */
+MDEntityDescriptor.prototype.addCertificate = function (use, cert) {
+	if (!this.saml2sp) {
+		this.saml2sp = {};
+	}
+	if (!this.saml2sp.certs) {
+		this.saml2sp.certs = [];
+	}
+	this.saml2sp.certs.push({use: use, cert: cert});
+};
+
+
+/*
  * Class: TestResult
  * Contains information about a single test performed regarding metadata.
  * The objects contain the following properties:

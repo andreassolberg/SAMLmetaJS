@@ -59,7 +59,7 @@
 			var l;
 
 			clearCerts();
-			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.certs) {
+			if (entitydescriptor.hasCertificate()) {
 				for (l in entitydescriptor.saml2sp.certs) {
 					if (entitydescriptor.saml2sp.certs.hasOwnProperty(l)) {
 						addCert(entitydescriptor.saml2sp.certs[l].use, entitydescriptor.saml2sp.certs[l].cert);
@@ -71,19 +71,13 @@
 		toXML: function (entitydescriptor) {
 			delete entitydescriptor.certs;
 			$('div#certs fieldset').each(function (index, element) {
-
 				var use = $(element).find('select.certuse').val();
 				var cert = $(element).find('textarea.certdata').val();
 
 				if (!use || !cert) {
 					return;
 				}
-
-				if (!entitydescriptor.saml2sp) entitydescriptor.saml2sp = {};
-				if (!entitydescriptor.saml2sp.certs) {
-					entitydescriptor.saml2sp.certs = [];
-				}
-				entitydescriptor.saml2sp.certs.push({'use': use, 'cert': cert});
+				entitydescriptor.addCertificate(use, cert);
 			});
 		}
 	};

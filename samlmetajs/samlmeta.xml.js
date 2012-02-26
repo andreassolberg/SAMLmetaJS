@@ -68,7 +68,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 
 			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
-			if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.certs) {
+			if (entitydescriptor.hasCertificate()) {
 				for(i = 0; i< entitydescriptor.saml2sp.certs.length; i++) {
 					this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i].use, entitydescriptor.saml2sp.certs[i].cert);
 				}
