@@ -63,12 +63,36 @@ var SAMLmetaJS = {};
 			'init': "urn:oasis:names:tc:SAML:profiles:SSO:request-init",
 			'idpdisc': "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol",
 			'xsd': "http://www.w3.org/2001/XMLSchema",
-			'ds': "http://www.w3.org/2000/09/xmldsig#"
+			'ds': "http://www.w3.org/2000/09/xmldsig#",
+			'xenc': "http://www.w3.org/2001/04/xmlenc#"
 		},
 		'certusage': {
-			'both': 'Both',
+		 	'both': 'Both',
 			'signing': 'Signing',
 			'encryption': 'Encryption'
+		},
+		'algorithms': {
+			'http://www.w3.org/2001/04/xmlenc#tripledes-cbc': 'TRIPLEDES',
+			'http://www.w3.org/2001/04/xmlenc#aes128-cbc': 'AES-128',
+			'http://www.w3.org/2001/04/xmlenc#aes256-cbc': 'AES-256',
+			'http://www.w3.org/2001/04/xmlenc#aes192-cbc': 'AES-192',
+			'http://www.w3.org/2001/04/xmlenc#rsa-1_5': 'RSA-v1.5',
+			'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p': 'RSA-OAEP',
+			'http://www.w3.org/2001/04/xmlenc#dh': 'Diffie-Hellman',
+			'http://www.w3.org/2001/04/xmlenc#kw-tripledes': 'TRIPLEDES KeyWrap',
+			'http://www.w3.org/2001/04/xmlenc#kw-aes128': 'AES-128 KeyWrap',
+			'http://www.w3.org/2001/04/xmlenc#kw-aes256': 'AES-256 KeyWrap',
+			'http://www.w3.org/2001/04/xmlenc#kw-aes192': 'AES-192 KeyWrap',
+			'http://www.w3.org/2000/09/xmldsig#sha1': 'SHA1',
+			'http://www.w3.org/2001/04/xmlenc#sha256': 'SHA256',
+			'http://www.w3.org/2001/04/xmlenc#sha512': 'SHA512',
+			'http://www.w3.org/2001/04/xmlenc#ripemd160': 'RIPEMD-160',
+			'http://www.w3.org/2000/09/xmldsig#': 'XML Digital Signature',
+			'http://www.w3.org/TR/2001/REC-xml-c14n-20010315': 'Canonical XML (omits comments)',
+			'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments': 'Canonical XML with Comments',
+			'http://www.w3.org/2001/10/xml-exc-c14n#': 'Exclusive XML Canonicalization (omits comments)',
+			'http://www.w3.org/2001/10/xml-exc-c14n#WithComments': 'Exclusive XML Canonicalization with Comments',
+			'http://www.w3.org/2000/09/xmldsig#base64': 'base64'
 		},
 		'languages': {
 			'en': 'English',

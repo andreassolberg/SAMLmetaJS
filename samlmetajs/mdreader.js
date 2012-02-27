@@ -231,18 +231,23 @@ MDEntityDescriptor.prototype.hasCertificate = function () {
 };
 
 /*
- * Add an Certificate.
+ * Add a Certificate.
  */
-MDEntityDescriptor.prototype.addCertificate = function (use, cert) {
+MDEntityDescriptor.prototype.addCertificate = function (use, cert, algorithm, keySize, OAEPparams) {
 	if (!this.saml2sp) {
 		this.saml2sp = {};
 	}
 	if (!this.saml2sp.certs) {
 		this.saml2sp.certs = [];
 	}
-	this.saml2sp.certs.push({use: use, cert: cert});
+	this.saml2sp.certs.push({
+		use: use,
+		cert: cert,
+		algorithm: algorithm,
+		keySize: keySize,
+		OAEPparams: OAEPparams
+	});
 };
-
 
 /*
  * Class: TestResult
@@ -583,6 +588,23 @@ parseFromString = function(xmlstring) {
 				}]);
 
 			}
+		}, {
+			namespace:  constants.ns.md, name: 'EncryptionMethod',
+			callback: function (n) {
+				cert.algorithm = nodeGetAttribute(n, 'Algorithm');
+				nodeProcessChildren(n, [{
+					namespace: constants.ns.xenc, name: 'KeySize',
+					callback: function (n) {
+						cert.keySize = nodeGetTextRecursive(n);
+					}
+				}, {
+					name: 'OAEPparams',
+					callback: function (n) {
+						cert.OAEPparams = nodeGetTextRecursive(n);
+					}
+				}]);
+			}
+
 		}]);
 
 		// console.log('found certificate');
@@ -591,8 +613,6 @@ parseFromString = function(xmlstring) {
 		if (!cert.cert) {
 			processTest(new TestResult('certdatamissing', 'Could not extract certificate data properly from KeyDescriptor element ', 0, 1));
 		}
-
-
 
 		return cert;
 	}

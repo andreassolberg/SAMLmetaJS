@@ -23,7 +23,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (entitydescriptor.entityAttributes) {
 				entityExtensions = this.addIfNotEntityExtensions(root);
 
-				entityAttributes = this.addIfNotEntityAttributes(entityExtensions);
+				entityAttributes = this.addNodIfNotExists(entityExtensions, 'EntityAttributes', SAMLmetaJS.Constants.ns.mdattr, mdattr); 
+
 				SAMLmetaJS.XML.wipeChildren(entityAttributes, SAMLmetaJS.Constants.ns.saml, 'Attribute');
 				for(var name in entitydescriptor.entityAttributes) {
 					this.addAttribute(entityAttributes, entitydescriptor.entityAttributes[name]);
@@ -47,7 +48,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				entitydescriptor.hasLocation()
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
-				mdui = this.addIfNotMDUI(extensions);
+				mdui = SAMLmetaJS.XML.addNodeIfNotExists(doc, extensions, 'UIInfo', SAMLmetaJS.Constants.ns.mdui, 'mdui');
 				this.updateMDUI(mdui, entitydescriptor);
 				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.init, 'RequestInitiator');
 				if (hasRequestInitiator) {
@@ -70,7 +71,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
 			if (entitydescriptor.hasCertificate()) {
 				for(i = 0; i< entitydescriptor.saml2sp.certs.length; i++) {
-					this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i].use, entitydescriptor.saml2sp.certs[i].cert);
+					this.addCert(spdescriptor, entitydescriptor.saml2sp.certs[i]);
 				}
 			}
 
@@ -157,22 +158,38 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 		},
 
-		"addCert": function(node, use, cert) {
-			var keydescriptor, keyinfo, x509data, x509cert;
+		"addCert": function(node, certificate) {
+			var keydescriptor, keyinfo, x509data, x509cert, encryptionMethod, keySize, OAEPparams;
 
 			keydescriptor = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:KeyDescriptor');
 
-			if (use === 'signing' || use === 'encryption') {
-				keydescriptor.setAttribute('use', use);
+			if (certificate.use === 'signing' || certificate.use === 'encryption') {
+				keydescriptor.setAttribute('use', certificate.use);
 			}
 
 			keyinfo = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:KeyInfo');
 			x509data = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:X509Data');
 			x509cert = doc.createElementNS(SAMLmetaJS.Constants.ns.ds, 'ds:X509Certificate');
-			x509cert.appendChild(doc.createTextNode(cert));
+			x509cert.appendChild(doc.createTextNode(certificate.cert));
 			x509data.appendChild(x509cert);
 			keyinfo.appendChild(x509data);
 			keydescriptor.appendChild(keyinfo);
+
+			if (certificate.algorithm) {
+				encryptionMethod = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:EncryptionMethod');
+				encryptionMethod.setAttribute('Algorithm', certificate.algorithm);
+				if (certificate.keySize) {
+					keySize = doc.createElementNS(SAMLmetaJS.Constants.ns.xenc, 'xenc:KeySize');
+					keySize.appendChild(doc.createTextNode(certificate.keySize));
+					encryptionMethod.appendChild(keySize);
+				}
+				if (certificate.OAEPparams) {
+					OAEPparams = doc.createElement('OAEPparams');
+					OAEPparams.appendChild(doc.createTextNode(certificate.OAEPparams));
+					encryptionMethod.appendChild(OAEPparams);
+				}
+				keydescriptor.appendChild(encryptionMethod);
+			}
 
 			node.insertBefore(keydescriptor, SAMLmetaJS.XML.findChildElement(node,
 				[
@@ -228,7 +245,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
 				for(lang in entitydescriptor.name) {
 					if (entitydescriptor.name.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:DisplayName', lang, entitydescriptor.name[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:DisplayName', lang, entitydescriptor.name[lang]);
 					}
 				}
 			}
@@ -236,7 +253,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Description');
 				for(lang in entitydescriptor.descr) {
 					if (entitydescriptor.descr.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Description', lang, entitydescriptor.descr[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Description', lang, entitydescriptor.descr[lang]);
 					}
 				}
 			}
@@ -252,7 +269,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
 				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
 					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
 					}
 				}
 			}
@@ -260,7 +277,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'InformationURL');
 				for(lang in entitydescriptor.saml2sp.mdui.informationURL) {
 					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
 					}
 				}
 			}
@@ -268,7 +285,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'PrivacyStatementURL');
 				for(lang in entitydescriptor.saml2sp.mdui.privacyStatementURL) {
 					if (entitydescriptor.saml2sp.mdui.privacyStatementURL.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.mdui, 'mdui:PrivacyStatementURL', lang, entitydescriptor.saml2sp.mdui.privacyStatementURL[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:PrivacyStatementURL', lang, entitydescriptor.saml2sp.mdui.privacyStatementURL[lang]);
 					}
 				}
 			}
@@ -284,12 +301,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			newNode.setAttribute('xml:lang', lang);
 			newNode.setAttribute('width', logo.width);
 			newNode.setAttribute('height', logo.height);
-			node.appendChild(newNode);
-		},
-		"addSimpleLocalizedAttribute": function(node, ns, name, lang, value) {
-			var newNode = doc.createElementNS(ns, name);
-			newNode.appendChild(doc.createTextNode(value));
-			newNode.setAttribute('xml:lang', lang);
 			node.appendChild(newNode);
 		},
 		"addMDUILocation": function(node, location) {
@@ -314,14 +325,14 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (entitydescriptor.name) {
 				for(lang in entitydescriptor.name) {
 					if (entitydescriptor.name.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.md, 'md:ServiceName', lang, entitydescriptor.name[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.md, 'md:ServiceName', lang, entitydescriptor.name[lang]);
 					}
 				}
 			}
 			if (entitydescriptor.descr) {
 				for(lang in entitydescriptor.descr) {
 					if (entitydescriptor.descr.hasOwnProperty(lang)) {
-						this.addSimpleLocalizedAttribute(node, SAMLmetaJS.Constants.ns.md, 'md:ServiceDescription', lang, entitydescriptor.descr[lang]);
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.md, 'md:ServiceDescription', lang, entitydescriptor.descr[lang]);
 					}
 				}
 			}
@@ -363,113 +374,30 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			node.appendChild(newNode);
 		},
 		"addIfNotEntityExtensions": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'Extensions' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.md
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:Extensions');
-			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
-				[
+			return SAMLmetaJS.XML.addNodeIfNotExists(doc, node, 'Extensions', SAMLmetaJS.Constants.ns.md, 'md', function (newNode) {
+				node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node, [
 					{'localName': 'SPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'IdPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
-				]
-			));
-			return newNode;
+				]));
+			});
 		},
 		"addIfNotExtensions": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'Extensions' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.md
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:Extensions');
-			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
-				[
+			return SAMLmetaJS.XML.addNodeIfNotExists(doc, node, 'Extensions', SAMLmetaJS.Constants.ns.md, 'md', function (newNode) {
+				node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node, [
 					{'localName': 'KeyDescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'SingleLogoutService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
-				]
-			));
-			return newNode;
-		},
-		"addIfNotMDUI": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'UIInfo' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.mdui
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:UIInfo');
-			node.appendChild(newNode);
-			return newNode;
-
-		},
-		"addIfNotEntityAttributes": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'EntityAttributes' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.mdattr
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdattr, 'mdattr:EntityAttributes');
-			node.appendChild(newNode);
-			return newNode;
-
+				]));
+			});
 		},
 		"addIfNotAttributeConsumingService": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'AttributeConsumingService' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.md
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:AttributeConsumingService');
-			newNode.setAttribute('index', 0);
-			node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node,
-				[
+			return SAMLmetaJS.XML.addNodeIfNotExists(doc, node, 'AttributeConsumingService', SAMLmetaJS.Constants.ns.md, 'md', function (newNode) {
+				newNode.setAttribute('index', 0);
+				node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node, [
 					{'localName': 'ContactPerson', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
-				]
-			));
-			return newNode;
+				]));
+			});
 		},
 		"addEndpoint": function(node, endpointtype, endpoint) {
 			var newNode, beforeNode;
@@ -528,24 +456,17 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 
 		"addIfNotSPSSODescriptor": function(node) {
-			var newNode;
-
-			// Iterate the root children
-			for (var i = 0; i < node.childNodes.length; i++ ) {
-				var currentChild = node.childNodes[i];
-				if (
-						currentChild.nodeType == 1 &&  // type is Element
-						currentChild.localName === 'SPSSODescriptor' &&
-						currentChild.namespaceURI === SAMLmetaJS.Constants.ns.md &&
-						SAMLmetaJS.XML.hasAttribute(currentChild, 'protocolSupportEnumeration', 'urn:oasis:names:tc:SAML:2.0:protocol')
-					)
-					return currentChild;
-			}
-
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.md, 'md:SPSSODescriptor');
-			newNode.setAttribute('protocolSupportEnumeration', 'urn:oasis:names:tc:SAML:2.0:protocol');
-			node.appendChild(newNode);
-			return newNode;
+			return SAMLmetaJS.XML.addNodeIfNotExists(doc, node, 'SPSSODescriptor', SAMLmetaJS.Constants.ns.md, 'md',
+					function (newNode) {
+						newNode.setAttribute('protocolSupportEnumeration', 'urn:oasis:names:tc:SAML:2.0:protocol');
+						node.insertBefore(newNode, SAMLmetaJS.XML.findChildElement(node, [
+							{'localName': 'SPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+							{'localName': 'IdPSSODescriptor', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
+						]));
+					},
+					function (child) {
+						return SAMLmetaJS.XML.hasAttribute(child, 'protocolSupportEnumeration', 'urn:oasis:names:tc:SAML:2.0:protocol');
+					});
 		},
 
 		"addIfNotEntityDescriptor": function() {
@@ -569,7 +490,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		"getXMLasString": function() {
 			return (new XMLSerializer()).serializeToString(doc);
 		}
-
 	};
 };
 
@@ -639,12 +559,16 @@ SAMLmetaJS.XML = {
 			node.removeChild(wipequeue[i]);
 		}
 	},
-	"findChildElement": function(node, list) {
+	"findChildElement": function(node, list, extraChecks) {
 		// Iterate the root children
 		var i, j;
 		for (i = 0; i < node.childNodes.length; i++ ) {
 			var currentChild = node.childNodes[i];
 			if(currentChild.nodeType !== 1) continue; // Process only elements.
+
+			if (extraChecks && !extraChecks(currentChild)) {
+				continue;
+			}
 
 			for(j = 0; j < list.length; j++) {
 				if (list[j].localName == currentChild.localName &&
@@ -655,6 +579,24 @@ SAMLmetaJS.XML = {
 			}
 		}
 		return null;
+	},
+	"addSimpleLocalizedAttribute": function(doc, node, ns, name, lang, value) {
+		var newNode = doc.createElementNS(ns, name);
+		newNode.appendChild(doc.createTextNode(value));
+		newNode.setAttribute('xml:lang', lang);
+		node.appendChild(newNode);
+	},
+	"addNodeIfNotExists": function(doc, parent, name, ns, nsPrefix, addToParent, extraChecks) {
+		var newNode = this.findChildElement(parent, [{localName: name, namespaceURI: ns}], extraChecks);
+		if (newNode === null) {
+			newNode = doc.createElementNS(ns, nsPrefix + ':' + name);
+			if (addToParent) {
+				addToParent(newNode);
+			} else {
+				parent.appendChild(newNode);
+			}
+		}
+		return newNode;
 	},
 	"prettifyXML": function(xmlstring) {
 		var parser = new DOMParser();
