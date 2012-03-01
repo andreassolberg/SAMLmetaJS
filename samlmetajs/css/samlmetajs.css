@@ -130,27 +130,9 @@ div#tabs div#info div.infologodiv button { width: auto; }
 
 /* SAML SP tab */
 
-div#tabs div#saml2sp fieldset legend {
+div#tabs div#endpoints fieldset legend {
 	background-image: url('../icons/bullet_wrench.png');
 }
-div#tabs div#saml2sp div.endpointfield.endpointfield-location {
-	clear: both;
-}
-div#tabs div#saml2sp div.endpointfield input {
-	width: 400px ! important;
-}
-div#tabs div#saml2sp div.endpointfield label {
-	width: 200px ! important;
-	display: block;
-	color: #999;
-	font-size: small;
-}
-div#tabs div#saml2sp div.endpointfield {
-	float: left;
-	margin: 2px 10px 5px 10px;
-/*	width: 45%;*/
-}
-
 
 
 /* Contacts tab */
