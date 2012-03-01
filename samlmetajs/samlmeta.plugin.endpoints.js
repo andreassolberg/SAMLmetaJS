@@ -1,20 +1,20 @@
 (function($) {
-        var UI = {
-	        clearEndpoints: function () {
-	                $("div#endpoints > div.content").empty();
-	        },
+	var UI = {
+		clearEndpoints: function () {
+			$("div#endpoints > div.content").empty();
+		},
 
 		addEndpoint: function (role, endpoint, endpointname) {
-                        var checked, endpointHTML, endpointType, foundBinding, binding, endpointTypes;
+			var checked, endpointHTML, foundBinding, binding, fillEndpointTypes;
 			var randID ='endpoint-' + Math.floor(Math.random() * 10000 + 1000);
 
-			// ---- Type of endpoint selector
 			endpointHTML = [
-			        '<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>',
+				'<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>',
 				'<div class="endpointfield inlineField">',
 				'Role:'
 			];
 
+			// ---- Role
 			endpointHTML.push('<div class="radioGroup">');
 			endpointHTML.push('<input class="role" type="radio" id="' + randID + '-role-idp" name="' + randID + '-role-name" value="idp" ' + (role === 'idp' ? 'checked="checked"' : '') + '" />');
 			endpointHTML.push('<label for="' + randID + '-role-idp">IdP</label>');
@@ -23,28 +23,16 @@
 			endpointHTML.push('</div>');
 			endpointHTML.push('</div>');
 
+			// ---- Type of endpoint selector
 			endpointHTML.push('<div class="inlineField">');
 			endpointHTML.push('<label for="' + randID + '-type">Endpoint type: </label>');
 			endpointHTML.push('<select class="datafield-type" name="' + randID + '-type-name" id="' + randID + '-type">');
-
-			endpointTypes = SAMLmetaJS.Constants.endpointTypes[role];
-			for (endpointType in endpointTypes) {
-			        if (endpointTypes.hasOwnProperty(endpointType)) {
-				        checked = '';
-					if (endpointType === endpointname) {
-					        checked = ' selected="selected" ';
-					}
-					endpointHTML.push('<option value="' + endpointType + '" ' + checked + '>');
-					endpointHTML.push(endpointTypes[endpointType]);
-					endpointHTML.push('</option>');
-				}
-			}
-
+			// This select is filled later with the fillEndpointTypes function
 			endpointHTML.push('</select>');
 			endpointHTML.push('</div>');
 
 			if (endpoint.index) {
-			        endpointHTML.push('<input type="hidden" class="datafield-index" id="' + randID + '-binding" name="' + randID + '-index-name" value="');
+				endpointHTML.push('<input type="hidden" class="datafield-index" id="' + randID + '-binding" name="' + randID + '-index-name" value="');
 				endpointHTML.push(endpoint.index + '" />');
 			}
 
@@ -55,10 +43,10 @@
 
 			foundBinding = false;
 			for (binding in SAMLmetaJS.Constants.bindings) {
-			        if (SAMLmetaJS.Constants.bindings.hasOwnProperty(binding)) {
-				        checked = '';
+				if (SAMLmetaJS.Constants.bindings.hasOwnProperty(binding)) {
+					checked = '';
 					if (endpoint.Binding === binding) {
-					        checked = ' selected="selected" ';
+						checked = ' selected="selected" ';
 						foundBinding = true;
 					}
 					endpointHTML.push('<option value="' + binding + '" ' + checked + '>');
@@ -68,7 +56,7 @@
 			}
 
 			if (endpoint.Binding && !foundBinding) {
-			        endpointHTML.push('<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>');
+				endpointHTML.push('<option value="' + endpoint.Binding + '" selected="selected">Unknown binding (' + endpoint.Binding + ')</option>');
 			}
 			endpointHTML.push('</select>');
 			endpointHTML.push('</div>');
@@ -88,11 +76,36 @@
 			endpointHTML.push('<button style="display: block; clear: both" class="remove">Remove</button>');
 			endpointHTML.push('</fieldset>');
 
-			$(endpointHTML.join('')).appendTo("div#endpoints > div.content").find('button.remove').click(function(e) {
-				e.preventDefault();
-				$(e.target).closest('fieldset').remove();
-			});
-	        }
+			$(endpointHTML.join('')).appendTo("div#endpoints > div.content")
+				.find('button.remove').click(function(e) {
+					e.preventDefault();
+					$(e.target).closest('fieldset').remove();
+				}).end()
+				.find('input.role').change(function (e) {
+					var role = $(this).val();
+					var $select = $(this).closest('fieldset').find('select.datafield-type');
+					fillEndpointTypes($select, role);
+				});
+
+			fillEndpointTypes = function ($select, role) {
+			    var endpointTypes = SAMLmetaJS.Constants.endpointTypes[role];
+			    var options = [];
+			    for (endpointType in endpointTypes) {
+				    if (endpointTypes.hasOwnProperty(endpointType)) {
+					    checked = '';
+					    if (endpointType === endpointname) {
+						    checked = ' selected="selected" ';
+					    }
+					    options.push('<option value="' + endpointType + '" ' + checked + '>');
+					    options.push(endpointTypes[endpointType]);
+					    options.push('</option>');
+				    }
+			    }
+			    $select.html(options.join(''));
+			};
+
+			fillEndpointTypes($('div#endpoints select#' + randID + '-type'), role);
+		}
 	};
 
 	var isEndpoint = function (endpointTypes, endpoint) {
@@ -107,11 +120,11 @@
 	}
 
 	var isSPEndpoint = function (endpoint) {
-	        return isEndpoint(SAMLmetaJS.Constants.endpointTypes.sp, endpoint);
+		return isEndpoint(SAMLmetaJS.Constants.endpointTypes.sp, endpoint);
 	};
 
 	var isIdPEndpoint = function (endpoint) {
-	        return isEndpoint(SAMLmetaJS.Constants.endpointTypes.idp, endpoint);
+		return isEndpoint(SAMLmetaJS.Constants.endpointTypes.idp, endpoint);
 	};
 
 	SAMLmetaJS.plugins.endpoints = {
@@ -145,12 +158,12 @@
 				for (endpoint in entitydescriptor.saml2sp) {
 					if (entitydescriptor.saml2sp.hasOwnProperty(endpoint)) {
 
-					        if (!isSPEndpoint(endpoint)) {
+						if (!isSPEndpoint(endpoint)) {
 							continue;
 						}
 
 						for (i = 0; i < entitydescriptor.saml2sp[endpoint].length; i++) {
-						        UI.addEndpoint('sp', entitydescriptor.saml2sp[endpoint][i], endpoint);
+							UI.addEndpoint('sp', entitydescriptor.saml2sp[endpoint][i], endpoint);
 						}
 					}
 				}
@@ -159,12 +172,12 @@
 				for (endpoint in entitydescriptor.saml2idp) {
 					if (entitydescriptor.saml2idp.hasOwnProperty(endpoint)) {
 
-					        if (!isIdPEndpoint(endpoint)) {
+						if (!isIdPEndpoint(endpoint)) {
 							continue;
 						}
 
 						for (i = 0; i < entitydescriptor.saml2idp[endpoint].length; i++) {
-						        UI.addEndpoint('idp', entitydescriptor.saml2idp[endpoint][i], endpoint);
+							UI.addEndpoint('idp', entitydescriptor.saml2idp[endpoint][i], endpoint);
 						}
 					}
 				}
@@ -203,23 +216,28 @@
 				}
 
 				if (role === 'idp') {
-				    if (!entitydescriptor.saml2idp) {
-					        entitydescriptor.saml2idp = {};
+
+					if (!entitydescriptor.saml2idp) {
+						entitydescriptor.saml2idp = {};
 					}
 					if (!entitydescriptor.saml2idp[endpointType]) {
-					        entitydescriptor.saml2idp[endpointType] = [];
+						entitydescriptor.saml2idp[endpointType] = [];
 					}
 					entitydescriptor.saml2idp[endpointType].push(newEndpoint);
+
 				} else if (role === 'sp') {
-				        if (!entitydescriptor.saml2sp) {
-					        entitydescriptor.saml2sp = {};
+
+					if (!entitydescriptor.saml2sp) {
+						entitydescriptor.saml2sp = {};
 					}
 					if (!entitydescriptor.saml2sp[endpointType]) {
-					        entitydescriptor.saml2sp[endpointType] = [];
+						entitydescriptor.saml2sp[endpointType] = [];
 					}
 					entitydescriptor.saml2sp[endpointType].push(newEndpoint);
+
 				}
 			});
+			console.log(entitydescriptor);
 		}
 	};
 
