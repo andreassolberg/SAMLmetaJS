@@ -42,12 +42,12 @@ div#tabs button {
 
 /* Generic field styles */
 .inlineField {
-    float: left;
-    margin: 2px 10px 5px;
+	float: left;
+	margin: 2px 10px 5px;
 }
 
 .newRow {
-    clear: left;
+	clear: left;
 }
 
 /* Verification box */
