@@ -116,7 +116,6 @@
 		},
 
 		toXML: function (entitydescriptor) {
-			delete entitydescriptor.certs;
 			$('div#certificates fieldset').each(function (index, element) {
 				var use = $(element).find('select.certuse').val();
 				var cert = $(element).find('textarea.certdata').val();
