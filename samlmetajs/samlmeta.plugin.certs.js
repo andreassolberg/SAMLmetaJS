@@ -102,9 +102,20 @@
 			var i;
 
 			UI.clearCertificates();
-			if (entitydescriptor.hasCertificate()) {
+			if (entitydescriptor.hasCertificate('idp')) {
+				for(i = 0; i < entitydescriptor.saml2idp.certs.length; i++) {
+					UI.addCertificate(
+						entitydescriptor.saml2idp.certs[i].use,
+						entitydescriptor.saml2idp.certs[i].cert,
+						entitydescriptor.saml2idp.certs[i].algorithm,
+						entitydescriptor.saml2idp.certs[i].keySize,
+						entitydescriptor.saml2idp.certs[i].OAEPparams
+					);
+				}
+			}
+			if (entitydescriptor.hasCertificate('sp')) {
 				for(i = 0; i < entitydescriptor.saml2sp.certs.length; i++) {
-				        UI.addCertificate(
+					UI.addCertificate(
 						entitydescriptor.saml2sp.certs[i].use,
 						entitydescriptor.saml2sp.certs[i].cert,
 						entitydescriptor.saml2sp.certs[i].algorithm,
@@ -126,7 +137,12 @@
 				if (!use || !cert) {
 					return;
 				}
-				entitydescriptor.addCertificate(use, cert, algorithm, keySize, OAEPparams);
+				if (entitydescriptor.saml2idp) {
+					entitydescriptor.addCertificate('idp', use, cert, algorithm, keySize, OAEPparams);
+				}
+				if (entitydescriptor.saml2sp) {
+					entitydescriptor.addCertificate('sp', use, cert, algorithm, keySize, OAEPparams);
+				}
 			});
 		}
 	};

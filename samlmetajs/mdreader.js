@@ -65,17 +65,22 @@ MDEntityDescriptor = function() {
  * type can be 'signing' or 'encryption'
  */
 MDEntityDescriptor.prototype.hasCertOfType = function (type) {
-	var
-		i;
 
-	if (!this.saml2sp || !this.saml2sp.certs) return false;
-
-	for(i = 0; i < this.saml2sp.certs.length; i++) {
-		// console.log('Looking for certificate of type:'); console.log(type); console.log(this.saml2sp.certs[i]);
-		if (this.saml2sp.certs[i].use === 'both') return true;
-		if (this.saml2sp.certs[i].use === type) return true;
-	}
-	return false;
+	var checkCert = function (role) {
+		var i;
+		if (!role || !role.certs) {
+			return false;
+		}
+		for(i = 0; i < role.certs.length; i++) {
+			// console.log('Looking for certificate of type:'); console.log(type); console.log(this.saml2sp.certs[i]);
+			if (role.certs[i].use === 'both' || role.certs[i].use === type) {
+				return true;
+			}
+		}
+		return false;
+	};
+	
+	return checkCert(this.saml2idp) || checkCert(this.saml2sp);
 }
 
 /*
@@ -225,22 +230,24 @@ MDEntityDescriptor.prototype.addPrivacyStatementURL = function (lang, url) {
 /*
  * Look for Certificates
  */
-MDEntityDescriptor.prototype.hasCertificate = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'certs') && !isEmpty(this.saml2sp.certs));
+MDEntityDescriptor.prototype.hasCertificate = function (role) {
+	var container = 'saml2' + role;
+	return (hasProp(this, container) && !isEmpty(this[container]) &&
+			hasProp(this[container], 'certs') && !isEmpty(this[container].certs));
 };
 
 /*
  * Add a Certificate.
  */
-MDEntityDescriptor.prototype.addCertificate = function (use, cert, algorithm, keySize, OAEPparams) {
-	if (!this.saml2sp) {
-		this.saml2sp = {};
+MDEntityDescriptor.prototype.addCertificate = function (role, use, cert, algorithm, keySize, OAEPparams) {
+	var container = 'saml2' + role;
+	if (!this[container]) {
+		this[container] = {};
 	}
-	if (!this.saml2sp.certs) {
-		this.saml2sp.certs = [];
+	if (!this[container].certs) {
+		this[container].certs = [];
 	}
-	this.saml2sp.certs.push({
+	this[container].certs.push({
 		use: use,
 		cert: cert,
 		algorithm: algorithm,

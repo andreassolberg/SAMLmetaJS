@@ -95,10 +95,11 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 
 		"addKeyDescriptor": function (node, entitydescriptor, role) {
+			var container = 'saml2' + role;
 			SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.md, 'KeyDescriptor');
-			if (entitydescriptor.hasCertificate()) {
-				for(i = 0; i< entitydescriptor[role].certs.length; i++) {
-					this.addCert(node, entitydescriptor[role].certs[i]);
+			if (entitydescriptor.hasCertificate(role)) {
+				for(i = 0; i < entitydescriptor[container].certs.length; i++) {
+					this.addCert(node, entitydescriptor[container].certs[i]);
 				}
 			}
 		},
@@ -118,7 +119,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		},
 
 		"addIdP": function (idpdescriptor, entitydescriptor) {
-			this.addKeyDescriptor(idpdescriptor, entitydescriptor, 'saml2idp');
+			this.addKeyDescriptor(idpdescriptor, entitydescriptor, 'idp');
 			this.addEndpoints(idpdescriptor, SAMLmetaJS.Constants.endpointTypes.idp, entitydescriptor.saml2idp);
 		},
 
@@ -160,7 +161,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				SAMLmetaJS.XML.wipeChildren(spdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
 
-			this.addKeyDescriptor(spdescriptor, entitydescriptor, 'saml2sp');
+			this.addKeyDescriptor(spdescriptor, entitydescriptor, 'sp');
 			this.addEndpoints(spdescriptor, SAMLmetaJS.Constants.endpointTypes.sp, entitydescriptor.saml2sp);
 
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name) &&
