@@ -40,6 +40,15 @@ div#tabs button {
 	margin: 4px; padding: 4px;
 }
 
+/* Generic field styles */
+.inlineField {
+    float: left;
+    margin: 2px 10px 5px;
+}
+
+.newRow {
+    clear: left;
+}
 
 /* Verification box */
 div#tabs div#samlmetajs_testresults div.samlmetajs_testentry {

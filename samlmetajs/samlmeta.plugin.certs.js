@@ -9,7 +9,7 @@
 
 			infoHTML = [
 				'<fieldset><legend>Certificate</legend>',
-				'<div>',
+				'<div class="inlineField">',
 				'<label for="' + randID + '-use-name">Use:</label>',
 				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">'
 			];
@@ -27,6 +27,8 @@
 			}
 
 			infoHTML.push('</select>');
+			infoHTML.push('</div>');
+			infoHTML.push('<div class="inlineField">');
 			infoHTML.push('<label for="' + randID + '-algorithm">Algorithm:</label>');
 			infoHTML.push('<select class="algorithm" name="' + randID + '-algorithm-name" id="' + randID + '-algorithm">');
 			infoHTML.push('<option value=""></option>');
@@ -45,15 +47,17 @@
 			infoHTML.push('</select>');
 			infoHTML.push('</div>');
 
-			infoHTML.push('<div>');
+			infoHTML.push('<div class="inlineField newRow">');
 			infoHTML.push('<label for="' + randID + '-keySize">Key size:</label>');
 			infoHTML.push('<input type="text" class="keySize" name="' + randID + '-keySize-name" id="' + randID + '-keySize" value="' + (keySize || '') + '" />');
-
-			infoHTML.push('<label for="' + randID + '-OAEPparams">OAEP parameters:</label>');
-			infoHTML.push('<input type="text" class="OAEPparams" name="' + randID + '-OAEPparams-name" id="' + randID + '-OAEPparams" value="' + (OAEPparams || '') + '" />');
 			infoHTML.push('</div>');
 
-			infoHTML.push('<textarea class="certdata" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>');
+			infoHTML.push('<div class="inlineField">');
+			infoHTML.push('<label for="' + randID + '-OAEPparams">OAEP parameters:</label>');
+			infoHTML.push('<input type="text" class="OAEPparams longInput" name="' + randID + '-OAEPparams-name" id="' + randID + '-OAEPparams" value="' + (OAEPparams || '') + '" />');
+			infoHTML.push('</div>');
+
+			infoHTML.push('<textarea class="certdata newRow" style="" name="' + randID + '-data" id="' + randID + '-data-name">' + (cert || '') + '</textarea>');
 
 			infoHTML.push('<button style="display: block" class="removecert">Remove</button>');
 			infoHTML.push('</fieldset>');
