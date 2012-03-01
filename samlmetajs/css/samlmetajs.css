@@ -46,6 +46,19 @@ div#tabs button {
 	margin: 2px 10px 5px;
 }
 
+.wideField input {
+        width: 80%;
+}
+
+.radioGroup {
+        margin-top: 10px;
+}
+
+.radioGroup label {
+        display: inline;
+	margin-right: 6px;
+}
+
 .newRow {
 	clear: left;
 }

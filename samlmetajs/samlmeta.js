@@ -129,12 +129,22 @@ var SAMLmetaJS = {};
 		},
 		'endpointTypes' : {
 			'sp': {
+				'ArtifactResolutionService': 'ArtifactResolutionService',
 				'AssertionConsumerService': 'AssertionConsumerService',
+				'ManageNameIDService': 'ManageNameIDService',
 				'SingleLogoutService': 'SingleLogoutService',
+				// Extensions defined at Service Provider Request Initiation Protocol and Profile Version 1.0
 				'RequestInitiator': 'RequestInitiator',
 				'DiscoveryResponse': 'DiscoveryResponse'
 			},
-			'idp' : {}
+			'idp' : {
+				'ArtifactResolutionService': 'ArtifactResolutionService',
+				'AssertionIDRequestService': 'AssertionIDRequestService',
+				'ManageNameIDService': 'ManageNameIDService',
+				'NameIDMappingService': 'NameIDMappingService',
+				'SingleLogoutService': 'SingleLogoutService',
+				'SingleSignOnService': 'SingleSignOnService'
+			}
 		},
 		'bindings': {
 			'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect': 'HTTP Redirect',

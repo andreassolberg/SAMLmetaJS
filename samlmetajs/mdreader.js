@@ -967,6 +967,90 @@ parseFromString = function(xmlstring) {
 		return saml2sp;
 	}
 
+	function parseSAML2IDP(node) {
+
+		var
+			saml2idp = {}
+			;
+
+		expectNode(node, 'IDPSSODescriptor', constants.ns.md);
+
+		// Process children of IDPSSODescriptor
+		nodeProcessChildren(node, [
+			{
+				namespace: constants.ns.md, name: 'KeyDescriptor',
+				callback: function(n) {
+					apush(saml2idp, 'certs', parseKeyDescriptor(n));
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'ArtifactResolutionService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'ArtifactResolutionService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('ArtifactResolutionServiceInvalidURL', 'ArtifactResolutionService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'AssertionIDRequestService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'AssertionIDRequestService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('AssertionIDRequestServiceInvalidURL', 'AssertionIDRequestService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'ManageNameIDService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'ManageNameIDService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('ManageNameIDServiceInvalidURL', 'ManageNameIDService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'NameIDMappingService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'NameIDMappingService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('NameIDMappingServiceInvalidURL', 'NameIDMappingService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'SingleLogoutService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'SingleLogoutService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('SingleLogoutServiceInvalidURL', 'SingleLogoutService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'SingleSignOnService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2idp, 'SingleSignOnService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('SingleSignOnServiceInvalidURL', 'SingleSignOnService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			}
+		// Fallback
+		], function(n) {
+			processTest(new TestResult('saml2idpunknownchild', 'Parsing this child of IDPSSODescr not yet implemented [' + nodeName(n) + ']'));
+		});
+
+		return saml2idp;
+	}
+
 	function parseOrganization (node) {
 
 		var
@@ -1125,7 +1209,7 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.md, name: 'IDPSSODescriptor',
 				callback: function(n) {
-					processTest(new TestResult('IDPSSODescriptorNotImplemented', 'Parsing IDPSSODescriptor not yet implemented'));
+					entity.saml2idp = parseSAML2IDP(n);
 				}
 			},
 			{
