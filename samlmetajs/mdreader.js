@@ -538,6 +538,7 @@ parseFromString = function(xmlstring) {
 
 	var doc = null;
 	var result = {};
+	var entitydescriptor = null;
 
 	function getDoc(xmlstring) {
 		var parser = null;
@@ -1278,17 +1279,20 @@ parseFromString = function(xmlstring) {
 	}
 
 
-	try {
-		validateXML(xmlstring);
-	} catch (e) {
-		console.log(e.message);
-		doc = getNewDoc();
-		return {};
+	if (xmlstring) {
+		try {
+			validateXML(xmlstring);
+			doc = getDoc(xmlstring);
+			entitydescriptor = parseEntityDescriptor(getDoc(xmlstring));
+		} catch (e) {
+			console.log(e.message);
+			entitydescriptor = parseEntityDescriptor(getNewDoc());
+		}
+	} else {
+		console.log('Empty XML string');
+		entitydescriptor = parseEntityDescriptor(getNewDoc());
 	}
 
-	doc = getDoc(xmlstring);
-
-	var entitydescriptor = parseEntityDescriptor(doc);
 
 	if (entitydescriptor.name) {
 		// Everthing is OK with the name. No need to override.
