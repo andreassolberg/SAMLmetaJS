@@ -3,16 +3,27 @@
 		clearCertificates: function () {
 			$("div#certificates > div.content").empty();
 		},
-		addCertificate: function (use, cert, algorithm, keySize, OAEPparams) {
+		addCertificate: function (role, use, cert, algorithm, keySize, OAEPparams) {
 			var infoHTML, key, checked;
 			var randID = 'certificate' + Math.floor(Math.random() * 10000 + 1000);
 
 			infoHTML = [
 				'<fieldset><legend>Certificate</legend>',
 				'<div class="inlineField">',
-				'<label for="' + randID + '-use-name">Use:</label>',
-				'<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">'
+				'Role:'
 			];
+
+			infoHTML.push('<div class="radioGroup">');
+			infoHTML.push('<input class="role" type="radio" id="' + randID + '-role-idp" name="' + randID + '-role-name" value="idp" ' + (role === 'idp' ? 'checked="checked"' : '') + '" />');
+			infoHTML.push('<label for="' + randID + '-role-idp">IdP</label>');
+			infoHTML.push('<input class="role" type="radio" id="' + randID + '-role-sp" name="' + randID + '-role-name" value="sp" ' + (role === 'sp' ? 'checked="checked"' : '') + '" />');
+			infoHTML.push('<label for="' + randID + '-role-sp">SP</label>');
+			infoHTML.push('</div>');
+			infoHTML.push('</div>');
+
+			infoHTML.push('<div class="inlineField">');
+			infoHTML.push('<label for="' + randID + '-use-name">Use:</label>');
+			infoHTML.push('<select class="certuse" name="' + randID + '-use-name" id="' + randID + '-use">');
 
 			for (key in SAMLmetaJS.Constants.certusage) {
 				if (SAMLmetaJS.Constants.certusage.hasOwnProperty(key)) {
@@ -94,7 +105,7 @@
 		setUp: function () {
 			$("div#certificates button.addcertificate").click(function(e) {
 				e.preventDefault();
-				UI.addCertificate('both', '', '', '', '', '');
+				UI.addCertificate('', 'both', '', '', '', '', '');
 			});
 		},
 
@@ -105,6 +116,7 @@
 			if (entitydescriptor.hasCertificate('idp')) {
 				for(i = 0; i < entitydescriptor.saml2idp.certs.length; i++) {
 					UI.addCertificate(
+						'idp',
 						entitydescriptor.saml2idp.certs[i].use,
 						entitydescriptor.saml2idp.certs[i].cert,
 						entitydescriptor.saml2idp.certs[i].algorithm,
@@ -116,6 +128,7 @@
 			if (entitydescriptor.hasCertificate('sp')) {
 				for(i = 0; i < entitydescriptor.saml2sp.certs.length; i++) {
 					UI.addCertificate(
+						'sp',
 						entitydescriptor.saml2sp.certs[i].use,
 						entitydescriptor.saml2sp.certs[i].cert,
 						entitydescriptor.saml2sp.certs[i].algorithm,
@@ -128,19 +141,20 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#certificates fieldset').each(function (index, element) {
+				var role = $(element).find('input.role:checked').val();
 				var use = $(element).find('select.certuse').val();
 				var cert = $(element).find('textarea.certdata').val();
 				var algorithm = $(element).find('select.algorithm').val();
 				var keySize = $(element).find('input.keySize').val();
 				var OAEPparams = $(element).find('input.OAEPparams').val();
 
-				if (!use || !cert) {
+				if (!role || !use || !cert) {
 					return;
 				}
-				if (entitydescriptor.saml2idp) {
+
+				if (role === 'idp') {
 					entitydescriptor.addCertificate('idp', use, cert, algorithm, keySize, OAEPparams);
-				}
-				if (entitydescriptor.saml2sp) {
+				} else if (role === 'sp') {
 					entitydescriptor.addCertificate('sp', use, cert, algorithm, keySize, OAEPparams);
 				}
 			});
