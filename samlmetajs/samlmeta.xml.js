@@ -90,7 +90,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				));
 
 			} else {
-				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.md, 'Organization');
+				SAMLmetaJS.XML.wipeChildren(parent, SAMLmetaJS.Constants.ns.md, 'Organization');
 			}
 		},
 
@@ -110,7 +110,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.md, endpointType);
 					if (SAMLmetaJS.tools.hasEndpoint(endpoints, endpointType)) {
 						for (i = 0; i < endpoints[endpointType].length; i += 1) {
-							console.log("Adding endpoint " + endpointType);
 							this.addEndpoint(node, endpointType, endpoints[endpointType][i]);
 						}
 					}
