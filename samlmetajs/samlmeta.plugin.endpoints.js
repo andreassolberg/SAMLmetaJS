@@ -197,7 +197,7 @@
 					return;
 				}
 
-				role = $(element).find('input.role').val();
+				role = $(element).find('input.role:checked').val();
 				endpointType = $(element).find('select.datafield-type').val();
 				newEndpoint.Binding = $(element).find('select.datafield-binding').attr('value');
 				newEndpoint.Location = $(element).find('input.datafield-location').attr('value');
