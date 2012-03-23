@@ -322,7 +322,7 @@
 		toXML: function (entitydescriptor) {
 			$('div#infoname > div').each(function (index, element) {
 				var value = $(element).children('input').attr('value'),
-					lang = $(element).find('div > select').val();
+					lang = $(element).find('select').val();
 				if (!value) {
 					return;
 				}
