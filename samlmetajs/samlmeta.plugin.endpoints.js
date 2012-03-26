@@ -203,6 +203,11 @@
 				newEndpoint.Location = $(element).find('input.datafield-location').attr('value');
 				newEndpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
 
+				// Check for required fields
+				if (!role || !endpointType || !newEndpoint.Binding || !newEndpoint.Location) {
+					return;
+				}
+
 				index  = $(element).find('input.datafield-index').attr('value');
 				if (!index) {
 					if (endpointType === 'AssertionConsumerService') {
