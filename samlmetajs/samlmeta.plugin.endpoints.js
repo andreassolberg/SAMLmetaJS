@@ -245,8 +245,8 @@
 					if (!entitydescriptor.saml2idp) {
 						entitydescriptor.saml2idp = {};
 					}
-					if (!entitydescriptor.saml2idp[endpointType]) {
-						entitydescriptor.saml2idp[endpointType] = [];
+					if (!entitydescriptor.saml2idp[result.endpointType]) {
+						entitydescriptor.saml2idp[result.endpointType] = [];
 					}
 					entitydescriptor.saml2idp[result.endpointType].push(result.endpoint);
 
@@ -255,8 +255,8 @@
 					if (!entitydescriptor.saml2sp) {
 						entitydescriptor.saml2sp = {};
 					}
-					if (!entitydescriptor.saml2sp[endpointType]) {
-						entitydescriptor.saml2sp[endpointType] = [];
+					if (!entitydescriptor.saml2sp[result.endpointType]) {
+						entitydescriptor.saml2sp[result.endpointType] = [];
 					}
 					entitydescriptor.saml2sp[result.endpointType].push(result.endpoint);
 
