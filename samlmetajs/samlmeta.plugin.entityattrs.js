@@ -64,17 +64,15 @@
 		},
 
 		fromXML: function (entitydescriptor) {
-			var attr;
+		        var i;
 
-			// Clear contacts
+			// Clear attributes
 			UI.clearEntityAttrs();
 
 			// Add existing contacts (from XML)
 			if (entitydescriptor.entityAttributes) {
-				for (attr in entitydescriptor.entityAttributes) {
-					if (entitydescriptor.entityAttributes.hasOwnProperty(attr)) {
-						UI.addEntityAttr(entitydescriptor.entityAttributes[attr]);
-					}
+			        for (i=0; i < entitydescriptor.entityAttributes.length; i += 1) {
+				        UI.addEntityAttr(entitydescriptor.entityAttributes[i]);
 				}
 			}
 		},

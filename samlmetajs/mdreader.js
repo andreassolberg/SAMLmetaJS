@@ -1126,7 +1126,7 @@ parseFromString = function(xmlstring) {
 
 	function parseEntityAttributes (node) {
 
-		var attributes = {};
+		var attributes = [];
 
 		expectNode(node, 'EntityAttributes', constants.ns.mdattr);
 
@@ -1136,7 +1136,7 @@ parseFromString = function(xmlstring) {
 				namespace: constants.ns.saml, name: 'Attribute',
 				callback: function(n) {
 					var newAttr = parseAttribute(n);
-					if (newAttr.name) attributes[newAttr.name] = newAttr;
+					attributes.push(newAttr);
 				}
 			},
 			{
