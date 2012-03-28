@@ -54,6 +54,7 @@
 		"addInfoname": function(lang, name) {
 			var randID = 'infoname' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infonamediv">';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'name');
 			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (name || '') + '" />' +
 				'<button style="" class="removename">Remove</button>' +
@@ -67,6 +68,7 @@
 		"addInfodescr": function(lang, descr) {
 			var randID = 'infodescr' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infodescrdiv"><div>';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'descr');
 			infoHTML += '<button style="" class="removedescr">Remove</button>' +
 				'</div><div>' +
@@ -81,6 +83,7 @@
 		"addInfokeywords": function (lang, keywords) {
 			var randID = 'infokeywords' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infokeywordsdiv">';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'keywords');
 			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (keywords || '') + '" />' +
 				'<button style="" class="removekeywords">Remove</button>' +
@@ -94,6 +97,7 @@
 		"addInfologo": function(lang, logo) {
 			var randID = 'infologo' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="infologodiv"><div>';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'logo');
 			infoHTML += '<input type="url" name="logo-' + randID + '-location-name" id="logo-' + randID + '-location" value="' + (logo.location ||'') + '" />' +
 				'<button class="removelogo">Remove</button>' +
@@ -146,6 +150,7 @@
 		"addInformationURL": function (lang, informationUrl) {
 			var randID = 'informationurl' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="informationurldiv">';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'informationurl');
 			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (informationUrl || '') + '" />' +
 				'<button style="" class="removeinformationurl">Remove</button>' +
@@ -159,6 +164,7 @@
 		"addPrivacyStatementURL": function (lang, privacyStatementUrl) {
 			var randID = 'informationurl' + Math.floor(Math.random() * 10000 + 1000);
 			var infoHTML = '<div class="privacystatementurldiv">';
+			infoHTML += '<ul class="errors"></ul>';
 			infoHTML += addLanguageSelect(randID, lang, 'privacystatementurl');
 			infoHTML += '<input type="text" name="' + randID + '-name-name" id="' + randID + '-name" value="' + (privacyStatementUrl || '') + '" />' +
 				'<button style="" class="removeprivacystatementurl">Remove</button>' +
@@ -168,6 +174,59 @@
 				e.preventDefault();
 				$(e.target).closest('div.privacystatementurldiv').remove();
 			});
+		},
+		validateName: function (element) {
+			return SAMLmetaJS.l10nValidator(element, "The name is required");
+		},
+		validateDescription: function (element) {
+			var value = null, lang = null, errors = [];
+			value = $(element).find('div > textarea').val();
+			lang = $(element).find('div > select').val();
+			if (!value) {
+				errors.push("The description is required");
+			}
+			return {
+				value: value,
+				lang: lang,
+				errors: errors
+			};
+		},
+		validateLogo: function (element) {
+			var location = null, width = null, height = null, lang = null, errors = [], $inputs;
+			$inputs = $(element).find('input');
+			location = $inputs.eq(0).val();
+			width = $inputs.eq(1).val();
+			height = $inputs.eq(2).val();
+			lang = $(element).find('div > select').val();
+
+			if (!location) {
+				errors.push("The location is required");
+			}
+
+			if (!width) {
+				errors.push("The width is required");
+			}
+
+			if (!height) {
+				errors.push("The height is required");
+			}
+
+			return {
+				location: location,
+				width: width,
+				height: height,
+				lang: lang,
+				errors: errors
+			};
+		},
+		validateKeywords: function (element) {
+			return SAMLmetaJS.l10nValidator(element, "The keywords are required");
+		},
+		validateInformationurl: function (element) {
+			return SAMLmetaJS.l10nValidator(element, "The information URL is required");
+		},
+		validatePrivacystatementurl: function (element) {
+			return SAMLmetaJS.l10nValidator(element, "The privacy statement URL is required");
 		}
 	};
 
@@ -321,62 +380,64 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#infoname > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value'),
-					lang = $(element).find('select').val();
-				if (!value) {
+				var result = UI.validateName(element);
+				if (result.errors.length > 0) {
 					return;
 				}
 				if (!entitydescriptor.name) {
 				    entitydescriptor.name = {};
 				}
-				entitydescriptor.name[lang] = value;
+				entitydescriptor.name[result.lang] = result.value;
 			});
 			$('div#infodescr > div').each(function (index, element) {
-				var value = $(element).find('div > textarea').val(),
-					lang = $(element).find('div > select').val();
-				if (!value) {
+				var result = UI.validateDescription(element);
+				if (result.errors.length > 0) {
 					return;
 				}
 				if (!entitydescriptor.descr) {
 				    entitydescriptor.descr = {};
 				}
-				entitydescriptor.descr[lang] = value;
+				entitydescriptor.descr[result.lang] = result.value;
 			});
 			$('div#infologo > div').each(function (index, element) {
-				var $inputs = $(element).find('input'),
-					location = $inputs.eq(0).val(),
-					width = $inputs.eq(1).val(),
-					height = $inputs.eq(2).val(),
-					lang = $(element).find('div > select').val();
-				if (!location || !width || !height) {
+				var result = UI.validateLogo(element);
+				if (result.errors.length > 0) {
 					return;
 				}
-				entitydescriptor.addLogo(lang, location, width, height);
+				entitydescriptor.addLogo(result.lang, result.location, result.width, result.height);
 			});
 			$('div#infokeywords > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value'),
-					lang = $(element).children('select').val();
-				if (!value) {
+				var result = UI.validateKeywords(element);
+				if (result.errors.length > 0) {
 					return;
 				}
-				entitydescriptor.addKeywords(lang, value);
+				entitydescriptor.addKeywords(result.lang, result.value);
 			});
 			$('div#infoinformationurl > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value'),
-					lang = $(element).children('select').val();
-				if (!value) {
+				var result = UI.validateInformationurl(element);
+				if (result.errors.length > 0) {
 					return;
 				}
-				entitydescriptor.addInformationURL(lang, value);
+				entitydescriptor.addInformationURL(result.lang, result.value);
 			});
 			$('div#infoprivacystatementurl > div').each(function (index, element) {
-				var value = $(element).children('input').attr('value'),
-					lang = $(element).children('select').val();
-				if (!value) {
+				var result = UI.validatePrivacystatementurl(element);
+				if (result.errors.length > 0) {
 					return;
 				}
-				entitydescriptor.addPrivacyStatementURL(lang, value);
+				entitydescriptor.addPrivacyStatementURL(result.lang, result.value);
 			});
+		},
+		validate: function () {
+			var validator = SAMLmetaJS.validatorManager({
+				'div#infoname > div': UI.validateName,
+				'div#infodescr > div': UI.validateDescription,
+				'div#infologo > div': UI.validateLogo,
+				'div#infokeywords > div': UI.validateKeywords,
+				'div#infoinformationurl > div': UI.validateInformationurl,
+				'div#infoprivacystatementurl > div': UI.validatePrivacystatementurl
+			});
+			return validator();
 		}
 	};
 

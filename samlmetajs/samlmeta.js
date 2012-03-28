@@ -41,14 +41,22 @@ var SAMLmetaJS = {};
 	SAMLmetaJS.plugins = {};
 
 	SAMLmetaJS.pluginEngine = {
-		'execute': function(hook, parameters) {
+		execute: function(hook, parameters) {
 			var plugin;
-			if (!SAMLmetaJS.plugins) {return;}
+			if (!SAMLmetaJS.plugins) {
+				return;
+			}
 			for (plugin in SAMLmetaJS.plugins) {
-				if (SAMLmetaJS.plugins[plugin][hook]) {
-					// console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
-					SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
-				}
+				SAMLmetaJS.pluginEngine.executeOne(plugin, hook, parameters);
+			}
+		},
+		executeOne: function (plugin, hook, parameters) {
+			if (!SAMLmetaJS.plugins) { 
+				return;
+			}
+			if (SAMLmetaJS.plugins[plugin] && SAMLmetaJS.plugins[plugin][hook]) {
+				// console.log('Executing hook [' + hook + '] in plugin [' + plugin + ']');
+				return SAMLmetaJS.plugins[plugin][hook].apply(null, parameters);
 			}
 		}
 	};
@@ -67,7 +75,7 @@ var SAMLmetaJS = {};
 			'xenc': "http://www.w3.org/2001/04/xmlenc#"
 		},
 		'certusage': {
-		 	'both': 'Both',
+			'both': 'Both',
 			'signing': 'Signing',
 			'encryption': 'Encryption'
 		},
@@ -228,7 +236,7 @@ var SAMLmetaJS = {};
 		if (
 			(typeof ruleset === 'undefined') ||
 			(ruleset === null)
-		 	){
+			){
 
 			this.ruleset = {}
 		} else {
@@ -253,6 +261,50 @@ var SAMLmetaJS = {};
 		this.tests = [];
 	}
 
+	SAMLmetaJS.validatorManager = function (validationContext) {
+		var
+			hideErrors = function (element) {
+				$(element).find('ul.errors').html('');
+			},
+			showErrors = function (element, errors) {
+				var output = $.map(errors, function (e) {
+					return '<li>' + e + '</li>';
+				});
+				$(element).find('ul.errors').html(output.join(''));
+			};
+
+		return function () {
+			var errors = 0;
+
+			$.each(validationContext, function (selector, validator) {
+				$(selector).each(function (index, element) {
+					var result = validator(element);
+					hideErrors(element);
+					if (result.errors.length > 0) {
+						showErrors(element, result.errors);
+						errors += result.errors.length;
+					}
+				});
+			});
+
+			return errors === 0;
+		};
+	};
+
+	SAMLmetaJS.l10nValidator = function (element, errorMessage) {
+		var value = null, lang = null, errors = [];
+		value = $(element).children('input').attr('value');
+		lang = $(element).children('select').val();
+
+		if (!value) {
+			errors.push(errorMessage);
+		}
+		return {
+			value: value,
+			lang: lang,
+			errors: errors
+		};
+	};
 
 	SAMLmetaJS.sync = function(node, options) {
 
@@ -356,6 +408,28 @@ var SAMLmetaJS = {};
 
 		};
 
+		var selectTab = function (event, ui) {
+			var 
+				isValid = true,
+				$tabs = $(event.target),
+				selected = $tabs.tabs("option", "selected"),
+				tab = $tabs.find('.ui-tabs-panel').eq(selected).attr('id');
+
+			if (tab !== 'rawmetadata') {
+				isValid = SAMLmetaJS.pluginEngine.executeOne(tab, 'validate', []);
+				if (typeof isValid === 'undefined') {
+				    isValid = true;
+				}
+			}
+
+			if (isValid && ui.index === 0) {  // rawmetadata tab
+				toXML();
+			}
+
+			return isValid;
+		};
+
+
 		// Add content
 		var embrace = function () {
 			$(node).wrap('<div id="rawmetadata"></div>');
@@ -379,8 +453,9 @@ var SAMLmetaJS = {};
 			tabnode.prepend('<div id="samlmetajs_testresults"></div>');
 			tabnode.append(pluginTabs.content.join(''));
 
-			tabnode.tabs();
+			tabnode.tabs({select: selectTab});
 		};
+
 
 		embrace();
 
@@ -402,10 +477,6 @@ var SAMLmetaJS = {};
 				testEngine.addTest(t);
 			}
 		});
-
-		// Initialization of the automatic reflection between UI elements and XML
-
-		$("a[href='#rawmetadata']").click(toXML);
 
 		SAMLmetaJS.pluginEngine.execute('tabClick', [
 			function(node) {

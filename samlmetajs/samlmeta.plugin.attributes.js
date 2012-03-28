@@ -95,6 +95,9 @@
 				
 			}
 
+		},
+		validate: function () {
+			return true;  // This plugin does not allow invalid inputs
 		}
 	};
 

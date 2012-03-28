@@ -135,6 +135,9 @@
 			if ($("input#includeLocation").attr('checked')) {
 				entitydescriptor.setLocation($("input#geolocation").val());
 			}
+		},
+		validate: function () {
+			return true;  // TODO: check if the input looks like a latitude and longitude tuple
 		}
 	};
 

@@ -40,6 +40,13 @@ div#tabs button {
 	margin: 4px; padding: 4px;
 }
 
+
+div.ui-tabs-panel ul.errors {
+	margin: 1em;
+	padding-left: 2em;
+	list-style-image: url(../icons/exclamation.png);
+}
+
 /* Generic field styles */
 .inlineField {
 	float: left;
@@ -47,7 +54,7 @@ div#tabs button {
 }
 
 .wideField input {
-        width: 80%;
+	width: 80%;
 }
 
 .radioGroup {

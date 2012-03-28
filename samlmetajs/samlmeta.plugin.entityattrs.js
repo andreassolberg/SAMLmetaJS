@@ -93,6 +93,9 @@
 				}
 				entitydescriptor.entityAttributes.push(newEntityAttr);
 			});
+		},
+		validate: function () {
+			return true;  // All the attribute fields are optional, so this always validates
 		}
 	};
 

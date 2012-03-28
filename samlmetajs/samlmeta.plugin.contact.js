@@ -79,8 +79,8 @@
 
 			// Clear contacts
 			UI.clearContacts();
-			
-			// Add existing contacts (from XML)			
+
+			// Add existing contacts (from XML)
 			if (entitydescriptor.contacts) {
 				for (i = 0; i < entitydescriptor.contacts.length; i++ ) {
 					UI.addContact(entitydescriptor.contacts[i]);
@@ -92,17 +92,18 @@
 			$('div#contact fieldset').each(function (index, element) {
 				var newContact = {};
 
-				if (!$(element).find('input').eq(1).attr('value')) {
-					return;
-				}
-
 				newContact.contactType = $(element).find('select').val();
 				newContact.givenName = $(element).find('input').eq(0).attr('value');
 				newContact.surName = $(element).find('input').eq(1).attr('value');
 				newContact.emailAddress = $(element).find('input').eq(2).attr('value');
-				if (!entitydescriptor.contacts) entitydescriptor.contacts = [];
+				if (!entitydescriptor.contacts) {
+					entitydescriptor.contacts = [];
+				}
 				entitydescriptor.contacts.push(newContact);
 			});
+		},
+		validate: function () {
+			return true;
 		}
 	};
 

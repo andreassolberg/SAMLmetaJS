@@ -10,6 +10,7 @@
 
 			endpointHTML = [
 				'<fieldset><legend>' + (endpointname || 'Endpoint') + '</legend>',
+				'<ul class="errors"></ul>',
 				'<div class="endpointfield inlineField">',
 				'Role:'
 			];
@@ -105,6 +106,36 @@
 			};
 
 			fillEndpointTypes($('div#endpoints select#' + randID + '-type'), role);
+		},
+		validateEndpoint: function (element) {
+			var role = null, endpointTyp = null, endpoint = {}, errors = [];
+
+			role = $(element).find('input.role:checked').val();
+			endpointType = $(element).find('select.datafield-type').val();
+			endpoint.Binding = $(element).find('select.datafield-binding').attr('value');
+			endpoint.Location = $(element).find('input.datafield-location').attr('value');
+			endpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
+
+			// Check for required fields
+			if (!role) {
+				errors.push("The role is required");
+			}
+			if (!endpointType) {
+				errors.push("The endpoint type is required");
+			}
+			if (!endpoint.Binding) {
+				errors.push("The binding is required");
+			}
+			if (!endpoint.Location) {
+				errors.push("The location is required");
+			}
+
+			return {
+				role: role,
+				endpointType: endpointType,
+				endpoint: endpoint,
+				errors: errors
+			};
 		}
 	};
 
@@ -190,37 +221,26 @@
 				indextaken = {};
 
 			$('div#endpoints fieldset').each(function (index, element) {
-				var newEndpoint = {};
-				var role, endpointType, index;
+				var index;
+				var result = UI.validateEndpoint(element);
 
-				if (!$(element).find('input').eq(0).attr('value')) {
-					return;
-				}
-
-				role = $(element).find('input.role:checked').val();
-				endpointType = $(element).find('select.datafield-type').val();
-				newEndpoint.Binding = $(element).find('select.datafield-binding').attr('value');
-				newEndpoint.Location = $(element).find('input.datafield-location').attr('value');
-				newEndpoint.ResponseLocation = $(element).find('input.datafield-responselocation').attr('value');
-
-				// Check for required fields
-				if (!role || !endpointType || !newEndpoint.Binding || !newEndpoint.Location) {
+				if (result.errors.length > 0) {
 					return;
 				}
 
 				index  = $(element).find('input.datafield-index').attr('value');
 				if (!index) {
-					if (endpointType === 'AssertionConsumerService') {
+					if (result.endpointType === 'AssertionConsumerService') {
 						while(indextaken[indexcounter]) { indexcounter++; }
 						index = indexcounter;
 					}
 				}
 				if (index) {
 					indextaken[index] = 1;
-					newEndpoint.index = index;
+					result.endpoint.index = index;
 				}
 
-				if (role === 'idp') {
+				if (result.role === 'idp') {
 
 					if (!entitydescriptor.saml2idp) {
 						entitydescriptor.saml2idp = {};
@@ -228,9 +248,9 @@
 					if (!entitydescriptor.saml2idp[endpointType]) {
 						entitydescriptor.saml2idp[endpointType] = [];
 					}
-					entitydescriptor.saml2idp[endpointType].push(newEndpoint);
+					entitydescriptor.saml2idp[result.endpointType].push(result.endpoint);
 
-				} else if (role === 'sp') {
+				} else if (result.role === 'sp') {
 
 					if (!entitydescriptor.saml2sp) {
 						entitydescriptor.saml2sp = {};
@@ -238,11 +258,17 @@
 					if (!entitydescriptor.saml2sp[endpointType]) {
 						entitydescriptor.saml2sp[endpointType] = [];
 					}
-					entitydescriptor.saml2sp[endpointType].push(newEndpoint);
+					entitydescriptor.saml2sp[result.endpointType].push(result.endpoint);
 
 				}
 			});
 			console.log(entitydescriptor);
+		},
+		validate: function () {
+			var validator = SAMLmetaJS.validatorManager({
+				'div#endpoints fieldset': UI.validateEndpoint
+			});
+			return validator();
 		}
 	};
 

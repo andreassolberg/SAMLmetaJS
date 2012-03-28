@@ -9,6 +9,7 @@
 
 			infoHTML = [
 				'<fieldset><legend>Certificate</legend>',
+				'<ul class="errors"></ul>',
 				'<div class="inlineField">',
 				'Role:'
 			];
@@ -80,6 +81,36 @@
 					e.preventDefault();
 					$(e.target).closest('fieldset').remove();
 				});
+		},
+		validateCertificate: function (element) {
+			var role = null, use = null, cert = null, algorithm = null, keySize = null, OAEPparams = null, errors = [];
+
+			role = $(element).find('input.role:checked').val();
+			use = $(element).find('select.certuse').val();
+			cert = $(element).find('textarea.certdata').val();
+			algorithm = $(element).find('select.algorithm').val();
+			keySize = $(element).find('input.keySize').val();
+			OAEPparams = $(element).find('input.OAEPparams').val();
+
+			// Check for required fields
+			if (!role) {
+				errors.push("The role is required");
+			}
+			if (!use) {
+				errors.push("The use is required");
+			}
+			if (!cert) {
+				errors.push("The certificate is required");
+			}
+			return {
+				role: role,
+				use: use,
+				cert: cert,
+				algorithm: algorithm,
+				keySize: keySize,
+				OAEPparams: OAEPparams,
+				errors: errors
+			};
 		}
 	};
 
@@ -141,23 +172,24 @@
 
 		toXML: function (entitydescriptor) {
 			$('div#certificates fieldset').each(function (index, element) {
-				var role = $(element).find('input.role:checked').val();
-				var use = $(element).find('select.certuse').val();
-				var cert = $(element).find('textarea.certdata').val();
-				var algorithm = $(element).find('select.algorithm').val();
-				var keySize = $(element).find('input.keySize').val();
-				var OAEPparams = $(element).find('input.OAEPparams').val();
+				var result = UI.validateCertificate(element);
 
-				if (!role || !use || !cert) {
+				if (result.errors.length > 0) {
 					return;
 				}
 
-				if (role === 'idp') {
-					entitydescriptor.addCertificate('idp', use, cert, algorithm, keySize, OAEPparams);
-				} else if (role === 'sp') {
-					entitydescriptor.addCertificate('sp', use, cert, algorithm, keySize, OAEPparams);
+				if (result.role === 'idp') {
+					entitydescriptor.addCertificate('idp', result.use, result.cert, result.algorithm, result.keySize, result.OAEPparams);
+				} else if (result.role === 'sp') {
+					entitydescriptor.addCertificate('sp', result.use, result.cert, result.algorithm, result.keySize, result.OAEPparams);
 				}
 			});
+		},
+		validate: function () {
+			var validator = SAMLmetaJS.validatorManager({
+				'div#certificates fieldset': UI.validateCertificate
+			});
+			return validator();
 		}
 	};
 
