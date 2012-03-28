@@ -29,6 +29,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				for(i = 0; i < entitydescriptor.entityAttributes.length; i += 1) {
 					this.addAttribute(entityAttributes, entitydescriptor.entityAttributes[i]);
 				}
+			} else {
+				SAMLmetaJS.XML.wipeChildren(root, SAMLmetaJS.Constants.ns.md, 'Extensions');
 			}
 
 			if (entitydescriptor.saml2idp) {
