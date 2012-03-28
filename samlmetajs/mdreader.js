@@ -942,6 +942,26 @@ parseFromString = function(xmlstring) {
 				}
 			},
 			{
+				namespace: constants.ns.md, name: 'ArtifactResolutionService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2sp, 'ArtifactResolutionService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('ArtifactResolutionServiceInvalidURL', 'ArtifactResolutionService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
+				namespace: constants.ns.md, name: 'ManageNameIDService',
+				callback: function(n) {
+					var e = parseEndpoint(n);
+					apush(saml2sp, 'ManageNameIDService', e);
+					if (!validateURL(e.Location)) {
+						processTest(new TestResult('ManageNameIDServiceInvalidURL', 'ManageNameIDService/@Location was not a valid URL', 0, 2));
+					}
+				}
+			},
+			{
 				namespace: constants.ns.md, name: 'SingleLogoutService',
 				callback: function(n) {
 					var e = parseEndpoint(n);
