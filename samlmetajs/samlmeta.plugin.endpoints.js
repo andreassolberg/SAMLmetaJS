@@ -108,7 +108,7 @@
 			fillEndpointTypes($('div#endpoints select#' + randID + '-type'), role);
 		},
 		validateEndpoint: function (element) {
-			var role = null, endpointTyp = null, endpoint = {}, errors = [];
+			var role = null, endpointType = null, endpoint = {}, errors = [];
 
 			role = $(element).find('input.role:checked').val();
 			endpointType = $(element).find('select.datafield-type').val();
