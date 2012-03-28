@@ -23,8 +23,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 			if (entitydescriptor.entityAttributes) {
 				entityExtensions = this.addIfNotEntityExtensions(root);
-
-				entityAttributes = this.addNodIfNotExists(entityExtensions, 'EntityAttributes', SAMLmetaJS.Constants.ns.mdattr, mdattr); 
+				entityAttributes = SAMLmetaJS.XML.addNodeIfNotExists(doc, entityExtensions, 'EntityAttributes', SAMLmetaJS.Constants.ns.mdattr, 'mdattr');
 
 				SAMLmetaJS.XML.wipeChildren(entityAttributes, SAMLmetaJS.Constants.ns.saml, 'Attribute');
 				for(var name in entitydescriptor.entityAttributes) {
