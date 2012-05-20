@@ -11,6 +11,9 @@
 		addLanguageSelect = function (randID, lang, suffix) {
 			var languageFound = false, result = [], language, checked;
 			result.push('<select name="' + randID + '-lang-' + suffix + '" id="' + randID + '-lang">');
+			if (lang === '') {
+				result.push('<option value=""></option>');
+			}
 			for (language in SAMLmetaJS.Constants.languages) {
 				if (SAMLmetaJS.Constants.languages.hasOwnProperty(language)) {
 					checked = '';
@@ -24,7 +27,7 @@
 				}
 			}
 
-			if (!languageFound) {
+			if (!languageFound && lang !== '') {
 				result.push('<option value="' + lang + '" selected="selected">Unknown language (' + lang + ')</option>');
 			}
 
@@ -304,7 +307,7 @@
 			});
 			$("div#info button.addlogo").click(function(e) {
 				e.preventDefault();
-				UI.addInfologo('en', '');
+				UI.addInfologo('', '');
 			});
 			$("div#info button.addkeywords").click(function(e) {
 				e.preventDefault();

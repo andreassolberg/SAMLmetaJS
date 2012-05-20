@@ -328,7 +328,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:Logo');
 			var text = doc.createTextNode(logo.location);
 			newNode.appendChild(text);
-			newNode.setAttribute('xml:lang', lang);
+			if (lang !== '') {
+				newNode.setAttribute('xml:lang', lang);
+			}
 			newNode.setAttribute('width', logo.width);
 			newNode.setAttribute('height', logo.height);
 			node.appendChild(newNode);

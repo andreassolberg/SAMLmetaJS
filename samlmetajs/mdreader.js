@@ -800,7 +800,7 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'Logo',
 				callback: function(n) {
-					var lang = nodeGetAttribute(n, 'xml:lang', 'en');
+					var lang = nodeGetAttribute(n, 'xml:lang', '');
 					if (!mdui.logo) {
 						mdui.logo = {};
 					}
