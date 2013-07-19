@@ -79,7 +79,7 @@ MDEntityDescriptor.prototype.hasCertOfType = function (type) {
 		}
 		return false;
 	};
-	
+
 	return checkCert(this.saml2idp) || checkCert(this.saml2sp);
 }
 
@@ -520,7 +520,7 @@ reader = function() {
 };
 
 validateEmail = function(string) {
-	var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+	var reg = /^(mailto:)?([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 	return reg.test(string);
 }
 
