@@ -319,9 +319,9 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 					}
 				}
 			}
-			SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'GeolocationHint');
+			SAMLmetaJS.XML.wipeChildren(node.parentNode, SAMLmetaJS.Constants.ns.mdui, 'DiscoHints');
 			if (entitydescriptor.hasLocation()) {
-				this.addMDUILocation(node, entitydescriptor.getLocation());
+				this.addMDUILocation(node.parentNode, entitydescriptor.getLocation());
 			}
 		},
 		"addMDUILogo": function(node, lang, logo) {
@@ -336,9 +336,11 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			node.appendChild(newNode);
 		},
 		"addMDUILocation": function(node, location) {
-			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:GeolocationHint');
+			var newNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:DiscoHints');
+			var geoNode = doc.createElementNS(SAMLmetaJS.Constants.ns.mdui, 'mdui:GeolocationHint');
 			var text = doc.createTextNode('geo:' + location);
-			newNode.appendChild(text);
+			newNode.appendChild(geoNode);
+			geoNode.appendChild(text);
 			node.appendChild(newNode);
 
 		},
