@@ -79,17 +79,67 @@ MDEntityDescriptor.prototype.hasCertOfType = function (type) {
 		}
 		return false;
 	};
-	
+
 	return checkCert(this.saml2idp) || checkCert(this.saml2sp);
 }
+
+/*
+ * Check if the current entity has a specified property.
+ */
+MDEntityDescriptor.prototype.hasProperty = function (property) {
+	var entity;
+	if (hasProp(this, 'saml2sp')) {
+		entity = this.saml2sp;
+	} else {
+		entity = this.saml2idp;
+	}
+	if (!entity) {
+		return false;
+	}
+
+	return hasProp(entity, property);
+};
+
+/*
+ * Return the specified property from the current entity.
+ */
+MDEntityDescriptor.prototype.getProperty = function (property) {
+	var entity;
+	if (hasProp(this, 'saml2sp')) {
+		entity = this.saml2sp;
+	} else {
+		entity = this.saml2idp;
+	}
+	if (!entity) {
+		this.saml2sp = {};
+		entity = this.saml2sp;
+	}
+
+	if (!hasProp(entity, property)) {
+		entity[property] = {};
+	}
+
+	return entity[property];
+};
+
+/*
+ * Look for a MDUI property in any language.
+ */
+MDEntityDescriptor.prototype.hasMDUIProperty = function (property) {
+	var mdui = this.hasProperty('mdui'),
+		result = false;
+	if (mdui) {
+		mdui = this.getProperty('mdui');
+		result = !isEmpty(mdui) && hasProp(mdui, property) && !isEmpty(mdui[property]);
+	};
+	return result;
+};
 
 /*
  * Look for logo in any language.
  */
 MDEntityDescriptor.prototype.hasLogo = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
-			hasProp(this.saml2sp.mdui, 'logo') && !isEmpty(this.saml2sp.mdui.logo));
+	return this.hasMDUIProperty('logo');
 };
 
 /*
@@ -100,16 +150,11 @@ MDEntityDescriptor.prototype.hasLogo = function () {
  *	- height: height in pixels
  */
 MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) {
-	if (!this.saml2sp) {
-		this.saml2sp = {};
+	var mdui = this.getProperty('mdui');
+	if (!hasProp(mdui, 'logo')) {
+		mdui.logo = {};
 	}
-	if (!this.saml2sp.mdui) {
-		this.saml2sp.mdui = {};
-	}
-	if (!this.saml2sp.mdui.logo) {
-		this.saml2sp.mdui.logo = {};
-	}
-	this.saml2sp.mdui.logo[lang] = {
+	mdui.logo[lang] = {
 		location: location,
 		width: width,
 		height: height
@@ -120,9 +165,7 @@ MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) 
  * Look for location.
  */
 MDEntityDescriptor.prototype.hasLocation = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
-			hasProp(this.saml2sp.mdui, 'location') && !isEmpty(this.saml2sp.mdui.location));
+	return this.hasMDUIProperty('location');
 };
 
 /*
@@ -132,7 +175,7 @@ MDEntityDescriptor.prototype.getLocation = function () {
 	if (!this.hasLocation()) {
 		return null;
 	} else {
-		return this.saml2sp.mdui.location;
+		return this.getProperty('mdui').location;
 	}
 };
 
@@ -141,91 +184,63 @@ MDEntityDescriptor.prototype.getLocation = function () {
  * nested structures as needed.
  */
 MDEntityDescriptor.prototype.setLocation = function (location) {
-	if (!hasProp(this, 'saml2sp')) {
-		this.saml2sp = {};
-	}
-	if (!hasProp(this.saml2sp, 'mdui')) {
-		this.saml2sp.mdui = {};
-	}
-	this.saml2sp.mdui.location = location;
+	var mdui = this.getProperty('mdui');
+	mdui.location = location;
 };
 
 /*
  * Look for keywords in any language.
  */
 MDEntityDescriptor.prototype.hasKeywords = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
-			hasProp(this.saml2sp.mdui, 'keywords') && !isEmpty(this.saml2sp.mdui.keywords));
+	return this.hasMDUIProperty('keywords');
 };
 
 /*
  * Add a set of keywords in the specified language.
  */
 MDEntityDescriptor.prototype.addKeywords = function (lang, keywords) {
-	if (!this.saml2sp) {
-		this.saml2sp = {};
+	var mdui = this.getProperty('mdui');
+	if (!hasProp(mdui, 'keywords')) {
+		mdui.keywords = {};
 	}
-	if (!this.saml2sp.mdui) {
-		this.saml2sp.mdui = {};
-	}
-	if (!this.saml2sp.mdui.keywords) {
-		this.saml2sp.mdui.keywords = {};
-	}
-	this.saml2sp.mdui.keywords[lang] = keywords;
+	mdui.keywords[lang] = keywords;
 };
-
 
 /*
  * Look for InformationURL in any language.
  */
 MDEntityDescriptor.prototype.hasInformationURL = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
-			hasProp(this.saml2sp.mdui, 'informationURL') && !isEmpty(this.saml2sp.mdui.informationURL));
+	return this.hasMDUIProperty('informationURL');
 };
 
 /*
  * Add an Information URL in the specified language.
  */
 MDEntityDescriptor.prototype.addInformationURL = function (lang, url) {
-	if (!this.saml2sp) {
-		this.saml2sp = {};
+	var mdui = this.getProperty('mdui');
+	if (!hasProp(mdui, 'informationURL')) {
+		mdui.informationURL = {};
 	}
-	if (!this.saml2sp.mdui) {
-		this.saml2sp.mdui = {};
-	}
-	if (!this.saml2sp.mdui.informationURL) {
-		this.saml2sp.mdui.informationURL = {};
-	}
-	this.saml2sp.mdui.informationURL[lang] = url;
+	mdui.informationURL[lang] = url;
 };
 
 /*
  * Look for PrivacyStatementURL in any language.
  */
 MDEntityDescriptor.prototype.hasPrivacyStatementURL = function () {
-	return (hasProp(this, 'saml2sp') && !isEmpty(this.saml2sp) &&
-			hasProp(this.saml2sp, 'mdui') && !isEmpty(this.saml2sp.mdui) &&
-			hasProp(this.saml2sp.mdui, 'privacyStatementURL') && !isEmpty(this.saml2sp.mdui.privacyStatementURL));
+	return this.hasMDUIProperty('privacyStatementURL');
 };
 
 /*
  * Add an Privacy Statement URL in the specified language.
  */
 MDEntityDescriptor.prototype.addPrivacyStatementURL = function (lang, url) {
-	if (!this.saml2sp) {
-		this.saml2sp = {};
+	var mdui = this.getProperty('mdui');
+	if (!hasProp(mdui, 'privacyStatementURL')) {
+		mdui.privacyStatementURL = {};
 	}
-	if (!this.saml2sp.mdui) {
-		this.saml2sp.mdui = {};
-	}
-	if (!this.saml2sp.mdui.privacyStatementURL) {
-		this.saml2sp.mdui.privacyStatementURL = {};
-	}
-	this.saml2sp.mdui.privacyStatementURL[lang] = url;
+	mdui.privacyStatementURL[lang] = url;
 };
-
 
 /*
  * Look for Certificates
