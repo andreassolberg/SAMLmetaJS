@@ -1337,7 +1337,7 @@ parseFromString = function(xmlstring) {
 	if (!entitydescriptor.descr) {
 		processTest(new TestResult('noentitydescr', 'The entity did not include a description', 0, 1));
 	}
-	if (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService) {
+	if (!entitydescriptor.saml2idp && (!entitydescriptor.saml2sp || !entitydescriptor.saml2sp.AssertionConsumerService)) {
 		processTest(new TestResult('noacsendpoint', 'The entity did not include an AssertionConsumerService endpoint', 0, 2));
 	}
 
