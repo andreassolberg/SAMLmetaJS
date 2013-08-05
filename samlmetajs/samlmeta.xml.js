@@ -181,7 +181,11 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 
 			this.addKeyDescriptor(spdescriptor, entitydescriptor, 'sp');
-			this.addEndpoints(spdescriptor, SAMLmetaJS.Constants.endpointTypes.sp, entitydescriptor.saml2sp);
+            // Remove already handled end points from endPointTypes
+            var notExtensionEndPointTypes = jQuery.extend({}, SAMLmetaJS.Constants.endpointTypes.sp);
+            delete notExtensionEndPointTypes.DiscoveryResponse;
+            delete notExtensionEndPointTypes.RequestInitiator;
+			this.addEndpoints(spdescriptor, notExtensionEndPointTypes, entitydescriptor.saml2sp);
 
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name) &&
 					entitydescriptor.saml2sp &&
