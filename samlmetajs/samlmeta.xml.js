@@ -403,6 +403,12 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			if (endpoint.Location) {
 				newNode.setAttribute('Location', endpoint.Location);
 			}
+            if (endpoint.ResponseLocation) {
+				newNode.setAttribute('ResponseLocation', endpoint.ResponseLocation);
+			}
+            if (endpoint.index) {
+				newNode.setAttribute('index', endpoint.index);
+			}
 			node.appendChild(newNode);
 		},
 		"addIfNotEntityExtensions": function(node) {
