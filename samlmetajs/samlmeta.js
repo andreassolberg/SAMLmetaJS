@@ -46,12 +46,19 @@ var SAMLmetaJS = {};
 			if (!SAMLmetaJS.plugins) {
 				return;
 			}
+			if (SAMLmetaJS.plugins.endpoints) {
+				// Always define first the endpoint, because other plugins may
+				// add information to it, and therefore they require it to exist
+				SAMLmetaJS.pluginEngine.executeOne('endpoints', hook, parameters);
+			}
 			for (plugin in SAMLmetaJS.plugins) {
-				SAMLmetaJS.pluginEngine.executeOne(plugin, hook, parameters);
+				if (plugin !== 'endpoints') {
+					SAMLmetaJS.pluginEngine.executeOne(plugin, hook, parameters);
+				}
 			}
 		},
 		executeOne: function (plugin, hook, parameters) {
-			if (!SAMLmetaJS.plugins) { 
+			if (!SAMLmetaJS.plugins) {
 				return;
 			}
 			if (SAMLmetaJS.plugins[plugin] && SAMLmetaJS.plugins[plugin][hook]) {
@@ -409,7 +416,7 @@ var SAMLmetaJS = {};
 		};
 
 		var selectTab = function (event, ui) {
-			var 
+			var
 				isValid = true,
 				$tabs = $(event.target),
 				selected = $tabs.tabs("option", "selected"),
