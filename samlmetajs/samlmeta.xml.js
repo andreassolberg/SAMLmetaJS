@@ -125,6 +125,20 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 		"addIdP": function (idpdescriptor, entitydescriptor) {
 			this.addKeyDescriptor(idpdescriptor, entitydescriptor, 'idp');
 			this.addEndpoints(idpdescriptor, SAMLmetaJS.Constants.endpointTypes.idp, entitydescriptor.saml2idp);
+
+			if (
+				entitydescriptor.hasLogo() ||
+				entitydescriptor.hasInformationURL() ||
+				entitydescriptor.hasPrivacyStatementURL() ||
+				entitydescriptor.hasLocation() ||
+				entitydescriptor.hasKeywords
+			) {
+				extensions = this.addIfNotExtensions(idpdescriptor);
+				mdui = SAMLmetaJS.XML.addNodeIfNotExists(doc, extensions, 'UIInfo', SAMLmetaJS.Constants.ns.mdui, 'mdui');
+				this.updateMDUI(mdui, entitydescriptor, 'saml2idp');
+			} else {
+				SAMLmetaJS.XML.wipeChildren(idpdescriptor, SAMLmetaJS.Constants.ns.md, 'Extensions');
+			}
 		},
 
 		"addSP": function(spdescriptor, entitydescriptor) {
@@ -142,11 +156,12 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				entitydescriptor.hasLogo() ||
 				entitydescriptor.hasInformationURL() ||
 				entitydescriptor.hasPrivacyStatementURL() ||
-				entitydescriptor.hasLocation()
+				entitydescriptor.hasLocation() ||
+				entitydescriptor.hasKeywords
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
 				mdui = SAMLmetaJS.XML.addNodeIfNotExists(doc, extensions, 'UIInfo', SAMLmetaJS.Constants.ns.mdui, 'mdui');
-				this.updateMDUI(mdui, entitydescriptor);
+				this.updateMDUI(mdui, entitydescriptor, 'saml2sp');
 				SAMLmetaJS.XML.wipeChildren(extensions, SAMLmetaJS.Constants.ns.init, 'RequestInitiator');
 				if (hasRequestInitiator) {
 					for (i = 0; i < entitydescriptor.saml2sp.RequestInitiator.length; i += 1) {
@@ -270,7 +285,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 
 		},
 
-		"updateMDUI": function(node, entitydescriptor) {
+		"updateMDUI": function(node, entitydescriptor, endpoint) {
 			if (SAMLmetaJS.tools.hasContents(entitydescriptor.name)) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'DisplayName');
 				for(lang in entitydescriptor.name) {
@@ -289,33 +304,33 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 			}
 			if (entitydescriptor.hasLogo()) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Logo');
-				for(lang in entitydescriptor.saml2sp.mdui.logo) {
-					if (entitydescriptor.saml2sp.mdui.logo.hasOwnProperty(lang)) {
-						this.addMDUILogo(node, lang, entitydescriptor.saml2sp.mdui.logo[lang]);
+				for(lang in entitydescriptor[endpoint].mdui.logo) {
+					if (entitydescriptor[endpoint].mdui.logo.hasOwnProperty(lang)) {
+						this.addMDUILogo(node, lang, entitydescriptor[endpoint].mdui.logo[lang]);
 					}
 				}
 			}
 			if (entitydescriptor.hasKeywords()) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'Keywords');
-				for(lang in entitydescriptor.saml2sp.mdui.keywords) {
-					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(lang)) {
-						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor.saml2sp.mdui.keywords[lang]);
+				for(lang in entitydescriptor[endpoint].mdui.keywords) {
+					if (entitydescriptor[endpoint].mdui.keywords.hasOwnProperty(lang)) {
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:Keywords', lang, entitydescriptor[endpoint].mdui.keywords[lang]);
 					}
 				}
 			}
 			if (entitydescriptor.hasInformationURL()) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'InformationURL');
-				for(lang in entitydescriptor.saml2sp.mdui.informationURL) {
-					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(lang)) {
-						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor.saml2sp.mdui.informationURL[lang]);
+				for(lang in entitydescriptor[endpoint].mdui.informationURL) {
+					if (entitydescriptor[endpoint].mdui.informationURL.hasOwnProperty(lang)) {
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:InformationURL', lang, entitydescriptor[endpoint].mdui.informationURL[lang]);
 					}
 				}
 			}
 			if (entitydescriptor.hasPrivacyStatementURL()) {
 				SAMLmetaJS.XML.wipeChildren(node, SAMLmetaJS.Constants.ns.mdui, 'PrivacyStatementURL');
-				for(lang in entitydescriptor.saml2sp.mdui.privacyStatementURL) {
-					if (entitydescriptor.saml2sp.mdui.privacyStatementURL.hasOwnProperty(lang)) {
-						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:PrivacyStatementURL', lang, entitydescriptor.saml2sp.mdui.privacyStatementURL[lang]);
+				for(lang in entitydescriptor[endpoint].mdui.privacyStatementURL) {
+					if (entitydescriptor[endpoint].mdui.privacyStatementURL.hasOwnProperty(lang)) {
+						SAMLmetaJS.XML.addSimpleLocalizedAttribute(doc, node, SAMLmetaJS.Constants.ns.mdui, 'mdui:PrivacyStatementURL', lang, entitydescriptor[endpoint].mdui.privacyStatementURL[lang]);
 					}
 				}
 			}

@@ -431,6 +431,7 @@
 				entitydescriptor.addPrivacyStatementURL(result.lang, result.value);
 			});
 		},
+
 		validate: function () {
 			var validator = SAMLmetaJS.validatorManager({
 				'div#infoname > div': UI.validateName,
