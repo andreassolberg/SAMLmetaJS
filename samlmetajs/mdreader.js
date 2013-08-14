@@ -790,9 +790,7 @@ parseFromString = function(xmlstring) {
 	}
 
 
-	function parseUIInfo(node) {
-
-		var mdui = {};
+	function parseUIInfo(node, mdui) {
 
 		expectNode(node, 'UIInfo', constants.ns.mdui);
 
@@ -830,12 +828,6 @@ parseFromString = function(xmlstring) {
 					if (!isHTTPS(mdui.logo[lang].location)) {
 						processTest(new TestResult('MDUILogoURLNotHttps', 'Location of Logo should use the https protocol', 0, 1));
 					}
-				}
-			},
-			{
-				namespace: constants.ns.mdui, name: 'GeolocationHint',
-				callback: function(n) {
-					mdui.location = nodeGetTextRecursive(n).substr(4);
 				}
 			},
 			{
@@ -878,9 +870,26 @@ parseFromString = function(xmlstring) {
 			processTest(new TestResult('mduiunknownchild', 'Parsing of this child element of MDUI not yet implemented [' + nodeName(n) + ']'));
 		});
 
-		return mdui;
+	}
+
+	function parseDiscoHintsInfo(node, mdui) {
+
+		expectNode(node, 'DiscoHints', constants.ns.mdui);
+
+		nodeProcessChildren(node, [
+			{
+				namespace: constants.ns.mdui, name: 'GeolocationHint',
+				callback: function(n) {
+					mdui.location = nodeGetTextRecursive(n).substr(4);
+				}
+			}
+		// Fallback
+		], function(n) {
+			processTest(new TestResult('mduiunknownchild', 'Parsing of this child element of MDUI:DiscoHint not yet implemented [' + nodeName(n) + ']'));
+		});
 
 	}
+
 
 	function parseSPSSODescriptorExtensions(node, saml2sp) {
 		expectNode(node, 'Extensions', constants.ns.md);
@@ -890,7 +899,19 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'UIInfo',
 				callback: function(n) {
-					saml2sp.mdui = parseUIInfo(n);
+					if (!saml2sp.mdui) {
+						saml2sp.mdui = {};
+					}
+					parseUIInfo(n, saml2sp.mdui);
+				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'DiscoHints',
+				callback: function(n) {
+					if (!saml2sp.mdui) {
+						saml2sp.mdui = {};
+					}
+					parseDiscoHintsInfo(n, saml2sp.mdui);
 				}
 			},
 			{
