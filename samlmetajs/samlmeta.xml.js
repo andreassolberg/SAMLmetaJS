@@ -156,7 +156,6 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				entitydescriptor.hasLogo() ||
 				entitydescriptor.hasInformationURL() ||
 				entitydescriptor.hasPrivacyStatementURL() ||
-				entitydescriptor.hasLocation() ||
 				entitydescriptor.hasKeywords
 			) {
 				extensions = this.addIfNotExtensions(spdescriptor);
@@ -339,7 +338,7 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				}
 			}
 			SAMLmetaJS.XML.wipeChildren(node.parentNode, SAMLmetaJS.Constants.ns.mdui, 'DiscoHints');
-			if (entitydescriptor.hasLocation()) {
+			if (endpoint === "saml2idp" && entitydescriptor.hasLocation()) {
 				this.addMDUILocation(node.parentNode, entitydescriptor.getLocation());
 			}
 		},
