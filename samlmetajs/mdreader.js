@@ -86,15 +86,16 @@ MDEntityDescriptor.prototype.hasCertOfType = function (type) {
 /*
  * Check if the current entity has a specified property.
  */
-MDEntityDescriptor.prototype.hasProperty = function (property) {
-	var entity;
-	if (hasProp(this, 'saml2sp')) {
-		entity = this.saml2sp;
-	} else {
-		entity = this.saml2idp;
-	}
+MDEntityDescriptor.prototype.hasProperty = function (property, entity) {
 	if (!entity) {
-		return false;
+		if (hasProp(this, 'saml2sp')) {
+			entity = this.saml2sp;
+		} else {
+			entity = this.saml2idp;
+		}
+		if (!entity) {
+			return false;
+		}
 	}
 
 	return hasProp(entity, property);
@@ -103,16 +104,16 @@ MDEntityDescriptor.prototype.hasProperty = function (property) {
 /*
  * Return the specified property from the current entity.
  */
-MDEntityDescriptor.prototype.getProperty = function (property) {
-	var entity;
-	if (hasProp(this, 'saml2sp')) {
-		entity = this.saml2sp;
-	} else {
-		entity = this.saml2idp;
-	}
+MDEntityDescriptor.prototype.getProperty = function (property, entity) {
 	if (!entity) {
-		this.saml2sp = {};
-		entity = this.saml2sp;
+		if (hasProp(this, 'saml2sp')) {
+			entity = this.saml2sp;
+		} else if (hasProp(this, 'saml2idp')) {
+			entity = this.saml2idp;
+		} else {
+			this.saml2sp = {};
+			entity = this.saml2sp;
+		}
 	}
 
 	if (!hasProp(entity, property)) {
@@ -125,11 +126,11 @@ MDEntityDescriptor.prototype.getProperty = function (property) {
 /*
  * Look for a MDUI property in any language.
  */
-MDEntityDescriptor.prototype.hasMDUIProperty = function (property) {
-	var mdui = this.hasProperty('mdui'),
+MDEntityDescriptor.prototype.hasMDUIProperty = function (property, entity) {
+	var mdui = this.hasProperty('mdui', entity),
 		result = false;
 	if (mdui) {
-		mdui = this.getProperty('mdui');
+		mdui = this.getProperty('mdui', entity);
 		result = !isEmpty(mdui) && hasProp(mdui, property) && !isEmpty(mdui[property]);
 	};
 	return result;
@@ -165,7 +166,7 @@ MDEntityDescriptor.prototype.addLogo = function (lang, location, width, height) 
  * Look for location.
  */
 MDEntityDescriptor.prototype.hasLocation = function () {
-	return this.hasMDUIProperty('location');
+	return this.hasMDUIProperty('location', this.saml2idp);
 };
 
 /*
@@ -175,7 +176,7 @@ MDEntityDescriptor.prototype.getLocation = function () {
 	if (!this.hasLocation()) {
 		return null;
 	} else {
-		return this.getProperty('mdui').location;
+		return this.getProperty('mdui', this.saml2idp).location;
 	}
 };
 
@@ -184,7 +185,7 @@ MDEntityDescriptor.prototype.getLocation = function () {
  * nested structures as needed.
  */
 MDEntityDescriptor.prototype.setLocation = function (location) {
-	var mdui = this.getProperty('mdui');
+	var mdui = this.getProperty('mdui', this.saml2idp);
 	mdui.location = location;
 };
 
@@ -908,10 +909,7 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.mdui, name: 'DiscoHints',
 				callback: function(n) {
-					if (!saml2sp.mdui) {
-						saml2sp.mdui = {};
-					}
-					parseDiscoHintsInfo(n, saml2sp.mdui);
+					processTest(new TestResult('extillegalelementdiscohints', 'Illegal element (DiscoHints) in MDUI Extensions at SPSSODescriptor [' + nodeName(n) + ']', 0, 2));
 				}
 			},
 			{
@@ -1031,6 +1029,36 @@ parseFromString = function(xmlstring) {
 		return saml2sp;
 	}
 
+	function parseIDPSSODescriptorExtensions(node, saml2idp) {
+		expectNode(node, 'Extensions', constants.ns.md);
+
+		// Process children of Extensions
+		nodeProcessChildren(node, [
+			{
+				namespace: constants.ns.mdui, name: 'UIInfo',
+				callback: function(n) {
+					if (!saml2idp.mdui) {
+						saml2idp.mdui = {};
+					}
+					parseUIInfo(n, saml2idp.mdui);
+				}
+			},
+			{
+				namespace: constants.ns.mdui, name: 'DiscoHints',
+				callback: function(n) {
+					if (!saml2idp.mdui) {
+						saml2idp.mdui = {};
+					}
+					parseDiscoHintsInfo(n, saml2idp.mdui);
+				}
+			}
+		// Fallback
+		], function(n) {
+			processTest(new TestResult('notimplementedssoext', 'Parsing Extensions at IDPSSODescriptor with [' + nodeName(n) + '] not implemented'));
+			// console.log('Parsing Extensions at SPSSODescriptor with [' + nodeName(n) + '] not implemented...');
+		});
+	}
+
 	function parseSAML2IDP(node) {
 
 		var
@@ -1041,6 +1069,12 @@ parseFromString = function(xmlstring) {
 
 		// Process children of IDPSSODescriptor
 		nodeProcessChildren(node, [
+			{
+				namespace: constants.ns.md, name: 'Extensions',
+				callback: function(n) {
+					parseIDPSSODescriptorExtensions(n, saml2idp);
+				}
+			},
 			{
 				namespace: constants.ns.md, name: 'KeyDescriptor',
 				callback: function(n) {
