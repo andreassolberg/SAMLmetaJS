@@ -551,7 +551,6 @@ isHTTPS = function(string) {
 
 parseFromString = function(xmlstring) {
 
-	var doc = null;
 	var result = {};
 	var entitydescriptor = null;
 
@@ -1317,7 +1316,6 @@ parseFromString = function(xmlstring) {
 	if (xmlstring) {
 		try {
 			validateXML(xmlstring);
-			doc = getDoc(xmlstring);
 			entitydescriptor = parseEntityDescriptor(getDoc(xmlstring));
 		} catch (e) {
 			console.log(e.message);
