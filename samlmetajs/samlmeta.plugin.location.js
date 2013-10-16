@@ -121,10 +121,20 @@
 
 			if (entitydescriptor.hasLocation()) {
 				location = entitydescriptor.getLocation();
-				UI.setLocation(location);
 				spl = location.split(',');
+				if (spl.length !== 2) {
+					spl = location.split('/');
+					if (spl.length !== 2) {
+						// Bad location data
+						return;
+					}
+				}
 				latLng = new google.maps.LatLng(spl[0], spl[1]);
 
+				location = latLng.toString();
+				location = location.substring(1, location.length - 1);
+
+				UI.setLocation(location);
 				map.panTo(latLng);
 				mapmarker.setPosition(latLng);
 				UI.geocodePosition(latLng);

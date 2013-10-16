@@ -551,7 +551,6 @@ isHTTPS = function(string) {
 
 parseFromString = function(xmlstring) {
 
-	var doc = null;
 	var result = {};
 	var entitydescriptor = null;
 
@@ -1317,7 +1316,6 @@ parseFromString = function(xmlstring) {
 	if (xmlstring) {
 		try {
 			validateXML(xmlstring);
-			doc = getDoc(xmlstring);
 			entitydescriptor = parseEntityDescriptor(getDoc(xmlstring));
 		} catch (e) {
 			console.log(e.message);
@@ -1328,23 +1326,29 @@ parseFromString = function(xmlstring) {
 		entitydescriptor = parseEntityDescriptor(getNewDoc());
 	}
 
-
-	if (entitydescriptor.name) {
-		// Everthing is OK with the name. No need to override.
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.name) {
-		entitydescriptor.name = entitydescriptor.saml2sp.mdui.name;
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.name) {
-		entitydescriptor.name = entitydescriptor.saml2sp.acs.name;
+	if (!entitydescriptor.name) {
+		if (entitydescriptor.hasMDUIProperty('name')) {
+			mduiAux = entitydescriptor.getProperty('mdui');
+			entitydescriptor.name = mduiAux.name;
+		} else if (entitydescriptor.hasProperty('acs')) {
+			mduiAux = entitydescriptor.getProperty('acs');
+			if (hasProp(mduiAux, 'name')) {
+				entitydescriptor.name = mduiAux.name;
+			}
+		}
 	}
 
-	if (entitydescriptor.descr) {
-		// Everthing is OK with the name. No need to override.
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.mdui && entitydescriptor.saml2sp.mdui.descr) {
-		entitydescriptor.descr = entitydescriptor.saml2sp.mdui.descr;
-	} else if (entitydescriptor.saml2sp && entitydescriptor.saml2sp.acs && entitydescriptor.saml2sp.acs.descr) {
-		entitydescriptor.descr = entitydescriptor.saml2sp.acs.descr;
+	if (!entitydescriptor.descr) {
+		if (entitydescriptor.hasMDUIProperty('descr')) {
+			mduiAux = entitydescriptor.getProperty('mdui');
+			entitydescriptor.descr = mduiAux.descr;
+		} else if (entitydescriptor.hasProperty('acs')) {
+			mduiAux = entitydescriptor.getProperty('acs');
+			if (hasProp(mduiAux, 'descr')) {
+				entitydescriptor.descr = mduiAux.descr;
+			}
+		}
 	}
-
 
 	if (!entitydescriptor.name) {
 		processTest(new TestResult('noentityname', 'The entity did not include a name', 0, 1));

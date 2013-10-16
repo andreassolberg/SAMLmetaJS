@@ -324,7 +324,12 @@
 		},
 
 		fromXML: function (entitydescriptor) {
-			var l;
+			var entityNode = entitydescriptor.saml2sp,
+				l;
+
+			if (entityNode === undefined) {
+				entityNode = entitydescriptor.saml2idp;
+			}
 
 			UI.clearInfoname();
 			if (entitydescriptor.name) {
@@ -346,36 +351,36 @@
 
 			UI.clearInfologo();
 			if (entitydescriptor.hasLogo()) {
-				for (l in entitydescriptor.saml2sp.mdui.logo) {
-					if (entitydescriptor.saml2sp.mdui.logo.hasOwnProperty(l)) {
-						UI.addInfologo(l, entitydescriptor.saml2sp.mdui.logo[l]);
+				for (l in entityNode.mdui.logo) {
+					if (entityNode.mdui.logo.hasOwnProperty(l)) {
+						UI.addInfologo(l, entityNode.mdui.logo[l]);
 					}
 				}
 			}
 
 			UI.clearInfokeywords();
 			if (entitydescriptor.hasKeywords()) {
-				for (l in entitydescriptor.saml2sp.mdui.keywords) {
-					if (entitydescriptor.saml2sp.mdui.keywords.hasOwnProperty(l)) {
-						UI.addInfokeywords(l, entitydescriptor.saml2sp.mdui.keywords[l]);
+				for (l in entityNode.mdui.keywords) {
+					if (entityNode.mdui.keywords.hasOwnProperty(l)) {
+						UI.addInfokeywords(l, entityNode.mdui.keywords[l]);
 					}
 				}
 			}
 
 			UI.clearInformationURL();
 			if (entitydescriptor.hasInformationURL()) {
-				for (l in entitydescriptor.saml2sp.mdui.informationURL) {
-					if (entitydescriptor.saml2sp.mdui.informationURL.hasOwnProperty(l)) {
-						UI.addInformationURL(l, entitydescriptor.saml2sp.mdui.informationURL[l]);
+				for (l in entityNode.mdui.informationURL) {
+					if (entityNode.mdui.informationURL.hasOwnProperty(l)) {
+						UI.addInformationURL(l, entityNode.mdui.informationURL[l]);
 					}
 				}
 			}
 
 			UI.clearPrivacyStatementURL();
 			if (entitydescriptor.hasPrivacyStatementURL()) {
-				for (l in entitydescriptor.saml2sp.mdui.privacyStatementURL) {
-					if (entitydescriptor.saml2sp.mdui.privacyStatementURL.hasOwnProperty(l)) {
-						UI.addPrivacyStatementURL(l, entitydescriptor.saml2sp.mdui.privacyStatementURL[l]);
+				for (l in entityNode.mdui.privacyStatementURL) {
+					if (entityNode.mdui.privacyStatementURL.hasOwnProperty(l)) {
+						UI.addPrivacyStatementURL(l, entityNode.mdui.privacyStatementURL[l]);
 					}
 				}
 			}
