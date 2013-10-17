@@ -244,7 +244,8 @@ SAMLmetaJS.xmlupdater = function(xmlstring) {
 				[
 					{'localName': 'SingleLogoutService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
 					{'localName': 'AssertionConsumerService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
-					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
+					{'localName': 'AttributeConsumingService', 'namespaceURI': SAMLmetaJS.Constants.ns.md},
+					{'localName': 'NameIDFormat', 'namespaceURI': SAMLmetaJS.Constants.ns.md}
 				]
 			));
 
