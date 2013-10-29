@@ -1239,6 +1239,9 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.md, name: 'SPSSODescriptor',
 				callback: function(n) {
+					if (entity.hasOwnProperty('saml2sp')) {
+						processTest(new TestResult('morethanonesp', 'There is more than one SP, which is unsupported. You may lose data if you continue.', 0 , 2));
+					}
 					entity.saml2sp = parseSAML2SP(n);
 				}
 			},
@@ -1252,6 +1255,9 @@ parseFromString = function(xmlstring) {
 			{
 				namespace: constants.ns.md, name: 'IDPSSODescriptor',
 				callback: function(n) {
+					if (entity.hasOwnProperty('saml2idp')) {
+						processTest(new TestResult('morethanoneidp', 'There is more than one IdP, which is unsupported. You may lose data if you continue.', 0 , 2));
+					}
 					entity.saml2idp = parseSAML2IDP(n);
 				}
 			},
