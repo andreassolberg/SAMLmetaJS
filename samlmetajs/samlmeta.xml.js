@@ -685,7 +685,7 @@ SAMLmetaJS.XML = {
 
 		function isTextElement(element) {
 			for (var child = element.firstChild; child != null; child = child.nextSibling) {
-				if (child instanceof Text) {
+				if (child instanceof Text || child instanceof Comment) {
 					continue;
 				}
 				return false;
@@ -704,21 +704,22 @@ SAMLmetaJS.XML = {
 
 
 		function prettifyElement(element, indentation) {
-			var ret = indentation + '<' + element.nodeName;
+			var ret = indentation + '<' + element.nodeName,
+				attrs = element.attributes;
 
-			var attrIndent = indentation;
-			while (attrIndent.length < ret.length) {
-				attrIndent += ' ';
-			}
-
-			var attrs = element.attributes;
-
-			for (var i = 0; i < attrs.length; i++) {
-				var a = attrs.item(i);
-				if (i > 0) {
-					ret += '\n' + attrIndent;
+			if (attrs.length > 0) {
+				var attrIndent = indentation;
+				while (attrIndent.length < ret.length) {
+					attrIndent += ' ';
 				}
-				ret += ' ' + a.nodeName + '="' + xmlEntities(a.value) + '"';
+
+				for (var i = 0; i < attrs.length; i++) {
+					var a = attrs.item(i);
+					if (i > 0) {
+						ret += '\n' + attrIndent;
+					}
+					ret += ' ' + a.nodeName + '="' + xmlEntities(a.value) + '"';
+				}
 			}
 
 			if (isEmptyElement(element)) {
@@ -738,13 +739,19 @@ SAMLmetaJS.XML = {
 			}
 
 			if (isTextElement(element)) {
-				return ret + xmlEntities(element.textContent) + '</' + element.nodeName + '>\n';
+				var text = element.textContent;
+				if (text.trim) {
+					text = text.trim();
+				} else {
+					text = text.replace(/^\s+|\s+$/g, '');
+				}
+				return ret + xmlEntities(text) + '</' + element.nodeName + '>\n';
 			}
 
 			ret += '\n';
 
 			for (var child = element.firstElementChild; child != null; child = child.nextElementSibling) {
-				ret += prettifyElement(child, indentation + '	 ');
+				ret += prettifyElement(child, indentation + '    ');
 			}
 
 			return ret + indentation + '</' + element.nodeName + '>\n';
